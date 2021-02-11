@@ -1,5 +1,9 @@
 # Hjelpefunksjoner som brukes i norartritt
 
+#' @importFrom magrittr %>%
+#' @importFrom dplyr mutate filter select left_join right_join case_when group_by summarise
+NULL
+
 # Hente sykehusnavn
 # Hente diagnosegrupper
 
@@ -46,14 +50,14 @@ legg_til_medisinnavn = function(d_medisin) {
   medisin_grupper = "medisin-grupper.csv"
   legemiddel_999 = "legemiddel-kodebok.csv"
 
-  medisin_fil = read_delim(paste0(mappe, medisin_grupper),
+  medisin_fil = readr::read_delim(paste0(mappe, medisin_grupper),
     delim = ";",
     trim_ws = TRUE,
     col_types = c("ici__iiiiiicc"),
     locale = locale(encoding = "windows-1252")
   )
 
-  medisin_kode_999 = read_delim(paste0(mappe, legemiddel_999),
+  medisin_kode_999 = readr::read_delim(paste0(mappe, legemiddel_999),
     delim = ";",
     trim_ws = TRUE,
     col_types = c("ic"),
@@ -69,7 +73,7 @@ legg_til_medisinnavn = function(d_medisin) {
       ),
     by = "LegemiddelType"
     ) %>%
-    mutate(medisin = coalesce(Legemiddel, legemiddel_navn)) %>%
+    mutate(medisin = dplyr::coalesce(Legemiddel, legemiddel_navn)) %>%
     left_join(medisin_kode_999, by = c("medisin" = "legemiddel_kodebok")) %>%
     mutate(
       legemiddel_navn_kode =
@@ -91,7 +95,7 @@ legg_til_medisinnavn = function(d_medisin) {
   n_navn = d_medisin %>%
     group_by(legemiddel_navn_kode) %>%
     summarise(
-      n = n_distinct(legemiddel_navn),
+      n = dplyr::n_distinct(legemiddel_navn),
       .groups = "drop"
     ) %>%
     filter(n != 1)
@@ -99,7 +103,7 @@ legg_til_medisinnavn = function(d_medisin) {
   if (!nrow(n_navn) == 0) {
     stop(paste0(
       "LegemiddelType ",
-      str_c(n_navn$legemiddel_navn_kode, collapse = ", "),
+      stringr::str_c(n_navn$legemiddel_navn_kode, collapse = ", "),
       " har flere navn for samme kode"
     ))
   }
