@@ -29,8 +29,9 @@
 #' @return
 #' Returnerer opprinnelig datasett i tillegg til ekstra informasjon om
 #' de ulike medisinene som registreres. Legemiddelnavn legges til, indikator
-#' for om medisinen er biologisk, dmard, csdmard, tsdmard	og en egen
-#' indikator for biologiske og tsdmard legges alle til opprinnelig datasett.
+#' for om medisinen er biologisk, dmard, csdmard, tsdmard, en egen
+#' indikator for "biologiske og tsdmard" og virkestoffnavn legges alle
+#' til opprinnelig datasett.
 #'
 #' @export
 #'
@@ -48,7 +49,7 @@ legg_til_medisinnavn = function(d_medisin) {
   medisin_fil = read_delim(paste0(mappe, medisin_grupper),
     delim = ";",
     trim_ws = TRUE,
-    col_types = c("ici__iiiiiic"),
+    col_types = c("ici__iiiiiicc"),
     locale = locale(encoding = "windows-1252")
   )
 
