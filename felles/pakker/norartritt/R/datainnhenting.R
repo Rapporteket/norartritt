@@ -66,8 +66,6 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
 
   # les inn data
   les_inn_data = function(skjema_id, kb = kb, dato = parent.frame()$dato, versjon = parent.frame()$versjon) {
-
-    # Se hva det er som skjer i denne funksjonen.
     d = rapwhale::les_dd_mrs(mappe_dd, dato = parent.frame()$dato, versjon = parent.frame()$versjon, skjema_id = skjema_id, kodebok = kb)
 
     # returnerer dataene
