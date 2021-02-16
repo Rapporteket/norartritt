@@ -17,7 +17,8 @@ NULL
 #' Kobler på legemiddelnavn og ekstra informasjon om medisiner registrert
 #' i NorArtritt til medisindata.
 #'
-#' @param d medisindata fra NorArtritt. Må inneholde kolonnen LegemiddelType.
+#' @param d_medisin medisindata fra NorArtritt.
+#' Må inneholde kolonnen LegemiddelType.
 #'
 #' @details
 #' På grunn av måten data overføres fra GoTreatIt til registeret er det
@@ -32,16 +33,27 @@ NULL
 #'
 #' @return
 #' Returnerer opprinnelig datasett i tillegg til ekstra informasjon om
-#' de ulike medisinene som registreres. Legemiddelnavn legges til, indikator
-#' for om medisinen er biologisk, dmard, csdmard, tsdmard, en egen
-#' indikator for "biologiske og tsdmard" og virkestoffnavn legges alle
-#' til opprinnelig datasett.
+#' de ulike medisinene som registreres. Nye variabler som legges til er:
+#' * \strong{legemiddel_navn}	Navn på formatet `legemiddelnavn (virkestoff)`.
+#' * \strong{legemiddel_navn_kode}	Heltallskode for gruppering av legemiddel_navn.
+#' * \strong{biokat}	Indikator for om legemiddel er biologisk. Tar verdien 0 eller 1.
+#' * \strong{dmard}	Indikator for om legemiddel er dmard
+#' (disease modifying antirheumatic drugs). Tar verdien 0 eller 1.
+#' * \strong{csdmard}	Indikator for om legemiddel er csdmard
+#' (conventional synthetic disease modifying antirheumatic drugs).
+#' Tar verdien 0 eller 1.
+#' * \strong{tsdmard}	Indikator for om legemiddel er tsdmard (targeted synthetic disease modifying antirheumatic drugs). Tar verdien 0 eller 1.
+#' * \strong{bio_og_tsdmard}	Indikator for om legemiddel er enten biologisk eller tsdmard.
+#' Tar verdien 0 eller 1.
+#' * \strong{legemiddel_gruppert} Heltallskode for gruppering av enkelte legemidler.
+#' * \strong{legemiddel_gruppert_navn}	Navn for legemiddel som brukes i de tilfeller
+#' hvor legemiddel er gruppert. For eksempel slås alle de ulike medisinene med
+#' virkestoff infliximab sammen til en gruppe.
+#' * \strong{Virkestoffnavn} Navn på virkestoff alene.
 #'
 #' @export
-#'
 #' @examples
 #' # d_medisin er medisindata fra NorArtritt.
-#'
 #' d_medisin_med_navn = legg_til_medisinnavn(d_medisin)
 legg_til_medisinnavn = function(d_medisin) {
 
