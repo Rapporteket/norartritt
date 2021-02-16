@@ -54,6 +54,7 @@ NULL
 #' @export
 #' @examples
 #' # d_medisin er medisindata fra NorArtritt.
+#'
 #' d_medisin_med_navn = legg_til_medisinnavn(d_medisin)
 legg_til_medisinnavn = function(d_medisin) {
 
@@ -121,4 +122,60 @@ legg_til_medisinnavn = function(d_medisin) {
   }
 
   d_medisin
+}
+
+#' Legg til sykehusnavn
+#'
+#' Kobler på sykehusnavn for bruk i analyser og rapporter.
+#'
+#' @param d Datasett fra NorArtritt. Må inneholde
+#' kolonnen UnitId som tilsvarer RESH-id for de ulike avdelingene.
+#'
+#' @details
+#' NorArtritt har allerede variabler for sykehusnavn og sykehuskortnavn i
+#' registeret, men disse variablene er mangelfulle. På grunn av det har vi
+#' laget en egen tabell på kvalitetsserver hvor vi har oppdaterte og riktige
+#' koblinger mellom UnitId og sykehusnavn. Det gjør det også enklere for oss
+#' å gruppere sykehus etter ulike kriterier. Ved endringer i inkluderte sykehus
+#' eller RESH-id'er er det denne tabellen som må oppdateres for å få riktige
+#' navn i rapporter og analyser.
+#'
+#' @return
+#' Returnerer opprinnelig datasett i tillegg til ekstra informasjon hentet fra
+#' sykehustabell på kvalitetsserver. Nye variabler er:
+#' * \strong{sykehusnavn} Fullt sykehusnavn.
+#' Eksempel Haukeland universitetssykehus.
+#' * \strong{sykehus_kortnavn} Forkortet sykehusnavn. Eksempelvis er
+#' Haukeland universitetssykehus forkortet til HUS.
+#' * \strong{sykehus_gruppe} Heltallskode for gruppering av sykehus. Primært
+#' for å samle Avtalespesialister i en gruppe.
+#' * \strong{sykehus_gruppe_navn} Navn tilknyttet heltallskode
+#' i `sykehus_gruppe`.
+#'
+#' @export
+#' @examples
+#' # d er datasett fra NorArtritt som inneholder variabelen UnitId
+#'
+#' d_med_sykehusnavn = legg_til_sykehusnavn(d)
+legg_til_sykehusnavn = function(d) {
+  adresse = paste0(***FJERNET ADRESSE***)
+  sykehus_navnefil = read_delim(adresse,
+    delim = ";",
+    col_types = c("iccic_"),
+    locale = locale(encoding = "windows-1252")
+  )
+
+  d = d %>%
+    left_join(sykehus_navnefil, by = c("UnitId" = "resh_id"))
+
+  if (any(is.na(d$sykehusnavn))) {
+    stop(paste0(
+      "Det mangler kobling for UnitId: ",
+      stringr::str_c(d %>%
+        filter(is.na(sykehusnavn)) %>%
+        distinct(UnitId) %>%
+        pull(UnitId), collapse = ", ")
+    ))
+  }
+  d
 }
