@@ -158,7 +158,7 @@ legg_til_medisinnavn = function(d_medisin) {
 #'
 #' d_med_sykehusnavn = legg_til_sykehusnavn(d)
 legg_til_sykehusnavn = function(d) {
-  adresse = paste0(***FJERNET ADRESSE***)
+  adresse = ***FJERNET ADRESSE***
   sykehus_navnefil = read_delim(adresse,
     delim = ";",
     col_types = c("iccic_"),
@@ -177,5 +177,103 @@ legg_til_sykehusnavn = function(d) {
         pull(UnitId), collapse = ", ")
     ))
   }
+  d
+}
+
+
+#' Legg til diagnosegrupper
+#'
+#' Legger til ekstra kolonner for diagnoser til diagnosedata fra NorArtritt.
+#'
+#' @param d Diagnosedatasett fra NorArtritt. Må inneholde variablene Kode og Navn.
+#'
+#' @details
+#' Funksjonen leser inn en diagnosefil fra NorArtritts kvalitetsserver.
+#' Denne filen inneholder koblinger for alle diagnosene som er brukt i analyser
+#' for NorArtritt, i tillegg til variabler for å gruppere diagnoser
+#' etter ulike kriterier. For eksempel er kodene M058, M059 og M060 samlet til
+#' en gruppe 'Revmatoid Artritt'.
+#' 'Leddsykdom' legges også i riktig grupper
+#' selv om diagnosen ikke har en egen kode i registeret.
+#' Ved endringer i hvilke diagnoser som inkluderes i
+#' analyser er det i denne filen vi må oppdatere koblingene.
+#'
+#' @return
+#' Returnerer inndata men med ekstra variabler med utbedret diagnoseinformasjon.
+#' Nye variabler er:
+#' * \strong{diaggrupper_med} Heltallskode for de ulike diagnosegruppene. Det er
+#' vanligvis denne inndelingen som brukes i NorArtritts analyser og rapporter.
+#' Delt inn i 8 diagnosegrupper.
+#' * \strong{diaggrupper_med_tekst} Diagnosenavn tilhørende de ulike
+#' heltallskodene i `diaggrupper_med`.
+#' * \strong{diaggrupper_rem} Heltallskode for inndeling i diagnosegrupper brukt
+#' i sammenheng med beregning av remisjon. Disse måles på ulike måter, angitt i
+#' variabelen `rem_maal`.
+#' * \strong{diaggrupper_rem_tekst} Diagnosenavn tilknyttet heltallskodene
+#' angitt i `diaggrupper_rem`.
+#' * \strong{rem_maal} Navn for remisjonsmål knyttet heltallskoden i
+#' `diaggrupper_rem`. Er enten DAS28-CRP eller ASDAS-CRP avhengig av diagnosen.
+#' * \strong{diaggrupper_hoved} Heltallskode for en alternativ diagnoseinndeling,
+#' hvor diagnosene er delt i 5 grupper.
+#' * \strong{diaggrupper_hoved_tekst} Diagnosenavn tilknyttet kodene angitt i
+#' `diaggrupper_hoved`.
+#' * \strong{perifer_aksial_diaggruppe} Heltallskode for en diagnoseinndeling
+#' for perifer aksial artritt. Delt inn i 3 grupper.
+#' * \strong{perifer_aksial_diaggruppe_tekst} Gruppenavn for diagnosene delt etter
+#' heltallskoden i `perifer_aksial_diaggruppe`.
+#'
+#' @export
+#' @examples
+#' # d_diagnose er diagnosedata fra NorArtritt
+#' d_med_diagnosedata = legg_til_diagnosegrupper(d_diagnose)
+legg_til_diagnosegrupper = function(d) {
+  adresse = ***FJERNET ADRESSE***
+  diagnosegrupper = read_delim(adresse,
+    delim = ";",
+    col_types = c("ciciccicic"),
+    locale = locale(encoding = "windows-1252")
+  )
+
+  d = d %>%
+    left_join(diagnosegrupper, by = "Kode")
+
+  # Leddsykdom har ikke kode i registeret, så den må håndteres manuelt.
+  d = d %>%
+    mutate(
+      diaggrupper_med =
+        replace(
+          diaggrupper_med,
+          Navn == "Leddsykdom", 8L
+        ),
+      diaggrupper_med_tekst =
+        replace(
+          diaggrupper_med_tekst,
+          Navn == "Leddsykdom",
+          "Andre kroniske artritter"
+        ),
+      diaggrupper_hoved =
+        replace(
+          diaggrupper_hoved,
+          Navn == "Leddsykdom", 5L
+        ),
+      diaggrupper_hoved_tekst =
+        replace(
+          diaggrupper_hoved_tekst,
+          Navn == "Leddsykdom",
+          "Andre kroniske artritter"
+        ),
+      perifer_aksial_diaggruppe =
+        replace(
+          perifer_aksial_diaggruppe,
+          Navn == "Leddsykdom", 3L
+        ),
+      perifer_aksial_diaggruppe_tekst =
+        replace(
+          perifer_aksial_diaggruppe_tekst,
+          Navn == "Leddsykdom",
+          "Udifferensiert"
+        )
+    )
+
   d
 }
