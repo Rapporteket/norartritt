@@ -1,7 +1,7 @@
 # Hjelpefunksjoner som brukes i norartritt
 
 #' @importFrom magrittr %>%
-#' @importFrom dplyr mutate filter select left_join right_join case_when group_by summarise
+#' @importFrom dplyr mutate filter select left_join right_join case_when group_by summarise ungroup
 NULL
 
 # Hente sykehusnavn
@@ -274,6 +274,50 @@ legg_til_diagnosegrupper = function(d) {
           "Udifferensiert"
         )
     )
+
+  d
+}
+
+
+
+#' Velg tidligste inklusjondato
+#'
+#' Velger den tidligste av alle ulike inklusjonsdatoer oppgitt på
+#' inklusjons- og oppfølgingsskjema i NorArtritt.
+#'
+#' @details
+#' Inklusjons- og oppfølgingsskjema i NorArtritt har en variabel kalt
+#' `InklusjonDato` som angir hvilken dato pasienten først ble inkludert i
+#' registeret. Denne datoen skulle i realiteten vært identisk for alle
+#' oppføringer for en pasient, men det er ikke tilfellet. Denne funksjonen
+#' velger ut den tidligste registrerte `InklusjonDato` for hver pasient og
+#' skriver over alle senere/manglende datoer i andre skjema.
+#' Hvis en pasient aldri har fått registrert inklusjonsdato returneres NA for
+#' denne pasienten.
+#'
+#' @param d_inkl_oppf Sammenkoblet datasett som inneholder alle aktuelle
+#' inklusjons- og oppfølgingsskjema for pasientgruppen.
+#'
+#' @return
+#' Returnerer inndata med oppdatert `InklusjonDato` for alle pasienter.
+#' @export
+#'
+#' @examples
+#' # d_inkl_oppf er sammenslått datasett med inklusjons- og oppfølgingsskjema
+#' d_inkl_oppf_dato = velg_tidligste_inklusjondato(d_inkl_oppf)
+velg_tidligste_inklusjondato = function(d_inkl_oppf) {
+  min_na = function(x) {
+    if (all(is.na(x))) {
+      x[NA]
+    } else {
+      min(x, na.rm = TRUE)
+    }
+  }
+
+  d = d_inkl_oppf %>%
+    group_by(PasientGUID) %>%
+    mutate(InklusjonDato = as.Date(min_na(InklusjonDato))) %>%
+    ungroup()
 
   d
 }
