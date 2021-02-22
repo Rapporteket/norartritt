@@ -306,24 +306,40 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
   d_rem_totalt
 }
 
-# andel RA pasienter som er til kontroll innen 3 mnd
+#' Indikator for andel pasienter som er til kontroll innen 3 mnd
+#'
+#' @description
+#' Indikatoren viser andelen av pasientene diagnostisert med Revmatoid Artritt
+#' som siste diagnose i 2014 eller senere, som får første oppfølging
+#' innen 3 mnd (90 dager) av diagnosedato.
+#'
+#' @details
+#' For pasienter som har inklusjonsskjema 7-90 dager etter diagnose regnes
+#' inklusjonsskjema som første kontroll.
+#'
+#'
+#' @param d_inkl_oppf Sammenkoblet inklusjon- og oppfølgingsdatasett
+#' @param d_diag Diagnosedatasett
+#'
+#' @return
+#' Returnerer en tibble med følgende variabler:
+#' * \strong{PasientGUID} Pasientidentifikator
+#' * \strong{ki_krit_teller} Indikator for om pasienten oppfyller
+#' kriterier for teller. Kan ta verdiene TRUE, FALSE.
+#' * \strong{ki_krit_nevner} Indikator for om pasienten oppfyller
+#' kriterier for nevner. Kan ta verdiene TRUE eller FALSE.
+#' * \strong{...} Eventuelle grupperingsvariabler
+#' @export
+#'
+#' @examples
+#' # d_inkl_oppf er sammenkoblet inklusjons- og oppfølgingsdatasett og
+#' # d_diag er diagnosedatasett
+#' d_ki_kontroll = ki_kontroll(d_inkl_oppf, d_diag)
 ki_kontroll = function(d_inkl_oppf, d_diag) {
 
-  # Skal se på andelen pasienter diagnostisert med RA i 2014 eller senere (som
-  # siste diagnose) som var til kontroll innen 3 mnd av diagnosedato. (90 dager)
-  # InklusjonDato må være maks 90 dager etter diagnosedato.
-  # Vi trenger datoer for diagnose, inklusjon og kontroll.
-
-  # Hvis pasienten har inklusjonsskjema 7-28 dager etter diagnose anses det som første kontroll.
-  # Hvis pasienten har inklusjonsskjema 0-7 eller 29-90 dager etter diagnose anses første oppfølgingsskjema som første kontroll.
-
-  # Nevner:
-  # RA som siste diagnose, satt i 2014 eller senere
-  # DatoInklusjon - dato_diagnose <= 90
-
-  # Teller:
-  # Samme som over, men må også ha hatt en kontroll i tidsrommet 0-90 dager etter diagnose.
-
+  # FIXME - støtte for grupperingsvariabler
+  # FIXME - fixme's fra QA under.
+  # FIXME - støtte for annen identifikator enn PasientGUID.
   # Pasienter som oppfyller kriterier for diagnose og diagnosetidspunkt.
   id_diagnose = d_diag %>%
     group_by(PasientGUID) %>%
