@@ -1,49 +1,79 @@
 # Kvalitetsindikatorer for NorArtritt
 
-# TODO
-# hente over alle funksjonene slik de ligger i datainnhenting-norartritt.R
-# Skrive fullstendig dokumentasjon
-# Lage tester for alle indikatorfunksjonene så langt det lar seg gjøre
-# Forenkle funksjonene
-
-# Kvalitetsindikatoren er "Andel pasienter som får sykdomsmodifiserende medisin innen 2 uker av diagnosedato".
+#' Kvalitetsindikator for tidlig oppstart av behandling
+#'
+#' @description
+#' Lager KI-datasett for om en pasient fikk tidlig oppstart av behandling.
+#'
+#' @details
+#' Indikatoren viser andelen pasienter som får sykdomsmodifiserende medisin
+#' innen 2 uker av diagnosedato.
+#' Det er en del begrensninger for hvilke pasienter som skal inkluderes.
+#' For å inkluderes i nevner må følgende kriterier være oppfylt:
+#' * Pasienten må ha Revmatoid Artritt som eneste registrerte diagnose.
+#' * Pasienten må være diagnostisert i 2014 eller senere.
+#' * Tid fra diagnose til inklusjon i registeret må være under eller lik 90 dager.
+#'
+#' For å inkluderes i teller må de da i tillegg ha begynt på sykdomsmodifiserende
+#' medisin innen 2 uker av diagnosedato.
+#'
+#' @param d_inklusjon Inklusjonsdatasett
+#' @param d_diagnose Diagnosedatasett
+#' @param d_medisin Medisindatasett
+#'
+#' @return
+#' Returnerer en tibble med følgende variabler:
+#' * \strong{PasientGUID} PasientID
+#' * \strong{ki_krit_teller} Indikator for om pasienten oppfyller kriterier for teller.
+#' Kan ta verdiene TRUE, FALSE.
+#' * \strong{ki_krit_nevner} Indikator for om pasienten oppfyller kriterier for nevner.
+#' Kan ta verdiene TRUE eller FALSE.
+#' * \strong{...} Eventuelle grupperingsvariabler blir også med i utdata.
+#'
+#' Pasientene kan ha flere rader hvor ki_krit_teller har ulike besvarelse. For
+#' eksempel kan en pasient ha startet på to medisiner innen 2 uker, men kun
+#' en av medisinene er en sykdomsmodifiserende medisin. Utdata er da filtrert
+#' slik at rader hvor ki_krit_nevner og ki_krit_teller er TRUE er prioritert.
+#'
+#' @export
+#'
+#' @examples
+#' # d_inkl, d_diag og d_medisin er henholdsvis
+#' # inklusjonsdata, diagnosedata og medisindata for NorArtitt.
+#' d_ki_sykmod = ki_sykmod(d_inkl, d_diag, d_medisin)
 ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
 
-  # Kvalitetsindikatoren er "Andel pasienter som får sykdomsmodifiserende medisin innen 2 uker av diagnosedato".
-
-  # Indikatoren ser på andel pasienter med Revmatoid Artritt som får sykdomsmodifiserende medisin innen 2 uker av diagnosedato.
-  # For å inkluderes i nevner må følgende kriterier være oppfylt.
-
-  # - Revmatoid Artritt (diaggrupper_med == 1) som eneste diagnose (Pasienter med flere diagnoser ekskluderes).
-  # - Pasienten har fått stilt diagnose i 2014 eller senere.
-  # - Tid fra diagnose til inklusjon i registeret er under eller lik 90 dager
-  #
-  # For å inkluderes i teller:
-  # - Må i tillegg til overnevnte kriterier også ha startet på en sykdomsmodifiserende
-  #   medisin i løpet av de første 14 dagene etter diagnosedato.
-
-  # Funksjonen returnerer en tibble med følgende variabler:
-  # PasientGUID, UnitId, diag_stilt_aar, ki_krit_teller, ki_krit_nevner
-  # Alle pasienter vil ha en rad i utdata hvor ki_krit_nevner og ki_krit_teller er TRUE eller FALSE
-  # Pasienter som ikke har revmatoid artritt vil da ha både teller og nevner satt til FALSE.
-  # For pasienter med flere medisinforløp er det sortert slik at oppføringer med TRUE
-  # på ki_krit_teller og/eller ki_krit_nevner beholdes.
-
-  # FIXME - Lage NorArtritt-pakke og flytte denne funksjonen dit. (Sammen med funksjoner for innlesning av data)
-  # FIXME - Vurder behov for å lage nye dataobjekter for å forenkle kobling i diverse figurer/beregninger.
+  # FIXME - Vurder behov for å lage nye dataobjekter for å forenkle
+  # kobling i diverse figurer/beregninger.
+  # FIXME - Oppdatere bruk av sykehusnavn og legemiddel_navn.
+  # Må enten bruke nye funksjonene for å hente navn, eller ta utgangspunkt i at
+  # det gjøres i preprosseseringsfunksjon (som ikke er laget ferdig enda).
 
   # Sykdomsmodifiserende midler:
   sykmod_medisin = c(1:8, 10:12, 14:16, 18, 20, 22, 24:26, 28:32)
 
   # Koble på inklusjonsskjema for å hente ut inklusjonstidspunkt og sykehustilhørighet
-  # !Fixme - lage funksjon for å koble på sykehusnavn, det skal ikke være med på inklusjonsskjema i utgangspunktet.
-  # Legg det inn der det trengs ved å joine på UnitId.
   d_inkl_diag_med = d_diagnose %>%
-    left_join(d_inklusjon %>% select(PasientGUID, InklusjonDato, sykehusnavn, sykehus_kortnavn), by = "PasientGUID") %>%
-    left_join(d_medisin %>% select(PasientGUID, StartDato, legemiddel_navn, legemiddel_navn_kode), by = "PasientGUID") %>%
-    mutate(dager_fra_diag_til_inkl = as.numeric(as_date(InklusjonDato) - dato_diag))
+    left_join(d_inklusjon %>%
+      select(
+        PasientGUID, InklusjonDato,
+        sykehusnavn, sykehus_kortnavn
+      ),
+    by = "PasientGUID"
+    ) %>%
+    left_join(d_medisin %>%
+      select(
+        PasientGUID, StartDato,
+        legemiddel_navn, legemiddel_navn_kode
+      ),
+    by = "PasientGUID"
+    ) %>%
+    mutate(
+      dager_fra_diag_til_inkl =
+        as.numeric(as_date(InklusjonDato) - dato_diag)
+    )
 
-  # Skal se på pasienter som kun har én diagnose, så lager en variabel n_diag for antall diagnoser
+  # Skal se på pasienter som kun har én diagnose
   d_ki_n_diag = d_inkl_diag_med %>%
     group_by(PasientGUID) %>%
     mutate(n_diag = n_distinct(diaggrupper_med)) %>%
@@ -69,7 +99,10 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
-    select(PasientGUID, UnitId, diag_stilt_aar, ki_krit_teller, ki_krit_nevner, tid_til_oppstart_medisin, dato_diag) %>%
+    select(
+      PasientGUID, UnitId, diag_stilt_aar, ki_krit_teller,
+      ki_krit_nevner, tid_til_oppstart_medisin, dato_diag
+    ) %>%
     ungroup()
 
   d_ki
