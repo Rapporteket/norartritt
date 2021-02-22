@@ -56,23 +56,15 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
   # Koble på inklusjonsskjema for å hente ut inklusjonstidspunkt og sykehustilhørighet
   d_inkl_diag_med = d_diagnose %>%
     left_join(d_inklusjon %>%
-      select(
-        PasientGUID, InklusjonDato,
-        sykehusnavn, sykehus_kortnavn
-      ),
-    by = "PasientGUID"
-    ) %>%
+                select(PasientGUID, InklusjonDato,
+                       sykehusnavn, sykehus_kortnavn),
+              by = "PasientGUID") %>%
     left_join(d_medisin %>%
-      select(
-        PasientGUID, StartDato,
-        legemiddel_navn, legemiddel_navn_kode
-      ),
-    by = "PasientGUID"
-    ) %>%
-    mutate(
-      dager_fra_diag_til_inkl =
-        as.numeric(as_date(InklusjonDato) - dato_diag)
-    )
+                select(PasientGUID, StartDato,
+                       legemiddel_navn, legemiddel_navn_kode),
+              by = "PasientGUID") %>%
+    mutate(dager_fra_diag_til_inkl =
+             as.numeric(as_date(InklusjonDato) - dato_diag))
 
   # Skal se på pasienter som kun har én diagnose
   d_ki_n_diag = d_inkl_diag_med %>%
@@ -83,27 +75,23 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
   # Lage ki_krit_nevner
   d_ki_med_krit_nevner = d_ki_n_diag %>%
     mutate(ki_krit_nevner = n_diag == 1 &
-      diaggrupper_med == 1 &
-      diag_stilt_aar >= 2014 &
-      dager_fra_diag_til_inkl >= 0 &
-      dager_fra_diag_til_inkl <= 90)
+             diaggrupper_med == 1 &
+             diag_stilt_aar >= 2014 &
+             dager_fra_diag_til_inkl >= 0 &
+             dager_fra_diag_til_inkl <= 90)
 
   # Legge til teller og reduserer til en rad per pasient
   d_ki = d_ki_med_krit_nevner %>%
-    mutate(
-      tid_til_oppstart_medisin = StartDato - dato_diag,
-      ki_krit_teller = ki_krit_nevner &
-        legemiddel_navn_kode %in% sykmod_medisin &
-        tid_til_oppstart_medisin >= 0 &
-        tid_til_oppstart_medisin <= 14
-    ) %>%
+    mutate(tid_til_oppstart_medisin = StartDato - dato_diag,
+           ki_krit_teller = ki_krit_nevner &
+             legemiddel_navn_kode %in% sykmod_medisin &
+             tid_til_oppstart_medisin >= 0 &
+             tid_til_oppstart_medisin <= 14) %>%
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
-    select(
-      PasientGUID, UnitId, diag_stilt_aar, ki_krit_teller,
-      ki_krit_nevner, tid_til_oppstart_medisin, dato_diag
-    ) %>%
+    select(PasientGUID, UnitId, diag_stilt_aar, ki_krit_teller,
+           ki_krit_nevner, tid_til_oppstart_medisin, dato_diag) %>%
     ungroup()
 
   d_ki
@@ -111,6 +99,7 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
 
 #' Kvalitetsindikator for andel pasienter som bruker en medisin
 #'
+#' @description
 #' Indikatoren viser andelen pasienter som bruker en gitt medisin i løpet av
 #' et år.
 #'
@@ -144,22 +133,19 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
   # FIXME - Fjerne avhengighet av PasientGUID (må kunne ta inn fødselsnummer også).
   d_ki = d_diagnose %>%
     left_join(d_medisin %>%
-      select(
-        PasientGUID, StartDato,
-        SluttDato, startaar, sluttaar, legemiddel_navn,
-        legemiddel_navn_kode
-      ), by = "PasientGUID") %>%
+                select(PasientGUID, StartDato,
+                       SluttDato, startaar, sluttaar, legemiddel_navn,
+                       legemiddel_navn_kode), by = "PasientGUID") %>%
     mutate(ki_krit_nevner = diaggrupper_med == 1 &
-      diag_stilt_aar <= aarstall)
+             diag_stilt_aar <= aarstall)
 
-  d_ki_med_krit = d_ki %>%
-    filter(ki_krit_nevner) %>%
+  d_ki_med_krit = d_ki %>% filter(ki_krit_nevner) %>%
     mutate(ki_krit_teller = ki_krit_nevner &
-      legemiddel_navn_kode %in% legemiddel &
-      !is.na(legemiddel_navn_kode) &
-      !is.na(startaar) &
-      startaar <= aarstall &
-      (sluttaar >= aarstall | is.na(SluttDato))) %>%
+             legemiddel_navn_kode %in% legemiddel &
+             !is.na(legemiddel_navn_kode) &
+             !is.na(startaar) &
+             startaar <= aarstall &
+             (sluttaar >= aarstall | is.na(SluttDato))) %>%
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
@@ -169,65 +155,83 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
   d_ki_med_krit
 }
 
-# Andel RA-pasienter som oppnår remisjon 1 år etter diagnose.
+#' Andel RA-pasienter som oppnår remisjon 1 år etter diagnose.
+#'
+#' @description
+#' Indikatoren viser andelen pasienter med RA som har oppnådd remisjon 1 år
+#' etter diagnosedato.
+#'
+#' @details
+#' `tisdrom_start` og `tidsrom_slutt` indikerer start og slutt for hva som skal
+#' regnes som 1-års kontroll i NorArtritt da det ikke er en fast kontroll etter
+#' 1 år. Pasienten må ha RA som siste diagnose, stilt i 2014 eller senere.
+#' Pasienten må ha hatt diagnosen i minst 1 år ved datadumpdato, og ha vært
+#' til kontroll i tidsrommet avgrenset med `tidsrom_start` og `tidsrom_slutt`.
+#' I tillegg kan ingen av variablene for ACR-EULAR målingene være missing.
+#' For å inkluderes i teller må også følgende krav være oppfylt for ACR-EULAR:
+#' * 1 eller færre ømme ledd.
+#' * 1 eller færre hovne ledd.
+#' * Crp <= 10.
+#' * Globalsykdomsaktivitet <= 10.
+#'
+#' @param d_diag Diagnosedatasett.
+#' @param d_inkl_oppf Sammenslått inklusjon- og oppfølgingsdatasett.
+#' @param tidsrom_start Nedre grense av tidsrom for beregning av hva som er 1-års
+#' kontroll. Antall dager etter diagnose.
+#' @param tidsrom_slutt Øvre grense av tidsrom for beregning av hva som er 1-års
+#' kontroll. Antall dager etter diagnose.
+#'
+#' @return
+#' Returnerer et datasett med følgende variabler:
+#' * \strong{PasientGUID} Pasientidentifikator.
+#' * \strong{ki_krit_teller} Indikator for om pasienten oppfyller
+#' kriterier for teller. Kan ta verdiene TRUE, FALSE.
+#' * \strong{ki_krit_nevner} Indikator for om pasienten oppfyller
+#' kriterier for nevner. Kan ta verdiene TRUE eller FALSE.
+#' * \strong{...} Eventuelle grupperingsvariabler blir også med i utdata.
+#'
+#' @export
+#'
+#' @examples
+#' d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
+#' d_ki_remisjon = ki_remisjon(d_diag, d_inkl_oppf)
 ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
 
-  # Indikator som ser på hvor stor andel av pasientene med
-  # Revmatoid Artritt (diaggrupper_med == 1)
-  # som oppnår remisjon ved kontroll 1 år etter diagnose
-  # 1 år regnes her som tidsrommet 180-485 dager etter diagnose.
-
-  # For å inkluderes i nevner på pasienten ha Revmatoid Artritt som siste diagnose,
-  # og diagnosen må være stilt i 2014 eller senere.
-  # Pasienten må også ha hatt diagnosen i minimum 365 dager ved datadump-dato,
-  # og pasienten må ha vært til kontroll i tidsrommet 180-485 dager etter diagnose.
-  # Ingen av målingene for acreular-kriteriene kan være NA
-
-  # For å inkluderes i teller skal alle kriteriene for nevner være oppfylt,
-  # og i tillegg må pasienten oppfylle krav for remisjon gitt ved acr-eular kriteriene.
-  # Kriteriene her er:
-  # - 1 eller færre ømme ledd,
-  # - 1 eller færre hovne ledd,
-  # - Crp <= 10,
-  # - globalsykdomsaktivitet <= 10.
-
   # FIXME - Dato for datadump må hentes dynamisk!
+  # FIXME - Legge inn støtte for grupperingsvariabler.
+  # FIXME - Validering og håndtering av variabler med "mrs_" prefiks.
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
   id_diagnose = d_diag %>%
     select(PasientGUID, diaggrupper_med, dato_diag, diag_stilt_aar, dager_diag_til_datadump) %>%
     arrange(desc(dato_diag)) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
-    filter(
-      diaggrupper_med == 1,
-      diag_stilt_aar >= 2014,
-      dager_diag_til_datadump >= 365
-    ) %>%
+    filter(diaggrupper_med == 1,
+           diag_stilt_aar >= 2014,
+           dager_diag_til_datadump >= 365) %>%
     pull(PasientGUID)
 
   # Kobler diagnosedata med skjema for de ulike kontrollene for hver pasient i utvalget.
   d = d_inkl_oppf %>%
-    left_join(d_diag %>% select(
-      PasientGUID, diaggrupper_med, dato_diag,
-      dager_diag_til_datadump, diag_stilt_aar
-    ), by = "PasientGUID") %>%
-    mutate(dager_siden_diagnose = ymd(dato_ktrl) - ymd(dato_diag)) %>%
+    left_join(d_diag %>% select(PasientGUID, diaggrupper_med, dato_diag,
+                                dager_diag_til_datadump, diag_stilt_aar), by = "PasientGUID") %>%
+    mutate(dager_siden_diagnose = ymd(dato_ktrl)-ymd(dato_diag)) %>%
     mutate(ki_krit_nevner = PasientGUID %in% id_diagnose &
-      dager_siden_diagnose >= tidsrom_start &
-      dager_siden_diagnose <= tidsrom_slutt &
-      !(is.na(mrs_OmmeLeddAntall)) &
-      !(is.na(mrs_HovneLeddAntall)) &
-      !(is.na(Crp)) &
-      !(is.na(PasientGlobalSykdomsaktivitet)))
+             dager_siden_diagnose >= tidsrom_start &
+             dager_siden_diagnose <= tidsrom_slutt &
+             !(is.na(mrs_OmmeLeddAntall)) &
+             !(is.na(mrs_HovneLeddAntall)) &
+             !(is.na(Crp)) &
+             !(is.na(PasientGlobalSykdomsaktivitet)))
 
   # Finner hvem som oppfyller krav for teller og reduserer til en rad per pasient.
   d_ki_rem = d %>%
     mutate(ki_krit_teller = ki_krit_nevner &
-      mrs_OmmeLeddAntall <= 1 & # fixme (QA): Produksjonskode bør aldri bruka variablar som startar med «mrs_», sidan me ikkje har noko kontroll på innhaldet. Desse må handterast spesielt (med validering og parsing) og «vanlege» variablar (med andre namn) lagast.
-      mrs_HovneLeddAntall <= 1 & # fixme (QA): Sjå over.
-      Crp <= 10 & !is.na(Crp) &
-      PasientGlobalSykdomsaktivitet <= 10 &
-      !is.na(PasientGlobalSykdomsaktivitet)) %>%
+             mrs_OmmeLeddAntall <= 1 & # fixme (QA): Produksjonskode bør aldri bruka variablar som startar med «mrs_», sidan me ikkje har noko kontroll på innhaldet. Desse må handterast spesielt (med validering og parsing) og «vanlege» variablar (med andre namn) lagast.
+             mrs_HovneLeddAntall <= 1 & # fixme (QA): Sjå over.
+             Crp <= 10 & !is.na(Crp) &
+             PasientGlobalSykdomsaktivitet <= 10 &
+             !is.na(PasientGlobalSykdomsaktivitet)) %>%
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
@@ -262,27 +266,23 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
     select(PasientGUID, diaggrupper_med, dato_diag, dager_diag_til_datadump) %>%
     arrange(desc(dato_diag)) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
-    filter(diaggrupper_med == 1) %>% # fixme (QA): Stemmer det at ein berre skal sjå pasientane der siste diaggrupper_med er lik 1? (Eller skal ein kanskje sjå på siste oppføring der diaggrupper_med er lik 1 for kvar pasient?) Det er uansett ikkje dokumentert kva som er gjort, så det umogleg for meg å vurdera om det er gjort rett eller galt.
+    filter(diaggrupper_med == 1) %>%  # fixme (QA): Stemmer det at ein berre skal sjå pasientane der siste diaggrupper_med er lik 1? (Eller skal ein kanskje sjå på siste oppføring der diaggrupper_med er lik 1 for kvar pasient?) Det er uansett ikkje dokumentert kva som er gjort, så det umogleg for meg å vurdera om det er gjort rett eller galt.
     pull(PasientGUID)
 
   d = d_inkl_oppf %>%
-    left_join(d_diag %>% select(
-      PasientGUID, diaggrupper_med, dato_diag,
-      dager_diag_til_datadump, diag_stilt_aar
-    ), by = "PasientGUID") %>%
+    left_join(d_diag %>% select(PasientGUID, diaggrupper_med, dato_diag,
+                                dager_diag_til_datadump, diag_stilt_aar), by = "PasientGUID") %>%
     mutate(ki_krit_nevner = ifelse(PasientGUID %in% id_diagnose,
-      yes = TRUE, no = FALSE
-    )) # fixme (QA): Igjen tullete bruk av ifelse().
+                                   yes = TRUE, no = FALSE)) # fixme (QA): Igjen tullete bruk av ifelse().
 
   d_rem_totalt = d %>%
     mutate(ki_krit_teller = ifelse(ki_krit_nevner &
-      mrs_OmmeLeddAntall <= 1 &
-      mrs_HovneLeddAntall <= 1 &
-      Crp <= 10 & !is.na(Crp) &
-      PasientGlobalSykdomsaktivitet <= 10 &
-      !is.na(PasientGlobalSykdomsaktivitet),
-    yes = TRUE, no = FALSE
-    )) %>%
+                                     mrs_OmmeLeddAntall <= 1 &
+                                     mrs_HovneLeddAntall <= 1 &
+                                     Crp <= 10 & !is.na(Crp) &
+                                     PasientGlobalSykdomsaktivitet <= 10 &
+                                     !is.na(PasientGlobalSykdomsaktivitet),
+                                   yes = TRUE, no = FALSE)) %>%
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
@@ -314,34 +314,28 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
     group_by(PasientGUID) %>%
     arrange(desc(dato_diag), .by_group = TRUE) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
-    filter(
-      diaggrupper_med == 1,
-      diag_stilt_aar >= 2014
-    ) %>%
+    filter(diaggrupper_med == 1,
+           diag_stilt_aar >= 2014) %>%
     pull(PasientGUID)
 
   # Finner de som oppfyller krav for nevner
   d_base = d_inkl_oppf %>%
     left_join(d_diag %>% select(PasientGUID, diaggrupper_med, diaggrupper_hoved, dato_diag, diag_stilt_aar), by = "PasientGUID") %>%
-    mutate(tid_til_inkl = InklusjonDato - dato_diag) %>%
+    mutate(tid_til_inkl = InklusjonDato-dato_diag) %>%
     mutate(ki_krit_nevner = ifelse(PasientGUID %in% id_diagnose &
-      diaggrupper_med == 1 &
-      tid_til_inkl >= 0 &
-      tid_til_inkl <= 180, # fixme (QA): Er inklusjon+diagnose der tid til inklusjon er negativ rett handtert?
-    yes = TRUE, no = FALSE
-    )) # fixme (QA): igjen håplaus bruk av ifelse().
+                                     diaggrupper_med == 1 &
+                                     tid_til_inkl >= 0 &
+                                     tid_til_inkl <= 180, # fixme (QA): Er inklusjon+diagnose der tid til inklusjon er negativ rett handtert?
+                                   yes = TRUE, no = FALSE)) # fixme (QA): igjen håplaus bruk av ifelse().
 
   d_ki_kontroll = d_base %>%
-    mutate(
-      dager_til_ktrl = dato_ktrl - dato_diag,
-      ki_krit_teller = ifelse(ki_krit_nevner & Skjematype == "Inklusjonskjema" & # fixme (QA): teit bruk av ifelse().
-        dager_til_ktrl > 7 & # fixme (QA): Mange magiske konstantar her. Gjer dei om til variablar.
-        dager_til_ktrl <= 90 | # fixme (QA): For så vidt rett, men for alle som ikkje har pugga detaljane i operatorpresedensane i R kunne det med fordel ha vore nokre parentesar!
-        ki_krit_nevner & Skjematype == "Oppfølgingskjema" &
-          dager_til_ktrl <= 90,
-      yes = TRUE, no = FALSE
-      )
-    ) %>% # fixme (QA): I skildringa sto det noko med ulike intervall, eks. 28 dagar. Men talet 28 dagar er ingen plass å sjå her, så indikatoren *må* vera rekna ut feil.
+    mutate(dager_til_ktrl = dato_ktrl - dato_diag,
+           ki_krit_teller = ifelse(ki_krit_nevner & Skjematype == "Inklusjonskjema" & # fixme (QA): teit bruk av ifelse().
+                                     dager_til_ktrl > 7 & # fixme (QA): Mange magiske konstantar her. Gjer dei om til variablar.
+                                     dager_til_ktrl <= 90 | # fixme (QA): For så vidt rett, men for alle som ikkje har pugga detaljane i operatorpresedensane i R kunne det med fordel ha vore nokre parentesar!
+                                     ki_krit_nevner & Skjematype == "Oppfølgingskjema" &
+                                     dager_til_ktrl <= 90,
+                                   yes = TRUE, no = FALSE)) %>% # fixme (QA): I skildringa sto det noko med ulike intervall, eks. 28 dagar. Men talet 28 dagar er ingen plass å sjå her, så indikatoren *må* vera rekna ut feil.
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
