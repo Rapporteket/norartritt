@@ -48,6 +48,7 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
   # FIXME - Oppdatere bruk av sykehusnavn og legemiddel_navn.
   # Må enten bruke nye funksjonene for å hente navn, eller ta utgangspunkt i at
   # det gjøres i preprosseseringsfunksjon (som ikke er laget ferdig enda).
+  # FIXME - Fjerne avhengighet av PasientGUID (må kunne ta inn fødselsnummer også).
 
   # Sykdomsmodifiserende midler:
   sykmod_medisin = c(1:8, 10:12, 14:16, 18, 20, 22, 24:26, 28:32)
@@ -108,8 +109,39 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
   d_ki
 }
 
-# Andel RA-pasienter som bruker methotrexate per år.
+#' Kvalitetsindikator for andel pasienter som bruker en medisin
+#'
+#' Indikatoren viser andelen pasienter som bruker en gitt medisin i løpet av
+#' et år.
+#'
+#' @param d_diagnose Diagnosedatasett
+#' @param d_medisin Medisindatasett
+#' @param aarstall Årstallet indikatoren skal beregnes for
+#' @param legemiddel En heltallsvektor med legemiddel_navn_kode for hvilke
+#' medisiner som skal inkluderes.
+#'
+#' @return
+#' Returnerer en tibble med følgende variabler:
+#' * \strong{PasientGUID} PasientID
+#' * \strong{ki_krit_teller} Indikator for om pasienten oppfyller
+#' kriterier for teller. Kan ta verdiene TRUE, FALSE.
+#' * \strong{ki_krit_nevner} Indikator for om pasienten oppfyller
+#' kriterier for nevner. Kan ta verdiene TRUE eller FALSE.
+#' * \strong{...} Eventuelle grupperingsvariabler blir også med i utdata.
+#' @export
+#'
+#' @examples
+#' # d_diag og d_medisin er diagnosedata og medisindata
+#' d_ki_medisinbruk = ki_medisinbruk(d_diag, d_medisin, 2020, 20)
 ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
+
+  # FIXME - Legge inn støtte for å definere hvilke diagnosegrupper det skal
+  # beregnes KI for.
+  # FIXME - Ta ut årstall fra argumentlisten. Tilrettelegg for at det kan løses
+  # vha gruppering av inndata og filtrering etterpå.
+  # FIXME - Håndtering av legemiddel_navn (kreve preprosessert data / hente
+  # vha legg_til_medisingrupper).
+  # FIXME - Fjerne avhengighet av PasientGUID (må kunne ta inn fødselsnummer også).
   d_ki = d_diagnose %>%
     left_join(d_medisin %>%
       select(
