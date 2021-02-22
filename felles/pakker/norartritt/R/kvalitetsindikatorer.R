@@ -240,20 +240,35 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
   d_ki_rem
 }
 
-# Remisjon totalt
+#' Remisjon totalt
+#'
+#' @description
+#' Regner ut total andel pasienter som har oppnådd remisjon.
+#'
+#' @details
+#' Funksjonen beregner andelen av RA-pasientene som har oppnådd remisjon.
+#' Ser kun på pasienter som har RA som siste diagnose.
+#'
+#' @param d_diag Diagnosedatasett
+#' @param d_inkl_oppf Sammenkoblet inklusjon- og oppfølgingsdatasett
+#'
+#' @return
+#' Returnerer en tibble med følgende variabler:
+#' * \strong{PasientGUID} Pasientidentifikator.
+#' * \strong{ki_krit_teller} Indikator for om pasienten oppfyller
+#' kriterier for teller. Kan ta verdiene TRUE, FALSE.
+#' * \strong{ki_krit_nevner} Indikator for om pasienten oppfyller
+#' kriterier for nevner. Kan ta verdiene TRUE eller FALSE.
+#' * \strong{...} Eventuelle grupperingsvariabler.
+#' @export
+#'
+#' @examples
+#' # d_diag og d_inkl_oppf er diagnose og sammenslått
+#' inklusjon og oppfølgingsdatasett
+#' d_remisjon_totalt = remisjon_totalt(d_diag, d_inkl_oppf)
 remisjon_totalt = function(d_diag, d_inkl_oppf) {
-  # En funksjon for å beregne oppnåelse av remisjon totalt sett.
-  # Denne stiller ingen krav til tidspunkt for oppnåelse, men er laget
-  # for å vise totalt andel av pasienter med RA som har oppnådd remisjon,
-  # samt antall som har nådd remisjon i et kalenderår.
+  # FIXME - Legge inn støtte for grupperingsvariabler.
 
-  # fixme (QA): Forvirrande tekst om kalenderår. Det er ikkje noko
-  #             argument for kalenderår, så funksjonen er openbart
-  #             ikkje laga for det (ein kan sjølvsagt køyra funksjonen
-  #             per kalenderår, med do() eller group_map() elns.,
-  #             men det alle variablar (ikkje berre kalenderår), så det
-  #             er tullete og forvirrande å dra inn kalenderår her).
-  #
   # fixme (QA): Funksjonen liknar veldig på ki_remisjon(). Er nok
   #             mykje betre/sikrare/enklare om éin av funksjonane er
   #             spesialtilfelle av den andre (eks. med argument
@@ -266,7 +281,7 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
     select(PasientGUID, diaggrupper_med, dato_diag, dager_diag_til_datadump) %>%
     arrange(desc(dato_diag)) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
-    filter(diaggrupper_med == 1) %>%  # fixme (QA): Stemmer det at ein berre skal sjå pasientane der siste diaggrupper_med er lik 1? (Eller skal ein kanskje sjå på siste oppføring der diaggrupper_med er lik 1 for kvar pasient?) Det er uansett ikkje dokumentert kva som er gjort, så det umogleg for meg å vurdera om det er gjort rett eller galt.
+    filter(diaggrupper_med == 1) %>%
     pull(PasientGUID)
 
   d = d_inkl_oppf %>%
