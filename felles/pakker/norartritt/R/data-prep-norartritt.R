@@ -11,7 +11,6 @@
 # Funksjonen skal implementeres i les_data_norartritt() slik at en får ut
 # både fullstendige datasett og ferdig prosseserte datasett.
 
-
 # Inklusjon
 # (Rett inklusjonsdato) Trekke ut tidligste inklusjonsdato fra inklusjon/oppfølgingsskjema
 # (Rett_skjematype) Konvertere første oppfølgingsskjema til inklusjonsskjema.
@@ -59,3 +58,41 @@
 #   # d_diag_aktmed
 #   - siste diagnose og aktive medisinforløp i rapporteringsår.
 #
+
+# Kjernefunksjon som kaller på alle underfunksjoner
+vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
+
+  # Rett inklusjonsdato
+  # velg_tidligste_inklusjonsdato() #FIXME - Flytte funksjonen hit.
+  # Rett skjematype
+  # velg_rett_skjematype()
+  # Filtrer bort ugyldige skjema
+  # Legg til datovariabler
+  # strukturer variabler som mangler kodebok
+  # Lag utvalgte ferdigfiltrerte objekter
+  # Returner data
+}
+
+velg_rett_skjematype = function(d_inkl, d_oppf) {
+
+  # Konvertere tidligste oppfølgingsskjema til inklusjonsskjema for de
+  # pasientene som mangler inklusjon.
+  # # Legge inn regel for valg hvis det er flere skjema på samme dato
+  # Returnere d_inkl og d_oppf med oppdaterte skjematyper.
+}
+
+filtrer_bort_ugyldige_skjema = function(d_inkl, d_oppf, d_diag, d_med) {
+
+}
+
+legg_til_ekstra_datovariabler = function(d_inkl, d_oppf, d_diag, d_med) {
+
+}
+
+lag_filtrerte_objekter = function(d_inkl, d_oppf, d_diag, d_med) {
+
+}
+
+strukturer_variabler_uten_kodebok = function(d_inkl, d_oppf, d_diag, d_med) {
+
+}
