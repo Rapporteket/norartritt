@@ -4,14 +4,6 @@
 #' @importFrom dplyr mutate filter select left_join right_join case_when group_by summarise ungroup
 NULL
 
-# Hente sykehusnavn
-# Hente diagnosegrupper
-
-# Lage en funksjon for å koble alle skjema sammen via skjemaGUID.
-# Tror det vil være nyttig for å filtrere bort pasienter som ikke har
-# inklusjonsskjema og for å gjøre andre nyttige koblinger.
-
-
 #' Legg til medisinnavn
 #'
 #' Kobler på legemiddelnavn og ekstra informasjon om medisiner registrert
