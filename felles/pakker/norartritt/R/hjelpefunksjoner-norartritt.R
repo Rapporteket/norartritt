@@ -274,7 +274,7 @@ legg_til_diagnosegrupper = function(d) {
 
 #' Velg tidligste inklusjondato
 #'
-#' Velger den tidligste av alle ulike inklusjonsdatoer oppgitt på
+#' Velger den tidligste inklusjonsdatoen for hver pasient oppgitt på
 #' inklusjons- og oppfølgingsskjema i NorArtritt.
 #'
 #' @details
@@ -287,6 +287,9 @@ legg_til_diagnosegrupper = function(d) {
 #' Hvis en pasient aldri har fått registrert inklusjonsdato returneres NA for
 #' denne pasienten.
 #'
+#' @param pas_id Variabel som brukes som pasientidentifikator. Standard verdi
+#' er `PasientGUID`, men for personidentifiserbare datadumper kan
+#' `Fødselsnummer` brukes.
 #' @param d_inkl_oppf Sammenkoblet datasett som inneholder alle aktuelle
 #' inklusjons- og oppfølgingsskjema for pasientgruppen.
 #'
@@ -297,7 +300,7 @@ legg_til_diagnosegrupper = function(d) {
 #' @examples
 #' # d_inkl_oppf er sammenslått datasett med inklusjons- og oppfølgingsskjema
 #' d_inkl_oppf_dato = velg_tidligste_inklusjondato(d_inkl_oppf)
-velg_tidligste_inklusjondato = function(d_inkl_oppf) {
+velg_tidligste_inklusjondato = function(pas_id = PasientGUID, d_inkl_oppf) {
   min_na = function(x) {
     if (all(is.na(x))) {
       x[NA]
@@ -307,7 +310,7 @@ velg_tidligste_inklusjondato = function(d_inkl_oppf) {
   }
 
   d = d_inkl_oppf %>%
-    group_by(PasientGUID) %>%
+    group_by({{ pas_id }}) %>%
     mutate(InklusjonDato = as.Date(min_na(InklusjonDato))) %>%
     ungroup()
 
