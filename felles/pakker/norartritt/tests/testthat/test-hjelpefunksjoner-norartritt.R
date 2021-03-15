@@ -1,9 +1,81 @@
 # tester hjelpefunksjoner-norartritt.R
 
 context("legg_til_medisinnavn")
-
 # Gir advarsel hvis det finnes en LegemiddelType som ikke har navn i kodebok
-# Gir advarsel hvis det finnes flere navn for en LegemiddelType
+d = tibble::tibble(
+  LegemiddelType = c(1, 2, 3, 765),
+  Legemiddel = c(NA, NA, NA, NA)
+)
+
+d_ut_forventet = tibble::tibble(
+  LegemiddelType = c(1, 2, 3),
+  Legemiddel = c(NA, NA, NA),
+  legemiddel_navn_kode = c(1L, 2L, 3L),
+  legemiddel_navn = c(
+    "Cimzia (certolizumab pegol)",
+    "Enbrel (etanercept)",
+    "Humira (adalimumab)"
+  ),
+  biokat = c(1L, 1L, 1L),
+  dmard = c(1L, 1L, 1L),
+  csdmard = c(0L, 0L, 0L),
+  tsdmard = c(0L, 0L, 0L),
+  bio_og_tsdmard = c(1L, 1L, 1L),
+  legemiddel_gruppert = c(1L, 2L, 3L),
+  legemiddel_gruppert_navn = c(
+    "Cimzia (certolizumab pegol)",
+    "Enbrel (etanercept)",
+    "Humira (adalimumab)"
+  ),
+  Virkestoff = c(
+    "certolizumab pegol",
+    "etanercept",
+    "adalimumab"
+  )
+)
+
+expect_error(
+  legg_til_medisinnavn(d),
+  "LegemiddelType 765 er ikke definert i medisinkodeboken"
+)
+
+# Funksjonen leser inn medisinnavn som forventet
+d = tibble::tibble(
+  LegemiddelType = c(1, 2, 3),
+  Legemiddel = c(NA, NA, NA)
+)
+
+d_ut_forventet = tibble::tibble(
+  LegemiddelType = c(1, 2, 3),
+  Legemiddel = c(NA, NA, NA),
+  legemiddel_navn_kode = c(1L, 2L, 3L),
+  legemiddel_navn = c(
+    "Cimzia (certolizumab pegol)",
+    "Enbrel (etanercept)",
+    "Humira (adalimumab)"
+  ),
+  biokat = c(1L, 1L, 1L),
+  dmard = c(1L, 1L, 1L),
+  csdmard = c(0L, 0L, 0L),
+  tsdmard = c(0L, 0L, 0L),
+  bio_og_tsdmard = c(1L, 1L, 1L),
+  legemiddel_gruppert = c(1L, 2L, 3L),
+  legemiddel_gruppert_navn = c(
+    "Cimzia (certolizumab pegol)",
+    "Enbrel (etanercept)",
+    "Humira (adalimumab)"
+  ),
+  Virkestoff = c(
+    "certolizumab pegol",
+    "etanercept",
+    "adalimumab"
+  )
+)
+
+expect_identical(
+  legg_til_medisinnavn(d),
+  d_ut_forventet
+)
 
 context("legg_til_sykehusnavn")
 # Gir advarsel om det finnes UnitID som ikke har navn i kodebok
