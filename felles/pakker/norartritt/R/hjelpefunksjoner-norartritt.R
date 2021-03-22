@@ -148,10 +148,10 @@ legg_til_medisinnavn = function(d_medisin) {
 #' d_med_sykehusnavn = legg_til_sykehusnavn(d)
 legg_til_sykehusnavn = function(d) {
   adresse = ***FJERNET ADRESSE***
-  sykehus_navnefil = read_delim(adresse,
+  sykehus_navnefil = readr::read_delim(adresse,
     delim = ";",
     col_types = c("iccic_"),
-    locale = locale(encoding = "windows-1252")
+    locale = readr::locale(encoding = "windows-1252")
   )
 
   d = d %>%
