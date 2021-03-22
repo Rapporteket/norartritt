@@ -313,3 +313,58 @@ velg_tidligste_inklusjondato = function(pas_id = PasientGUID, d_inkl_oppf) {
 
   d
 }
+
+
+# FIXME - dokumentasjon
+# FIXME - implementere i les_data_norartritt()
+# FIXME - Tester ?
+
+#' Valider legemiddeltype
+#'
+#' Validerer legemiddeltype i medisinfil mot kodebok. Hvis HEMIT gjør endringer i
+#' hvordan legemiddeltyper er kodet, eller legger til nye legemiddel i hovedlisten
+#' fra de som per nå er kodet som LegemiddelType = 999 vil denne funksjonen
+#' stanse innlesningen av medisinskjema og gi returnere en feilmelding.
+#'
+#' @param mappe_dd Filsti til hvor kodebok er lagret.
+#'
+#' @return
+#' Returnerer en feilmelding hvis legemiddeltyper i kodebok er endret.
+#'
+#' @export
+#'
+#' @examples
+#' # mappe_dd er plassering for kodebok som skal sjekkes.
+#'
+#' valider_legemiddeltype(mappe_dd)
+valider_legemiddeltype = function(mappe_dd) {
+  kb = les_kb_mrs(mappe_dd)
+
+  kb_legemiddeltype = kb %>%
+    filter(
+      skjema_id == "Medisineringskjema",
+      variabel_id == "LegemiddelType"
+    ) %>%
+    select(verdi, verditekst)
+
+  mappe = paste0(***FJERNET ADRESSE***)
+  medisin_grupper = "medisin-grupper.csv"
+
+  medisinfil = readr::read_delim(paste0(mappe, medisin_grupper),
+    delim = ";",
+    trim_ws = TRUE,
+    col_types = c("ici__iiiiiiccc"),
+    locale = readr::locale(encoding = "windows-1252")
+  )
+
+  medisin_uttrekk = medisinfil %>%
+    select("verdi" = LegemiddelType, "verditekst" = legemiddelnavn_i_kodebok) %>%
+    mutate(verdi = as.character(verdi))
+
+  legemiddel_feil = setdiff(kb_legemiddel_type, medisin_uttrekk)
+
+  if (nrow(legemiddel_feil) > 0) {
+    stop(stringr::str_c("Det er ikke samsvar mellom legemiddelnavn i kodebok og vår medisinfil
+         for legemiddeltype: ", legemiddel_feil %>% pull(verdi), collapse = ", "))
+  }
+}
