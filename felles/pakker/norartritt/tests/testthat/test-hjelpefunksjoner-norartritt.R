@@ -86,7 +86,87 @@ test_that("Leser inn enhetsinformasjon fra sykehusfil som forventet", {
 
 context("legg_til_diagnosegrupper")
 # Gir advarsel om det finnes diagnosekoder som ikke har navn i kodebok
-# Gir advarsel om noen mangler Kode
+test_that("Feilmelding hvis diagnosekoder ikke finnes i diagnosekodebok", {
+  d = tibble::tibble(
+    Kode = "M7654",
+    Navn = "Ny diagnose"
+  )
+
+  feilmelding = "Kode: M7654 finnes ikke i diagnosekodebok"
+
+  expect_error(
+    legg_til_diagnosegrupper(d),
+    feilmelding
+  )
+})
+
+test_that("Pasienter med Leddsykdom får forventet info fra diagnosekodebok", {
+  d = tibble::tibble(
+    Kode = c("M123", "M130", NA_character_),
+    Navn = c("Palindrom revmatisme", "Polyartritt", "Leddsykdom")
+  )
+
+  d_forventet = tibble::tibble(
+    Kode = c("M123", "M130", NA_character_),
+    Navn = c("Palindrom revmatisme", "Polyartritt", "Leddsykdom"),
+    diaggrupper_med = c(8L, 4L, 8L),
+    diaggrupper_med_tekst = c(
+      "Andre kroniske artritter",
+      "Polyartritt",
+      "Andre kroniske artritter"
+    ),
+    diaggrupper_rem = c(3L, 3L, NA_integer_),
+    diaggrupper_rem_tekst = c(rep("Andre perifere artritter", 2), NA_character_),
+    rem_maal = c(rep("DAS28-CRP", 2), NA_character_),
+    diaggrupper_hoved = c(5L, 3L, 5L),
+    diaggrupper_hoved_tekst = c(
+      "Andre kroniske artritter",
+      "Polyartritt",
+      "Andre kroniske artritter"
+    ),
+    perifer_aksial_diaggruppe = c(rep(1L, 2), 3L),
+    perifer_aksial_diaggruppe_tekst = c(rep("Perifer", 2), "Udifferensiert")
+  )
+
+  expect_identical(
+    legg_til_diagnosegrupper(d),
+    d_forventet
+  )
+})
+
+test_that("Leser inn diagnoseinformasjon som forventet", {
+  d = tibble::tibble(
+    Kode = c("M123", "M130", "M131"),
+    Navn = c("Palindrom revmatisme", "Polyartritt", "Monoartritt")
+  )
+
+  d_forventet = tibble::tibble(
+    Kode = c("M123", "M130", "M131"),
+    Navn = c("Palindrom revmatisme", "Polyartritt", "Monoartritt"),
+    diaggrupper_med = c(8L, 4L, 4L),
+    diaggrupper_med_tekst = c(
+      "Andre kroniske artritter",
+      "Polyartritt",
+      "Polyartritt"
+    ),
+    diaggrupper_rem = c(3L, 3L, 3L),
+    diaggrupper_rem_tekst = c(rep("Andre perifere artritter", 3)),
+    rem_maal = c(rep("DAS28-CRP", 3)),
+    diaggrupper_hoved = c(5L, 3L, 3L),
+    diaggrupper_hoved_tekst = c(
+      "Andre kroniske artritter",
+      "Polyartritt",
+      "Polyartritt"
+    ),
+    perifer_aksial_diaggruppe = c(rep(1L, 3)),
+    perifer_aksial_diaggruppe_tekst = c(rep("Perifer", 3))
+  )
+
+  expect_identical(
+    legg_til_diagnosegrupper(d),
+    d_forventet
+  )
+})
 
 context("velg_tidligste_inklusjondato")
 
