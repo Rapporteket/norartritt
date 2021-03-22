@@ -88,11 +88,11 @@ context("legg_til_diagnosegrupper")
 # Gir advarsel om det finnes diagnosekoder som ikke har navn i kodebok
 test_that("Feilmelding hvis diagnosekoder ikke finnes i diagnosekodebok", {
   d = tibble::tibble(
-    Kode = "M7654",
-    Navn = "Ny diagnose"
+    Kode = c("M7654", "M49494"),
+    Navn = c("Ny diagnose", "Narvestad")
   )
 
-  feilmelding = "Kode: M7654 finnes ikke i diagnosekodebok"
+  feilmelding = "Kode: M7654, M49494 finnes ikke i diagnosekodebok"
 
   expect_error(
     legg_til_diagnosegrupper(d),
