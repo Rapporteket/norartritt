@@ -58,16 +58,29 @@ legg_til_medisinnavn = function(d_medisin) {
   medisin_fil = readr::read_delim(paste0(mappe, medisin_grupper),
     delim = ";",
     trim_ws = TRUE,
-    col_types = c("ici__iiiiiicc"),
-    locale = locale(encoding = "windows-1252")
+    col_types = c("ici__iiiiiiccc"),
+    locale = readr::locale(encoding = "windows-1252")
   )
 
   medisin_kode_999 = readr::read_delim(paste0(mappe, legemiddel_999),
     delim = ";",
     trim_ws = TRUE,
     col_types = c("ic"),
-    locale = locale(encoding = "windows-1252")
+    locale = readr::locale(encoding = "windows-1252")
   )
+
+  # Sjekk at alle LegemiddelTyper i datasettet finnes i medisinkodebok
+  na_legemiddel_navn = d_medisin %>%
+    filter(!LegemiddelType %in% medisin_fil$LegemiddelType) %>%
+    dplyr::pull(LegemiddelType)
+
+  if (length(na_legemiddel_navn) > 0) {
+    stop(paste0(
+      "LegemiddelType ",
+      stringr::str_c(na_legemiddel_navn, collapse = ", "),
+      " er ikke definert i medisinkodeboken"
+    ))
+  }
 
   # Henter ut navn og riktig kode for medisiner med LegemiddelType 999
   d_medisin = d_medisin %>%
@@ -91,27 +104,11 @@ legg_til_medisinnavn = function(d_medisin) {
   # Legger til ekstra informasjon om hvert legemiddel
   d_medisin = d_medisin %>%
     select(-legemiddel_navn, -medisin, -legemiddel_kodebok_kode) %>%
-    right_join(medisin_fil %>%
+    left_join(medisin_fil %>%
       select(-LegemiddelType),
     by = "legemiddel_navn_kode"
-    )
-
-  # Sjekk at det kun er et legemiddelnavn per kode
-  n_navn = d_medisin %>%
-    group_by(legemiddel_navn_kode) %>%
-    summarise(
-      n = dplyr::n_distinct(legemiddel_navn),
-      .groups = "drop"
     ) %>%
-    filter(n != 1)
-
-  if (!nrow(n_navn) == 0) {
-    stop(paste0(
-      "LegemiddelType ",
-      stringr::str_c(n_navn$legemiddel_navn_kode, collapse = ", "),
-      " har flere navn for samme kode"
-    ))
-  }
+    select(-legemiddelnavn_i_kodebok)
 
   d_medisin
 }
