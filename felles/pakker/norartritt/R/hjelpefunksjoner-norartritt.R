@@ -217,11 +217,17 @@ legg_til_sykehusnavn = function(d) {
 #' d_med_diagnosedata = legg_til_diagnosegrupper(d_diagnose)
 legg_til_diagnosegrupper = function(d) {
   adresse = ***FJERNET ADRESSE***
-  diagnosegrupper = read_delim(adresse,
+  diagnosegrupper = readr::read_delim(adresse,
     delim = ";",
     col_types = c("ciciccicic"),
-    locale = locale(encoding = "windows-1252")
+    locale = readr::locale(encoding = "windows-1252")
   )
+
+  ukjent_kode = setdiff(d$Kode, diagnosegrupper$Kode)
+  ukjent_kode = ukjent_kode[!is.na(ukjent_kode)]
+  if (length(ukjent_kode) > 0) {
+    stop(paste0("Kode: ", stringr::str_c(ukjent_kode, collapse = ", "), " finnes ikke i diagnosekodebok"))
+  }
 
   d = d %>%
     left_join(diagnosegrupper, by = "Kode")
