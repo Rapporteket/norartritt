@@ -55,6 +55,34 @@ test_that("Leser inn data fra medisinkodebok som forventet", {
 
 context("legg_til_sykehusnavn")
 # Gir advarsel om det finnes UnitID som ikke har navn i kodebok
+test_that("Feilmelding hvis UnitID i datasett ikke finnes i kodebok", {
+  d = tibble::tibble(UnitId = c(1, 2, 34))
+  feilmelding = "Det mangler kobling for UnitId: 1, 2, 34"
+
+  expect_error(legg_til_sykehusnavn(d),
+    error = feilmelding
+  )
+})
+
+test_that("Leser inn enhetsinformasjon fra sykehusfil som forventet", {
+  d = tibble::tibble(UnitId = c(110629L, 102977L, 104579L))
+
+  d_forventet_ut = tibble::tibble(
+    UnitId = c(110629L, 102977L, 104579L),
+    sykehusnavn = c(
+      "Martina Hansens hospital", "Haukeland universitetssykehus",
+      "St. Olavs hospital"
+    ),
+    sykehus_kortnavn = c("MHH", "HUS", "St. Olav"),
+    sykehus_gruppe = c(1L, 2L, 3L),
+    sykehus_gruppe_navn = c("MHH", "HUS", "St. Olav")
+  )
+
+  expect_identical(
+    legg_til_sykehusnavn(d),
+    d_forventet_ut
+  )
+})
 
 context("legg_til_diagnosegrupper")
 # Gir advarsel om det finnes diagnosekoder som ikke har navn i kodebok
@@ -98,7 +126,6 @@ test_that("Tidligste dato returneres hvis det også finnes NA", {
   )
 })
 
-# Sjekk at funksjonen aksepterer annen pas_id
 test_that("Fungerer med alternativ pasientidentifikator", {
   dato = c("NA", "2019-11-12", "2020-11-23", "2020-08-27")
   d = tibble::tibble(
