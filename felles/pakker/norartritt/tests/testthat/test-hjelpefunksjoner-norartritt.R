@@ -54,7 +54,7 @@ test_that("Leser inn data fra medisinkodebok som forventet", {
 })
 
 context("legg_til_sykehusnavn")
-# Gir advarsel om det finnes UnitID som ikke har navn i kodebok
+
 test_that("Feilmelding hvis UnitID i datasett ikke finnes i kodebok", {
   d = tibble::tibble(UnitId = c(1, 2, 34))
   feilmelding = "Det mangler kobling for UnitId: 1, 2, 34"
