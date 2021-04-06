@@ -1,7 +1,7 @@
 # Hjelpefunksjoner som brukes i norartritt
 
 #' @importFrom magrittr %>%
-#' @importFrom dplyr mutate filter select left_join right_join case_when group_by summarise ungroup
+#' @importFrom dplyr mutate filter select left_join right_join case_when group_by summarise ungroup arrange slice pull bind_rows
 NULL
 
 #' Legg til medisinnavn
@@ -373,4 +373,58 @@ valider_legemiddeltype = function(mappe_dd) {
     stop(stringr::str_c("Det er ikke samsvar mellom legemiddelnavn i kodebok og vår medisinfil
          for legemiddeltype: ", legemiddel_feil %>% pull(verdi), collapse = ", "))
   }
+}
+
+
+# Rett skjematype
+# FIXME - Legge til skikkelig dokumentasjon
+# FIXME - Rydde i koden
+konverter_skjematype = function(inkl, oppf) {
+
+  # ID for pasienter med skjema som skal konverteres
+  id_oppf_uten_inkl = setdiff(oppf$PasientGUID, inkl$PasientGUID)
+  id_flere_inklusjon = inkl$PasientGUID[which(duplicated(inkl$PasientGUID))]
+
+  # Slå sammen inklusjon og oppfølgingsskjema
+  d_inkl_oppf = inkl %>%
+    bind_rows(oppf)
+
+  # Trekke ut skjemaGUID for skjema som skal konverteres
+  inkl_til_oppf_skjemaGUID = d_inkl_oppf %>%
+    filter(
+      PasientGUID %in% id_flere_inklusjon,
+      FormTypeId == 1L
+    ) %>%
+    group_by(PasientGUID) %>%
+    arrange(FormDate) %>%
+    slice(-1) %>%
+    pull(SkjemaGUID)
+
+  oppf_til_inkl_skjemaGUID = d_inkl_oppf %>%
+    filter(
+      PasientGUID %in% id_oppf_uten_inkl,
+      FormTypeId == 2L
+    ) %>%
+    group_by(PasientGUID) %>%
+    arrange(FormDate) %>%
+    slice(1) %>%
+    pull(SkjemaGUID)
+
+  # Konvertere til riktig skjematype
+  d_inkl_oppf = d_inkl_oppf %>%
+    mutate(
+      Skjematype = case_when(
+        SkjemaGUID %in% inkl_til_oppf_skjemaGUID ~ "Oppfølgingskjema",
+        SkjemaGUID %in% oppf_til_inkl_skjemaGUID ~ "Inklusjonskjema",
+        TRUE ~ Skjematype
+      ),
+      FormTypeId = case_when(
+        SkjemaGUID %in% inkl_til_oppf_skjemaGUID ~ 2L,
+        SkjemaGUID %in% oppf_til_inkl_skjemaGUID ~ 1L,
+        TRUE ~ FormTypeId
+      )
+    ) %>%
+    arrange(FormTypeId)
+
+  d_inkl_oppf
 }
