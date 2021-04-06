@@ -1,5 +1,6 @@
 # tester hjelpefunksjoner-norartritt.R
 
+# legg_til_medisinnavn ----------------------------------------------------
 context("legg_til_medisinnavn")
 
 test_that("Advarsel hvis data inneholder LegemiddelType som ikke har navn i kodebok", {
@@ -53,6 +54,8 @@ test_that("Leser inn data fra medisinkodebok som forventet", {
   )
 })
 
+
+# legg_til_sykehusnavn ----------------------------------------------------
 context("legg_til_sykehusnavn")
 
 test_that("Feilmelding hvis UnitID i datasett ikke finnes i kodebok", {
@@ -84,6 +87,8 @@ test_that("Leser inn enhetsinformasjon fra sykehusfil som forventet", {
   )
 })
 
+
+# legg_til_diagnosegrupper ------------------------------------------------
 context("legg_til_diagnosegrupper")
 # Gir advarsel om det finnes diagnosekoder som ikke har navn i kodebok
 test_that("Feilmelding hvis diagnosekoder ikke finnes i diagnosekodebok", {
@@ -168,6 +173,8 @@ test_that("Leser inn diagnoseinformasjon som forventet", {
   )
 })
 
+
+# velg_tidligste_inklusjonsdato -------------------------------------------
 context("velg_tidligste_inklusjondato")
 
 test_that("NA returneres hvis ingen inklusjonsdato finnes", {
@@ -221,5 +228,106 @@ test_that("Fungerer med alternativ pasientidentifikator", {
   expect_identical(
     velg_tidligste_inklusjondato(pas_id = fnr, d),
     d_ut_forventet
+  )
+})
+
+
+# konverter_skjematype ----------------------------------------------------
+context("Konverter skjematype")
+
+test_that("Oppfølgingsskjema blir konvertert til inklusjon hvis inklusjon mangler", {
+  d_inkl = tibble::tibble(
+    PasientGUID = c("a", "b"),
+    Skjematype = c("Inklusjonskjema", "Inklusjonskjema"),
+    FormTypeId = c(1L, 1L),
+    FormDate = as.POSIXct(c("2021-02-23", "2021-02-23")),
+    SkjemaGUID = c("skjema_1", "skjema_2")
+  )
+
+
+
+  d_oppf = tibble::tibble(
+    PasientGUID = c("a", "b", "c"),
+    Skjematype = c(
+      "Oppfølgingskjema",
+      "Oppfølgingskjema",
+      "Oppfølgingskjema"
+    ),
+    FormTypeId = c(2L, 2L, 2L),
+    FormDate = as.POSIXct(c(
+      "2021-02-24",
+      "2021-02-24",
+      "2021-02-25"
+    )),
+    SkjemaGUID = c("skjema_3", "skjema_4", "skjema_5")
+  )
+
+
+  forventet_ut = tibble::tibble(
+    PasientGUID = c("a", "b", "c", "a", "b"),
+    Skjematype = c(
+      "Inklusjonskjema", "Inklusjonskjema",
+      "Inklusjonskjema", "Oppfølgingskjema",
+      "Oppfølgingskjema"
+    ),
+    FormTypeId = c(1L, 1L, 1L, 2L, 2L),
+    FormDate = as.POSIXct(c(
+      "2021-02-23", "2021-02-23",
+      "2021-02-25", "2021-02-24",
+      "2021-02-24"
+    )),
+    SkjemaGUID = c("skjema_1", "skjema_2", "skjema_5", "skjema_3", "skjema_4")
+  )
+
+
+
+  expect_identical(
+    konverter_skjematype(inkl = d_inkl, oppf = d_oppf),
+    forventet_ut
+  )
+})
+
+test_that("Duplikate inklusjonsskjema konverteres til oppfølging", {
+  d_inkl_duplikat = tibble::tibble(
+    PasientGUID = c("a", "a", "a", "b"),
+    Skjematype = c("Inklusjonskjema", "Inklusjonskjema", "Inklusjonskjema", "Inklusjonskjema"),
+    FormTypeId = c(1L, 1L, 1L, 1L),
+    FormDate = as.POSIXct(c("2021-02-23", "2020-01-15", "2021-01-01", "2021-02-23")),
+    SkjemaGUID = c("skjema_1", "skjema_2", "skjema_6", "skjema_3")
+  )
+
+  d_oppf_ok = tibble::tibble(
+    PasientGUID = c("a", "b"),
+    Skjematype = c(
+      "Oppfølgingskjema",
+      "Oppfølgingskjema"
+    ),
+    FormTypeId = c(2L, 2L),
+    FormDate = as.POSIXct(c(
+      "2021-02-24",
+      "2021-02-24"
+    )),
+    SkjemaGUID = c("skjema_4", "skjema_5")
+  )
+
+  duplikat_forventet_ut = tibble::tibble(
+    PasientGUID = c("a", "b", "a", "a", "a", "b"),
+    Skjematype = c(
+      "Inklusjonskjema", "Inklusjonskjema",
+      "Oppfølgingskjema", "Oppfølgingskjema",
+      "Oppfølgingskjema", "Oppfølgingskjema"
+    ),
+    FormTypeId = c(1L, 1L, 2L, 2L, 2L, 2L),
+    FormDate = as.POSIXct(c(
+      "2020-01-15", "2021-02-23",
+      "2021-02-23", "2021-01-01",
+      "2021-02-24", "2021-02-24"
+    )),
+    SkjemaGUID = c("skjema_2", "skjema_3", "skjema_1", "skjema_6", "skjema_4", "skjema_5")
+  )
+
+  expect_identical(
+    konverter_skjematype(inkl = d_inkl_duplikat, oppf = d_oppf_ok),
+    duplikat_forventet_ut
   )
 })
