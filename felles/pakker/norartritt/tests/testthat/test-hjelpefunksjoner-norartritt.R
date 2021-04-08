@@ -331,3 +331,44 @@ test_that("Duplikate inklusjonsskjema konverteres til oppfølging", {
     duplikat_forventet_ut
   )
 })
+
+
+# fjern_uaktuelle_diagnoser -----------------------------------------------
+context("fjern_uaktuelle_diagnoser")
+test_that("Uaktuelle diagnoser blir filtrert bort som forventet", {
+  diagnose_med_uakt = tibble::tibble(
+    pas_id = c(1, 2, 3),
+    Navn = c(
+      "Revmatoid artritt", "Psoreasisartritt",
+      "Artrose"
+    )
+  )
+  diagnose_med_uakt_ut = tibble::tibble(
+    pas_id = c(1, 2),
+    Navn = c("Revmatoid artritt", "Psoreasisartritt")
+  )
+
+  expect_identical(
+    fjern_uaktuelle_diagnoser(diagnose_med_uakt),
+    diagnose_med_uakt_ut
+  )
+})
+
+# fjerne_skjema_hjelpefunksjon --------------------------------------------
+context("fjerne_skjema_hjelpefunksjon")
+test_that("skjema filtreres ut som forventet", {
+  a = tibble::tibble(PasientGUID = c("1", "2", "3", "4"))
+  b = tibble::tibble(PasientGUID = c("1", "2", "3", "5"))
+
+  forventet_ut = b %>%
+    filter(dplyr::row_number() %in% 1:3)
+
+  expect_identical(
+    fjerne_skjema_hjelpefunksjon(d_hoved = a, d_motpart = b),
+    forventet_ut
+  )
+  expect_identical(
+    fjerne_skjema_hjelpefunksjon(d_hoved = a, d_motpart = a),
+    a
+  )
+})
