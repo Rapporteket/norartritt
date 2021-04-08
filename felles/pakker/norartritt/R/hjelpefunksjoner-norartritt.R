@@ -55,59 +55,44 @@ legg_til_medisinnavn = function(d_medisin) {
   medisin_grupper = "medisin-grupper.csv"
   legemiddel_999 = "legemiddel-kodebok.csv"
 
-  medisin_fil = readr::read_delim(paste0(mappe, medisin_grupper),
-    delim = ";",
-    trim_ws = TRUE,
-    col_types = c("ici__iiiiiiccc"),
-    locale = readr::locale(encoding = "windows-1252")
-  )
+  medisin_fil = readr::read_delim(paste0(mappe, medisin_grupper), delim = ";",
+                           trim_ws = TRUE,
+                           col_types = c("ici__iiiiiiccc"),
+                           locale = readr::locale(encoding = "windows-1252"))
 
-  medisin_kode_999 = readr::read_delim(paste0(mappe, legemiddel_999),
-    delim = ";",
-    trim_ws = TRUE,
-    col_types = c("ic"),
-    locale = readr::locale(encoding = "windows-1252")
-  )
+  medisin_kode_999 = readr::read_delim(paste0(mappe, legemiddel_999), delim = ";",
+                                trim_ws = TRUE,
+                                col_types = c("ic"),
+                                locale = readr::locale(encoding = "windows-1252"))
 
   # Sjekk at alle LegemiddelTyper i datasettet finnes i medisinkodebok
   na_legemiddel_navn = d_medisin %>%
     filter(!LegemiddelType %in% medisin_fil$LegemiddelType) %>%
     dplyr::pull(LegemiddelType)
 
-  if (length(na_legemiddel_navn) > 0) {
-    stop(paste0(
-      "LegemiddelType ",
-      stringr::str_c(na_legemiddel_navn, collapse = ", "),
-      " er ikke definert i medisinkodeboken"
-    ))
+  if(length(na_legemiddel_navn) > 0) {
+    stop(paste0("LegemiddelType ",
+                stringr::str_c(na_legemiddel_navn, collapse = ", "),
+                " er ikke definert i medisinkodeboken"))
   }
 
   # Henter ut navn og riktig kode for medisiner med LegemiddelType 999
-  d_medisin = d_medisin %>%
-    left_join(medisin_fil %>%
-      select(
-        LegemiddelType, legemiddel_navn,
-        legemiddel_navn_kode
-      ),
-    by = "LegemiddelType"
-    ) %>%
+  d_medisin = d_medisin %>% left_join(medisin_fil %>%
+                                        select(LegemiddelType, legemiddel_navn,
+                                               legemiddel_navn_kode),
+                                      by = "LegemiddelType") %>%
     mutate(medisin = dplyr::coalesce(Legemiddel, legemiddel_navn)) %>%
     left_join(medisin_kode_999, by = c("medisin" = "legemiddel_kodebok")) %>%
-    mutate(
-      legemiddel_navn_kode =
-        case_when(
-          !is.na(legemiddel_kodebok_kode) ~ legemiddel_kodebok_kode,
-          TRUE ~ legemiddel_navn_kode
-        )
-    )
+    mutate(legemiddel_navn_kode =
+             case_when(!is.na(legemiddel_kodebok_kode) ~ legemiddel_kodebok_kode,
+                       TRUE ~ legemiddel_navn_kode))
 
   # Legger til ekstra informasjon om hvert legemiddel
   d_medisin = d_medisin %>%
     select(-legemiddel_navn, -medisin, -legemiddel_kodebok_kode) %>%
     left_join(medisin_fil %>%
-      select(-LegemiddelType),
-    by = "legemiddel_navn_kode"
-    ) %>%
+                 select(-LegemiddelType),
+               by = "legemiddel_navn_kode") %>%
     select(-legemiddelnavn_i_kodebok)
 
   d_medisin
@@ -147,24 +132,20 @@ legg_til_medisinnavn = function(d_medisin) {
 #'
 #' d_med_sykehusnavn = legg_til_sykehusnavn(d)
 legg_til_sykehusnavn = function(d) {
+
   adresse = ***FJERNET ADRESSE***
-  sykehus_navnefil = readr::read_delim(adresse,
-    delim = ";",
-    col_types = c("iccic_"),
-    locale = readr::locale(encoding = "windows-1252")
-  )
+  sykehus_navnefil = readr::read_delim(adresse, delim = ";",
+                                col_types = c("iccic_"),
+                                locale = readr::locale(encoding = "windows-1252"))
 
-  d = d %>%
-    left_join(sykehus_navnefil, by = c("UnitId" = "resh_id"))
+  d = d %>% left_join(sykehus_navnefil, by = c("UnitId" = "resh_id"))
 
-  if (any(is.na(d$sykehusnavn))) {
-    stop(paste0(
-      "Det mangler kobling for UnitId: ",
-      stringr::str_c(d %>%
-        filter(is.na(sykehusnavn)) %>%
-        distinct(UnitId) %>%
-        pull(UnitId), collapse = ", ")
-    ))
+  if(any(is.na(d$sykehusnavn))) {
+    stop(paste0("Det mangler kobling for UnitId: ",
+                stringr::str_c(d %>%
+                  filter(is.na(sykehusnavn)) %>%
+                  distinct(UnitId) %>%
+                  pull(UnitId), collapse = ", ")))
   }
   d
 }
@@ -216,59 +197,42 @@ legg_til_sykehusnavn = function(d) {
 #' # d_diagnose er diagnosedata fra NorArtritt
 #' d_med_diagnosedata = legg_til_diagnosegrupper(d_diagnose)
 legg_til_diagnosegrupper = function(d) {
+
   adresse = ***FJERNET ADRESSE***
-  diagnosegrupper = readr::read_delim(adresse,
-    delim = ";",
-    col_types = c("ciciccicic"),
-    locale = readr::locale(encoding = "windows-1252")
-  )
+  diagnosegrupper = readr::read_delim(adresse, delim = ";",
+                           col_types = c("ciciccicic"),
+                           locale = readr::locale(encoding = "windows-1252"))
 
   ukjent_kode = setdiff(d$Kode, diagnosegrupper$Kode)
   ukjent_kode = ukjent_kode[!is.na(ukjent_kode)]
-  if (length(ukjent_kode) > 0) {
+  if(length(ukjent_kode) > 0) {
     stop(paste0("Kode: ", stringr::str_c(ukjent_kode, collapse = ", "), " finnes ikke i diagnosekodebok"))
   }
 
-  d = d %>%
-    left_join(diagnosegrupper, by = "Kode")
+  d = d %>% left_join(diagnosegrupper, by = "Kode")
 
   # Leddsykdom har ikke kode i registeret, så den må håndteres manuelt.
-  d = d %>%
-    mutate(
-      diaggrupper_med =
-        replace(
-          diaggrupper_med,
-          Navn == "Leddsykdom", 8L
-        ),
-      diaggrupper_med_tekst =
-        replace(
-          diaggrupper_med_tekst,
-          Navn == "Leddsykdom",
-          "Andre kroniske artritter"
-        ),
-      diaggrupper_hoved =
-        replace(
-          diaggrupper_hoved,
-          Navn == "Leddsykdom", 5L
-        ),
-      diaggrupper_hoved_tekst =
-        replace(
-          diaggrupper_hoved_tekst,
-          Navn == "Leddsykdom",
-          "Andre kroniske artritter"
-        ),
-      perifer_aksial_diaggruppe =
-        replace(
-          perifer_aksial_diaggruppe,
-          Navn == "Leddsykdom", 3L
-        ),
-      perifer_aksial_diaggruppe_tekst =
-        replace(
-          perifer_aksial_diaggruppe_tekst,
-          Navn == "Leddsykdom",
-          "Udifferensiert"
-        )
-    )
+  d = d %>% mutate(diaggrupper_med =
+                     replace(diaggrupper_med,
+                             Navn == "Leddsykdom", 8L),
+                   diaggrupper_med_tekst =
+                     replace(diaggrupper_med_tekst,
+                             Navn == "Leddsykdom",
+                             "Andre kroniske artritter"),
+                   diaggrupper_hoved =
+                     replace(diaggrupper_hoved,
+                             Navn == "Leddsykdom", 5L),
+                   diaggrupper_hoved_tekst =
+                     replace(diaggrupper_hoved_tekst,
+                             Navn == "Leddsykdom",
+                             "Andre kroniske artritter"),
+                   perifer_aksial_diaggruppe =
+                     replace(perifer_aksial_diaggruppe,
+                             Navn == "Leddsykdom", 3L),
+                   perifer_aksial_diaggruppe_tekst =
+                     replace(perifer_aksial_diaggruppe_tekst,
+                             Navn == "Leddsykdom",
+                             "Udifferensiert"))
 
   d
 }
@@ -304,16 +268,11 @@ legg_til_diagnosegrupper = function(d) {
 #' # d_inkl_oppf er sammenslått datasett med inklusjons- og oppfølgingsskjema
 #' d_inkl_oppf_dato = velg_tidligste_inklusjondato(d_inkl_oppf)
 velg_tidligste_inklusjondato = function(pas_id = PasientGUID, d_inkl_oppf) {
-  min_na = function(x) {
-    if (all(is.na(x))) {
-      x[NA]
-    } else {
-      min(x, na.rm = TRUE)
-    }
-  }
+
+  min_na = function(x){if(all(is.na(x))) x[NA] else min(x, na.rm = TRUE)}
 
   d = d_inkl_oppf %>%
-    group_by({{ pas_id }}) %>%
+    group_by({{pas_id}}) %>%
     mutate(InklusjonDato = as.Date(min_na(InklusjonDato))) %>%
     ungroup()
 
@@ -344,24 +303,21 @@ velg_tidligste_inklusjondato = function(pas_id = PasientGUID, d_inkl_oppf) {
 #'
 #' valider_legemiddeltype(mappe_dd)
 valider_legemiddeltype = function(mappe_dd) {
+
   kb = les_kb_mrs(mappe_dd)
 
   kb_legemiddeltype = kb %>%
-    filter(
-      skjema_id == "Medisineringskjema",
-      variabel_id == "LegemiddelType"
-    ) %>%
+    filter(skjema_id == "Medisineringskjema",
+           variabel_id == "LegemiddelType") %>%
     select(verdi, verditekst)
 
   mappe = paste0(***FJERNET ADRESSE***)
   medisin_grupper = "medisin-grupper.csv"
 
-  medisinfil = readr::read_delim(paste0(mappe, medisin_grupper),
-    delim = ";",
-    trim_ws = TRUE,
-    col_types = c("ici__iiiiiiccc"),
-    locale = readr::locale(encoding = "windows-1252")
-  )
+  medisinfil = readr::read_delim(paste0(mappe, medisin_grupper), delim = ";",
+                                 trim_ws = TRUE,
+                                 col_types = c("ici__iiiiiiccc"),
+                                 locale = readr::locale(encoding = "windows-1252"))
 
   medisin_uttrekk = medisinfil %>%
     select("verdi" = LegemiddelType, "verditekst" = legemiddelnavn_i_kodebok) %>%
@@ -369,16 +325,46 @@ valider_legemiddeltype = function(mappe_dd) {
 
   legemiddel_feil = setdiff(kb_legemiddel_type, medisin_uttrekk)
 
-  if (nrow(legemiddel_feil) > 0) {
+  if(nrow(legemiddel_feil) > 0 ) {
     stop(stringr::str_c("Det er ikke samsvar mellom legemiddelnavn i kodebok og vår medisinfil
          for legemiddeltype: ", legemiddel_feil %>% pull(verdi), collapse = ", "))
   }
+
 }
 
 
-# Rett skjematype
-# FIXME - Legge til skikkelig dokumentasjon
-# FIXME - Rydde i koden
+#' Konverter skjematyper
+#'
+#' `konverter_skjematype` håndterer manglende eller duplikate skjema for
+#' pasienter i NorArtritt.
+#' Alle pasienter *skal* i teorien ha ett inklusjonsskjema, og et ubegrenset
+#' antall oppfølgingsskjema. I virkeligheten er det dessverre ikke slik, og det
+#' finnes pasienter med flere inklusjonsskjema og pasienter uten inklusjonsskjema.
+#'
+#' Overflødige inklusjonsskjema konverteres til oppfølgingsskjema
+#' (det tidligste inklusjonsskjema beholdes som inklusjonsskjema),
+#' og hvis en pasient mangler inklusjonsskjema vil det tidligste oppfølgingsskjemaet
+#' konverteres til inklusjonsskjema.
+#'
+#' @param inkl datasett med alle inklusjonsskjema for NorArtritt. Må minimum
+#' inneholde variablene PasientGUID, Skjematype, FormTypeId og SkjemaGUID.
+#' @param oppf datasett med alle oppfølgingskskjema for NorArtritt. Må minimum
+#' inneholde variablene PasientGUID, Skjematype, FormTypeId og SkjemaGUID.
+#'
+#' @return
+#' Returnerer en tibble med alle inklusjons- og oppfølgingsskjema samlet.
+#' Dette vil videre filtreres og utbedres i påfølgende funksjoner før det til
+#' slutt returneres som opprinnelige datasett hvor inklusjon og oppfølging er
+#' separert.
+#'
+#' @export
+#'
+#' @examples
+#' Leser inn data for NorArtritt
+#' norartritt::les_data_norartritt()
+#' d_inkl_full_rettet = konverter_skjematype(
+#' inkl = d_full_Inklusjonsskjema,
+#' oppf = d_full_Oppfølgingsskjema)
 konverter_skjematype = function(inkl, oppf) {
 
   # ID for pasienter med skjema som skal konverteres
@@ -391,20 +377,16 @@ konverter_skjematype = function(inkl, oppf) {
 
   # Trekke ut skjemaGUID for skjema som skal konverteres
   inkl_til_oppf_skjemaGUID = d_inkl_oppf %>%
-    filter(
-      PasientGUID %in% id_flere_inklusjon,
-      FormTypeId == 1L
-    ) %>%
+    filter(PasientGUID %in% id_flere_inklusjon,
+           FormTypeId == 1L) %>%
     group_by(PasientGUID) %>%
     arrange(FormDate) %>%
     slice(-1) %>%
     pull(SkjemaGUID)
 
   oppf_til_inkl_skjemaGUID = d_inkl_oppf %>%
-    filter(
-      PasientGUID %in% id_oppf_uten_inkl,
-      FormTypeId == 2L
-    ) %>%
+    filter(PasientGUID %in% id_oppf_uten_inkl,
+           FormTypeId == 2L) %>%
     group_by(PasientGUID) %>%
     arrange(FormDate) %>%
     slice(1) %>%
@@ -412,19 +394,14 @@ konverter_skjematype = function(inkl, oppf) {
 
   # Konvertere til riktig skjematype
   d_inkl_oppf = d_inkl_oppf %>%
-    mutate(
-      Skjematype = case_when(
-        SkjemaGUID %in% inkl_til_oppf_skjemaGUID ~ "Oppfølgingskjema",
-        SkjemaGUID %in% oppf_til_inkl_skjemaGUID ~ "Inklusjonskjema",
-        TRUE ~ Skjematype
-      ),
-      FormTypeId = case_when(
-        SkjemaGUID %in% inkl_til_oppf_skjemaGUID ~ 2L,
-        SkjemaGUID %in% oppf_til_inkl_skjemaGUID ~ 1L,
-        TRUE ~ FormTypeId
-      )
-    ) %>%
+    mutate(Skjematype = case_when(SkjemaGUID %in% inkl_til_oppf_skjemaGUID ~ "Oppfølgingskjema",
+                                  SkjemaGUID %in% oppf_til_inkl_skjemaGUID ~ "Inklusjonskjema",
+                                  TRUE ~ Skjematype),
+           FormTypeId = case_when(SkjemaGUID %in% inkl_til_oppf_skjemaGUID ~ 2L,
+                                  SkjemaGUID %in% oppf_til_inkl_skjemaGUID ~ 1L,
+                                  TRUE ~ FormTypeId)) %>%
     arrange(FormTypeId)
 
   d_inkl_oppf
 }
+
