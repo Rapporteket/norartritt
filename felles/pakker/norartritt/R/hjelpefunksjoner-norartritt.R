@@ -405,3 +405,94 @@ konverter_skjematype = function(inkl, oppf) {
   d_inkl_oppf
 }
 
+#' Fjern ugyldige skjema
+#'
+#' Fjerner skjema i de ulike datasettene hvis pasienten mangler en nødvendig
+#' registrering av et annet skjema.
+#' For å inkluderes i analysene *må* pasienten ha både inklusjons- og
+#' diagnoseskjema.
+#' Denne funksjonen fjerner skjema i følgende rekkefølge:
+#' Diagnoseskjema for pasienter som mangler inklusjonsskjema.
+#' Inklusjonsskjema for pasienter som mangler diagnoseskjema.
+#' Oppfølgingsskjema for pasienter som mangler diagnoseskjema.
+#' Medisineringsskjema for pasienter som mangler diagnoseskjema.
+#'
+#' @param inkl Datasett med inklusjonsskjema for NorArtritt.
+#' @param oppf Datasett med oppfølgingsskjema for NorArtritt.
+#' @param med Datasett med medisinskjema for NorArtritt.
+#' @param diag Datasett med diagnoseskjema for NorArtritt.
+#'
+#' @return
+#' Returnerer filtrerte objekter for inndata med "_filtrert" som suffix.
+#'
+#' @export
+#'
+#' @examples
+#' # leser inn data for NorArtritt
+#' library(norartritt)
+#' les_data_norartritt()
+#' fjern_ugyldige_skjema(inkl = d_full_Inklusjonskjema,
+#'                       oppf = d_full_Oppfølgingskjema,
+#'                       med = d_full_Medisineringskjema,
+#'                       diag = d_full_Diagnoseskjema)
+fjern_ugyldige_skjema = function(inkl, oppf, med, diag) {
+
+  diag = fjern_uaktuelle_diagnoser(diag)
+  assign("diag_filtrert", fjerne_skjema_hjelpefunksjon(d_hoved = inkl, d_motpart = diag), .GlobalEnv)
+  assign("inkl_filtrert", fjerne_skjema_hjelpefunksjon(d_hoved = diag, d_motpart = inkl), .GlobalEnv)
+  assign("oppf_filtrert", fjerne_skjema_hjelpefunksjon(d_hoved = diag, d_motpart = oppf), .GlobalEnv)
+  assign("med_filtrert", fjerne_skjema_hjelpefunksjon(d_hoved = diag, d_motpart = med), .GlobalEnv)
+}
+
+#' Fjern uaktuelle diagnoser
+#'
+#' Fjerner et utvalg uaktuelle diagnoser som er registrert i NorArtritt.
+#' Disse er ikke av interesse for analyser, og hvis pasientene kun har en av
+#' disse diagnosene oppfyller de ikke inklusjonskriteriene for registeret.
+#'
+#' @param diag Diagnosedatasett fra NorArtritt.
+#'
+#' @return
+#' Returnerer diagnosedatasett hvor diagnosene
+#' Artrose, Juvenil Idiopatisk Artritt (JIA), Kondrokalsinose,
+#' Krystallartritter, Pyogen Artritt og Urinsyregikt er filtrert bort.
+#'
+#' @export
+#'
+#' @examples
+#' #Leser inn data fra NorArtritt
+#' library(norartritt)
+#' les_data_norartritt()
+#' diagnosedata_filtrert = fjern_uaktuelle_diagnoser(d_full_Diagnoseskjema)
+fjern_uaktuelle_diagnoser = function(diag) {
+  # uaktuelle diagnoser----------
+  uakt_diag = c("Artrose", "Juvenil Idiopatisk Artritt (JIA)", "Kondrokalsinose",
+                "Krystallartritter", "Pyogen Artritt", "Urinsyregikt")
+
+  # Fjerner diagnoseskjema for pasienter som mangler andre diagnoser enn de overnevnte
+  diag = diag %>% filter(!Navn %in% uakt_diag)
+
+  diag
+}
+
+#' Hjelpefunksjon for fjerning av skjema
+#'
+#' Hjelpefunksjon for fjerning av ugyldige skjema. Sjekker om det finnes
+#' Pasient-ID i d_motpart som ikke finnes i d_hoved.
+#' Brukes for eksempel for å fjerne inklusjonsskjema for pasienter som ikke har
+#' diagnoseskjema.
+#'
+#' @param d_hoved datasett med skjema som inneholder variabelen PasientGUID
+#' d_motpart skal kontrolleres mot.
+#' @param d_motpart datasett med skjema som eventuelt skal filtreres bort.
+#' Må inneholde variabelen PasientGUID.
+#'
+#' @return
+#' Returnerer filtrert versjon av d_motpart, hvor ID'er som ikke finnes i
+#' d_hoved er filtrert bort.
+fjerne_skjema_hjelpefunksjon = function(d_hoved, d_motpart) {
+
+  id_mangler_i_hoved = setdiff(d_motpart$PasientGUID, d_hoved$PasientGUID)
+  d = d_motpart %>% filter(!PasientGUID %in% id_mangler_i_hoved)
+  d
+}
