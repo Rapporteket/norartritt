@@ -279,11 +279,6 @@ velg_tidligste_inklusjondato = function(pas_id = PasientGUID, d_inkl_oppf) {
   d
 }
 
-
-# FIXME - dokumentasjon
-# FIXME - implementere i les_data_norartritt()
-# FIXME - Tester ?
-
 #' Valider legemiddeltype
 #'
 #' Validerer legemiddeltype i medisinfil mot kodebok. Hvis HEMIT gjør endringer i
@@ -496,3 +491,35 @@ fjerne_skjema_hjelpefunksjon = function(d_hoved, d_motpart) {
   d = d_motpart %>% filter(!PasientGUID %in% id_mangler_i_hoved)
   d
 }
+
+
+legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
+
+  d_inkl = d_inkl %>%
+    mutate(aar_ktrl = lubridate::year(InklusjonDato),
+           dato_ktrl = as_date(InklusjonDato))
+
+  d_oppf = d_oppf %>%
+    mutate(aar_ktrl = lubridate::year(FormDate),
+           dato_ktrl = as_date(FormDate))
+
+  d_med = d_med %>%
+    mutate(startaar = year(StartDato),
+           sluttaar = year(SluttDato),
+           StartDato = as_date(StartDato),
+           SluttDato = as_date(SluttDato))
+
+  d_diag = d_diag %>%
+    mutate(aar = lubridate::year(Dato),
+           dato_diag = as_date(FormDate),
+           diag_stilt_aar = lubridate::year(FormDate))
+
+  # Returnere alle objekter
+  (list(d_inkl, d_oppf, d_diag, d_med))
+
+}
+
+
+#legg_til_dager_diag_til_datadump = function() {
+
+#}
