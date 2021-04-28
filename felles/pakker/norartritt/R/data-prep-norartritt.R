@@ -1,6 +1,9 @@
-
 # Preprossesering av data for NorArtritt
 
+#' @importFrom magrittr %>%
+#' @importFrom dplyr add_count filter group_by arrange distinct select left_join mutate
+NULL
+#'
 # Lage en funksjon for å forberede alle datasett i NorArtritt for analyse.
 # Hovedfokus er for bruk i årsrapport, men jeg antar objektene vil være
 # å foretrekke i øvrige analyser også.
@@ -52,8 +55,30 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
 }
 
 
-# FIXME - Dokumentasjon
-lag_filtrerte_objekter = function(d_inkl, d_oppf, d_diag, d_med) {
+#' Lag filtrerte objekter
+#'
+#' Lager filtrerte objekter som er nyttige for bruk i analyse til for eksempel
+#' årsrapport.
+#'
+#' Objektene som returneres er:
+#' * \strong{d_med_vasket} Inneholder alle medisinskjema for alle pasienter i
+#' registeret som har en aktuell diagnose. Skjema uten startdato er fjernet, og
+#' dupliserte skjema er tatt bort. For duplikater er skjema som har en
+#' sluttdato beholdt.
+#' * \strong{d_diag_pers} Inneholder siste diagnose for hver pasient.
+#' * \strong{d_diag_med} Inneholder siste diagnose for hver pasient, i tillegg
+#' til hele medisinhistorikken for pasientene. Her legges det også til
+#' "Ingen medisin" for pasienter som ikke får medisinsk behandling.
+#'
+#' @param d_inkl Inklusjonsdatasett fra NorArtritt
+#' @param d_diag Diagnosedatasett fra NorArtritt
+#' @param d_med Medisindatasett fra NorArtritt
+#'
+#' @return
+#' Returnerer objektene d_med_vasket, d_diag_pers og d_diag_med til det
+#' globale miljøet.
+#' @export
+lag_filtrerte_objekter = function(d_inkl, d_diag, d_med) {
 
   # medisinforløp for hver pasient hvor duplikater er fjernet
   d_med_vasket = d_med %>%
