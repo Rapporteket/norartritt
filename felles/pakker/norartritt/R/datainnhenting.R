@@ -68,6 +68,10 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
   les_inn_data = function(skjema_id, kb = kb, dato = parent.frame()$dato, versjon = parent.frame()$versjon) {
     d = rapwhale::les_dd_mrs(mappe_dd, dato = parent.frame()$dato, versjon = parent.frame()$versjon, skjema_id = skjema_id, kodebok = kb)
 
+    # if(skjema_id == "Medisineringskjema") {
+    #   valider_legemiddeltype(mappe_dd)
+    # }
+
     # returnerer dataene
     objektnamn = paste0("d_full_", skjema_id)
     assign(objektnamn, d, envir = omgjevnad)
@@ -77,4 +81,11 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
   les_inn_data(skjema_id = "Diagnoseskjema", kb = kb, versjon = versjon)
   les_inn_data(skjema_id = "Oppfølgingskjema", kb = kb, versjon = versjon)
   les_inn_data(skjema_id = "Medisineringskjema", kb = kb, versjon = versjon)
+
+  vask_data_norartritt(
+    d_inkl = d_full_Inklusjonskjema,
+    d_oppf = d_full_Oppfølgingskjema,
+    d_diag = d_full_Diagnoseskjema,
+    d_med = d_full_Medisineringskjema
+  )
 }
