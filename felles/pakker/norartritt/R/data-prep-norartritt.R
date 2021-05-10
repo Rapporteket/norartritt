@@ -22,17 +22,23 @@ NULL
 
 # Kjernefunksjon som kaller på alle underfunksjoner
 vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
+
+  # Legger sammen inklusjon og oppfølging
   d_inkl_oppf = d_inkl %>%
     bind_rows(d_oppf)
+
   # Rett inklusjonsdato
   d_inkl_oppf = velg_tidligste_inklusjondato(d_inkl_oppf = d_inkl_oppf)
+
   # Rett skjematype
   d_inkl_oppf = konverter_skjematype(inkl = d_inkl, oppf = d_oppf)
+
   # Pakk ut inklusjons og oppfølgingsskjema.
   d_inkl = d_inkl_oppf %>%
     filter(FormTypeId == 1)
   d_oppf = d_inkl_oppf %>%
     filter(FormTypeId == 2)
+
   # Filtrer bort ugyldige skjema
   fjern_ugyldige_skjema(inkl = d_inkl, oppf = d_oppf, diag = d_diag, med = d_med) # Returnerer filtrerte objekter
 
@@ -42,6 +48,7 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
     d_diag = diag_filtrert, d_med = med_filtrert
   )
 
+  # Trekker ut de ulike skjematypene fra skjema objekt
   d_inkl = skjema[[1]]
   d_oppf = skjema[[2]]
   d_diag = skjema[[3]]
@@ -50,8 +57,11 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
   # strukturer variabler som mangler kodebok
 
   # Lag utvalgte ferdigfiltrerte objekter
-
-  # Returner data
+  lag_filtrerte_objekter(
+    d_inkl = d_inkl,
+    d_diag = d_diag,
+    d_med = d_med
+  )
 }
 
 
