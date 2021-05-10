@@ -2,6 +2,7 @@
 
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate filter select left_join right_join case_when group_by summarise ungroup arrange slice pull bind_rows
+#' @importFrom lubridate as_date year
 NULL
 
 #' Legg til medisinnavn
@@ -493,14 +494,47 @@ fjerne_skjema_hjelpefunksjon = function(d_hoved, d_motpart) {
 }
 
 
+
+#' Legger til ekstra datovariabler
+#'
+#' Legger til ekstra datovariabler til skjema i NorArtritt for å forenkle
+#' analyser.
+#' For inklusjon- og oppfølgingsskjema legges det til:
+#' * \strong{aar_ktrl} Årstall for inklusjon i registeret.
+#' * \strong{dato_ktrl} Dato for inklusjon i registeret.
+#' For medisinskjema legges det til:
+#' * \strong{startaar} År for oppstart medisin.
+#' * \strong{sluttaar} År for avslutning av medisin.
+#' * \strong{StartDato} Dato for oppstart medisin.
+#' * \strong{SluttDato} Dato for avslutning av medisin.
+#'
+#' @param d_inkl inklusjonsskjema fra NorArtritt.
+#' @param d_oppf Oppfølgingsskjema fra NorArtritt.
+#' @param d_med Medisinskjema fra NorArtritt.
+#' @param d_diag Diagnoseskjema fra NorArtritt.
+#'
+#' @return
+#' Returnerer en liste med de fire skjematypene i NorArtritt hvor ekstra
+#' datovariabler er lagt til.
+#'
+#' @export
+#'
+#' @examples
+#' # leser inn data for norartritt:
+#' library(norartritt)
+#' les_data_norartritt()
+#' legg_til_datovariabler(d_inkl = d_full_Inklusjonsskjema,
+#' d_oppf = d_full_Oppfølgingsskjema,
+#' d_med = d_full_Medisinskjema,
+#' d_diag = d_full_Diagnoseskjema)
 legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
 
   d_inkl = d_inkl %>%
-    mutate(aar_ktrl = lubridate::year(InklusjonDato),
+    mutate(aar_ktrl = year(InklusjonDato),
            dato_ktrl = as_date(InklusjonDato))
 
   d_oppf = d_oppf %>%
-    mutate(aar_ktrl = lubridate::year(FormDate),
+    mutate(aar_ktrl = year(FormDate),
            dato_ktrl = as_date(FormDate))
 
   d_med = d_med %>%
@@ -510,9 +544,9 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
            SluttDato = as_date(SluttDato))
 
   d_diag = d_diag %>%
-    mutate(aar = lubridate::year(Dato),
+    mutate(aar = year(Dato),
            dato_diag = as_date(FormDate),
-           diag_stilt_aar = lubridate::year(FormDate))
+           diag_stilt_aar = year(FormDate))
 
   # Returnere alle objekter
   (list(d_inkl, d_oppf, d_diag, d_med))
