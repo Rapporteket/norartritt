@@ -59,6 +59,7 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
   # Lag utvalgte ferdigfiltrerte objekter
   lag_filtrerte_objekter(
     d_inkl = d_inkl,
+    d_oppf = d_oppf,
     d_diag = d_diag,
     d_med = d_med
   )
@@ -88,7 +89,7 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
 #' Returnerer objektene d_med_vasket, d_diag_pers og d_diag_med til det
 #' globale miljøet.
 #' @export
-lag_filtrerte_objekter = function(d_inkl, d_diag, d_med) {
+lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 
   # medisinforløp for hver pasient hvor duplikater er fjernet
   d_med_vasket = d_med %>%
@@ -161,9 +162,13 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med) {
       diagnose_aar = lubridate::year(dato_diag)
     )
 
+  d_inkl_oppf = d_inkl %>%
+    bind_rows(d_oppf)
+
   assign("d_med_vasket", d_med_vasket, envir = .GlobalEnv)
   assign("d_diag_pers", d_diag_pers, envir = .GlobalEnv)
   assign("d_diag_med", d_diag_med, envir = .GlobalEnv)
+  assign("d_inkl_oppf", d_inkl_oppf, envir = .GlobalEnv)
 }
 
 
