@@ -30,6 +30,12 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
   # Rett inklusjonsdato
   d_inkl_oppf = velg_tidligste_inklusjondato(d_inkl_oppf = d_inkl_oppf)
 
+  # Pakk ut inklusjons og oppfølgingsskjema.
+  d_inkl = d_inkl_oppf %>%
+    filter(FormTypeId == 1)
+  d_oppf = d_inkl_oppf %>%
+    filter(FormTypeId == 2)
+
   # Rett skjematype
   d_inkl_oppf = konverter_skjematype(inkl = d_inkl, oppf = d_oppf)
 
@@ -40,7 +46,16 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
     filter(FormTypeId == 2)
 
   # Filtrer bort ugyldige skjema
-  fjern_ugyldige_skjema(inkl = d_inkl, oppf = d_oppf, diag = d_diag, med = d_med) # Returnerer filtrerte objekter
+  filtrerte_skjema = fjern_ugyldige_skjema(
+    inkl = d_inkl,
+    oppf = d_oppf,
+    diag = d_diag,
+    med = d_med
+  )
+  inkl_filtrert = filtrerte_skjema[[1]]
+  oppf_filtrert = filtrerte_skjema[[2]]
+  diag_filtrert = filtrerte_skjema[[3]]
+  med_filtrert = filtrerte_skjema[[4]]
 
   # Legg til datovariabler
   skjema = legg_til_datovariabler(
@@ -91,6 +106,20 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
 #' @export
 lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 
+  # Baseobjekter for alle skjema
+  d_inkl = d_inkl %>%
+    legg_til_sykehusnavn()
+
+  d_oppf = d_oppf %>%
+    legg_til_sykehusnavn()
+
+  d_diag = d_diag %>%
+    legg_til_diagnosegrupper()
+
+  d_med = d_med %>%
+    legg_til_medisinnavn()
+
+
   # medisinforløp for hver pasient hvor duplikater er fjernet
   d_med_vasket = d_med %>%
     filter(!is.na(StartDato))
@@ -112,19 +141,24 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 
   # d_diag_med: Siste diagnose og hele medisinhistorikken, inkludert Ingen medisin
   # for de som ikke har medisinsk behandling
+  # FIXME - Forbedre select. Se hva som ekskluderes.
   d_diag_med = d_diag_pers %>%
     select(
       PasientGUID, UnitId, FormDate, PatientAge, PatientGender, Kode, Navn, Dato, DiagnoseDato,
-      aar, dato_diag, diag_stilt_aar
+      aar, dato_diag, diag_stilt_aar, diaggrupper_med, diaggrupper_med_tekst,
+      diaggrupper_rem, diaggrupper_rem_tekst, rem_maal, diaggrupper_hoved,
+      diaggrupper_hoved_tekst, perifer_aksial_diaggruppe,
+      perifer_aksial_diaggruppe_tekst
     ) %>%
     left_join(d_med_vasket %>%
       select(
         PasientGUID, Enhet, Mengde, LegemiddelType, Legemiddel, Intervall,
         EndringArsak, StartDato, SluttDato, EndringsDato,
-        startaar, sluttaar
+        startaar, sluttaar, legemiddel_navn, legemiddel_navn_kode,
+        biokat, csdmard, dmard, tsdmard, bio_og_tsdmard,
+        legemiddel_gruppert, legemiddel_gruppert_navn,
+        Virkestoff
       ), by = "PasientGUID") %>%
-    legg_til_medisinnavn() %>% # FIXME - Flytte denne til tidligere objekt.
-    legg_til_sykehusnavn() %>% # FIXME - Flytte til tidligere objekt
     mutate(
       legemiddel_navn = replace(
         as.character(legemiddel_navn),
@@ -169,6 +203,10 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
   assign("d_diag_pers", d_diag_pers, envir = .GlobalEnv)
   assign("d_diag_med", d_diag_med, envir = .GlobalEnv)
   assign("d_inkl_oppf", d_inkl_oppf, envir = .GlobalEnv)
+  assign("d_inkl", d_inkl, envir = .GlobalEnv)
+  assign("d_oppf", d_oppf, envir = .GlobalEnv)
+  assign("d_diag", d_diag, envir = .GlobalEnv)
+  assign("d_med", d_med, envir = .GlobalEnv)
 }
 
 
