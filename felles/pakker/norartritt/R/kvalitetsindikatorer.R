@@ -1,5 +1,10 @@
 # Kvalitetsindikatorer for NorArtritt
 
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter group_by ungroup arrange desc distinct n_distinct select left_join mutate pull
+#' @importFrom lubridate as_date ymd
+NULL
+#'
 #' Kvalitetsindikator for tidlig oppstart av behandling
 #'
 #' @description
@@ -49,6 +54,7 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
   # Må enten bruke nye funksjonene for å hente navn, eller ta utgangspunkt i at
   # det gjøres i preprosseseringsfunksjon (som ikke er laget ferdig enda).
   # FIXME - Fjerne avhengighet av PasientGUID (må kunne ta inn fødselsnummer også).
+  # FIXME - Sjekke at jeg ikke importerer flere funksjoner en nødvendig i toppen
 
   # Sykdomsmodifiserende midler:
   sykmod_medisin = c(1:8, 10:12, 14:16, 18, 20, 22, 24:26, 28:32)
@@ -64,7 +70,7 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
                        legemiddel_navn, legemiddel_navn_kode),
               by = "PasientGUID") %>%
     mutate(dager_fra_diag_til_inkl =
-             as.numeric(as_date(InklusjonDato) - dato_diag))
+             as.numeric(as_date(InklusjonDato) - as_date(dato_diag)))
 
   # Skal se på pasienter som kun har én diagnose
   d_ki_n_diag = d_inkl_diag_med %>%
@@ -82,7 +88,7 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
 
   # Legge til teller og reduserer til en rad per pasient
   d_ki = d_ki_med_krit_nevner %>%
-    mutate(tid_til_oppstart_medisin = StartDato - dato_diag,
+    mutate(tid_til_oppstart_medisin = as_date(StartDato) - as_date(dato_diag),
            ki_krit_teller = ki_krit_nevner &
              legemiddel_navn_kode %in% sykmod_medisin &
              tid_til_oppstart_medisin >= 0 &
