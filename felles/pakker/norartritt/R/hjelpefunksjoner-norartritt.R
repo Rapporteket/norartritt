@@ -275,6 +275,7 @@ velg_tidligste_inklusjondato = function(pas_id = PasientGUID, d_inkl_oppf) {
   d = d_inkl_oppf %>%
     group_by({{pas_id}}) %>%
     mutate(InklusjonDato = as.Date(min_na(InklusjonDato))) %>%
+    filter(!is.na(InklusjonDato)) %>%
     ungroup()
 
   d
@@ -434,10 +435,14 @@ konverter_skjematype = function(inkl, oppf) {
 fjern_ugyldige_skjema = function(inkl, oppf, med, diag) {
 
   diag = fjern_uaktuelle_diagnoser(diag)
-  assign("diag_filtrert", fjerne_skjema_hjelpefunksjon(d_hoved = inkl, d_motpart = diag), .GlobalEnv)
-  assign("inkl_filtrert", fjerne_skjema_hjelpefunksjon(d_hoved = diag, d_motpart = inkl), .GlobalEnv)
-  assign("oppf_filtrert", fjerne_skjema_hjelpefunksjon(d_hoved = diag, d_motpart = oppf), .GlobalEnv)
-  assign("med_filtrert", fjerne_skjema_hjelpefunksjon(d_hoved = diag, d_motpart = med), .GlobalEnv)
+
+  diag_filtrert = fjerne_skjema_hjelpefunksjon(d_hoved = inkl, d_motpart = diag)
+  inkl_filtrert = fjerne_skjema_hjelpefunksjon(d_hoved = diag, d_motpart = inkl)
+  oppf_filtrert = fjerne_skjema_hjelpefunksjon(d_hoved = diag, d_motpart = oppf)
+  med_filtrert  = fjerne_skjema_hjelpefunksjon(d_hoved = diag, d_motpart = med)
+
+  # Returnere alle objekter
+  (list(inkl_filtrert, oppf_filtrert, diag_filtrert, med_filtrert))
 }
 
 #' Fjern uaktuelle diagnoser
@@ -492,7 +497,6 @@ fjerne_skjema_hjelpefunksjon = function(d_hoved, d_motpart) {
   d = d_motpart %>% filter(!PasientGUID %in% id_mangler_i_hoved)
   d
 }
-
 
 
 #' Legger til ekstra datovariabler
