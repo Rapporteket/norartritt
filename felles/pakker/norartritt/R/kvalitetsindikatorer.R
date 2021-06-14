@@ -145,7 +145,8 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
     mutate(ki_krit_nevner = diaggrupper_med == 1 &
              diag_stilt_aar <= aarstall)
 
-  d_ki_med_krit = d_ki %>% filter(ki_krit_nevner) %>%
+  d_ki_med_krit = d_ki %>% 
+    filter(ki_krit_nevner) %>%
     mutate(ki_krit_teller = ki_krit_nevner &
              legemiddel_navn_kode %in% legemiddel &
              !is.na(legemiddel_navn_kode) &
