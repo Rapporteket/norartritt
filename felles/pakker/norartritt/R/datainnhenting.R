@@ -4,6 +4,7 @@ grunnmappe_norartritt = "***FJERNET ADRESSE***"
 # Les inn NorArtritt-data
 
 # TODO Lage funksjoner for dataprep som gjøres i datainnhenting-norartritt.R
+# FIXME - Oppdatere dokumentasjon for å beskrive alle objektene som lastes inn og hva som gjøres med dem.
 
 #' @importFrom magrittr %>%
 NULL
