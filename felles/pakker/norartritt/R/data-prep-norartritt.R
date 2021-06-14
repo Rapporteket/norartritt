@@ -117,22 +117,22 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     legg_til_diagnosegrupper()
 
   d_med = d_med %>%
-    legg_til_medisinnavn()
-
+    legg_til_medisinnavn() %>%
+    filter(!(LegemiddelType == 999 & is.na(Legemiddel)))
 
   # medisinforløp for hver pasient hvor duplikater er fjernet
-  d_med_vasket = d_med %>%
+  if (nrow(d_med %>% filter(legemiddel_navn_kode == 999)) > 0) {
+    warning("Det finnes legemiddel med LegemiddelType 999 som ikke er definert i kodebok")
+  }
+
+  # medisinforløp for hver pasient hvor duplikater er fjernet
+  d_med_vasket_uten_na = d_med %>%
     filter(!is.na(StartDato))
 
-  skjemaid_duplikat = d_med_vasket %>%
-    add_count(PasientGUID, StartDato, LegemiddelType) %>%
-    filter(n > 1) %>%
-    group_by(PasientGUID) %>%
+  d_med_vasket = d_med_vasket_uten_na %>%
+    group_by(PasientGUID, StartDato, LegemiddelType) %>%
     arrange(SluttDato) %>%
-    distinct(PasientGUID, .keep_all = TRUE) %>%
-    select(-n)
-
-  d_med_vasket = setdiff(d_med_vasket, skjemaid_duplikat)
+    distinct(PasientGUID, StartDato, LegemiddelType, .keep_all = TRUE)
 
   # Siste diagnose for hver pasient
   d_diag_pers = d_diag %>%
