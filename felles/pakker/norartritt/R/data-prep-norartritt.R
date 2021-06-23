@@ -20,7 +20,23 @@ NULL
 
 # FIXME - Flytte hjelpefunksjoner til dette skriptet.
 
-# Kjernefunksjon som kaller på alle underfunksjoner
+#' vask data norartritt
+#'
+#' Funksjon som vasker data fra NorArtritt. Datadumper som lastes ned fra
+#' registeret trenger preprossesering før det kan brukes i analyse.
+#' Denne funksjonen gjør alt det nødvendige arbeidet med preprossesering
+#' og lager nye objekter som brukes mye i analyse. Funksjonen vil normalt
+#' sett ikke kalles direkte, men det kan være nyttig hvis en prøver å lese
+#' inn et identifiserbart datasett med fødselsnummer, og ikke PasientGUID.
+#'
+#'
+#' @param d_inkl Inklusjonsdatasett, vanligvis d_full_Inklusjonsskjema.
+#' @param d_oppf Oppfølgingsdatasett, vanligvis d_full_Oppfølgingsskjema.
+#' @param d_diag Diagnosedatasett, vanligvis d_full_Diagnoseskjema.
+#' @param d_med Medisindatasett, vanligvis d_full_Medisineringskjema.
+#'
+#' @return
+#' @export
 vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
 
   # Legger sammen inklusjon og oppfølging
