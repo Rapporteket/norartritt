@@ -148,7 +148,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
   d_med_vasket = d_med_vasket_uten_na %>%
     group_by(PasientGUID, StartDato, LegemiddelType) %>%
     arrange(SluttDato) %>%
-    distinct(PasientGUID, StartDato, LegemiddelType, .keep_all = TRUE)
+    distinct(PasientGUID, StartDato, LegemiddelType, .keep_all = TRUE) %>%
+    ungroup()
 
   # Siste diagnose for hver pasient
   d_diag_pers = d_diag %>%
