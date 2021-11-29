@@ -122,6 +122,13 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
 #' @export
 lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 
+  # Lager objekt med dødsdato for alle pasienter som har dødd
+  d_dodsdato = d_inkl %>%
+    select(PasientGUID, DeathDate) %>%
+    filter(!is.na(DeathDate)) %>%
+    distinct(PasientGUID, .keep_all = TRUE) %>%
+    mutate(DeathDate = as_date(DeathDate))
+
   # Baseobjekter for alle skjema
   d_inkl = d_inkl %>%
     legg_til_sykehusnavn()
@@ -130,18 +137,34 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     legg_til_sykehusnavn()
 
   d_diag = d_diag %>%
-    legg_til_diagnosegrupper()
+    legg_til_diagnosegrupper() %>%
+    left_join(d_dodsdato, by = "PasientGUID") %>%
+    filter(is.na(DeathDate) | DeathDate >= dato_diag)
 
   d_med = d_med %>%
     legg_til_medisinnavn() %>%
-    filter(!(LegemiddelType == 999 & is.na(Legemiddel)))
+    filter(!(LegemiddelType == 999 & is.na(Legemiddel))) %>%
+    left_join(d_dodsdato, by = "PasientGUID") %>%
+    mutate(SluttDato = if_else(is.na(SluttDato) & !is.na(DeathDate),
+      DeathDate,
+      if_else(SluttDato > DeathDate,
+        DeathDate,
+        SluttDato
+      )
+    )) %>%
+    mutate(
+      startaar = lubridate::year(StartDato),
+      sluttaar = lubridate::year(SluttDato)
+    )
+
 
   # medisinforløp for hver pasient hvor duplikater er fjernet
   if (nrow(d_med %>% filter(legemiddel_navn_kode == 999)) > 0) {
     warning("Det finnes legemiddel med LegemiddelType 999 som ikke er definert i kodebok")
   }
 
-  # medisinforløp for hver pasient hvor duplikater er fjernet
+  # Fjerner duplikate medisinforløp og legger inn DeathDate som SluttDato hvis
+  # død inntreffer før medisinforløp er registrert avsluttet.
   d_med_vasket_uten_na = d_med %>%
     filter(!is.na(StartDato))
 
@@ -170,7 +193,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     left_join(d_med_vasket %>%
       select(
         PasientGUID, Enhet, Mengde, LegemiddelType, Legemiddel, Intervall,
-        EndringArsak, StartDato, SluttDato, EndringsDato,
+        EndringArsak, StartDato, SluttDato, EndringsDato, DeathDate,
         startaar, sluttaar, legemiddel_navn, legemiddel_navn_kode,
         biokat, csdmard, dmard, tsdmard, bio_og_tsdmard,
         legemiddel_gruppert, legemiddel_gruppert_navn,
@@ -224,6 +247,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
   assign("d_oppf", d_oppf, envir = .GlobalEnv)
   assign("d_diag", d_diag, envir = .GlobalEnv)
   assign("d_med", d_med, envir = .GlobalEnv)
+  assign("d_dodsdato", d_dodsdato, envir = .GlobalEnv)
 }
 
 
