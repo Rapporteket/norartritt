@@ -81,12 +81,6 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
   les_inn_data(skjema_id = "Inklusjonskjema", kb = kb, versjon = versjon)
   les_inn_data(skjema_id = "Diagnoseskjema", kb = kb, versjon = versjon)
   les_inn_data(skjema_id = "Oppfølgingskjema", kb = kb, versjon = versjon)
+  les_inn_data(skjema_id = "Oppfølgingskjema2", kb = kb, versjon = versjon)
   les_inn_data(skjema_id = "Medisineringskjema", kb = kb, versjon = versjon)
-
-  vask_data_norartritt(
-    d_inkl = d_full_Inklusjonskjema,
-    d_oppf = d_full_Oppfølgingskjema,
-    d_diag = d_full_Diagnoseskjema,
-    d_med = d_full_Medisineringskjema
-  )
 }
