@@ -145,7 +145,7 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
     mutate(ki_krit_nevner = diaggrupper_med == 1 &
              diag_stilt_aar <= aarstall)
 
-  d_ki_med_krit = d_ki %>% 
+  d_ki_med_krit = d_ki %>%
     filter(ki_krit_nevner) %>%
     mutate(ki_krit_teller = ki_krit_nevner &
              legemiddel_navn_kode %in% legemiddel &
@@ -226,16 +226,16 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
     mutate(ki_krit_nevner = PasientGUID %in% id_diagnose &
              dager_siden_diagnose >= tidsrom_start &
              dager_siden_diagnose <= tidsrom_slutt &
-             !(is.na(mrs_OmmeLeddAntall)) &
-             !(is.na(mrs_HovneLeddAntall)) &
+             !(is.na(OmmeLeddAntall)) &
+             !(is.na(HovneLeddAntall)) &
              !(is.na(Crp)) &
              !(is.na(PasientGlobalSykdomsaktivitet)))
 
   # Finner hvem som oppfyller krav for teller og reduserer til en rad per pasient.
   d_ki_rem = d %>%
     mutate(ki_krit_teller = ki_krit_nevner &
-             mrs_OmmeLeddAntall <= 1 & # fixme (QA): Produksjonskode bør aldri bruka variablar som startar med «mrs_», sidan me ikkje har noko kontroll på innhaldet. Desse må handterast spesielt (med validering og parsing) og «vanlege» variablar (med andre namn) lagast.
-             mrs_HovneLeddAntall <= 1 & # fixme (QA): Sjå over.
+             OmmeLeddAntall <= 1 &
+             HovneLeddAntall <= 1 &
              Crp <= 10 & !is.na(Crp) &
              PasientGlobalSykdomsaktivitet <= 10 &
              !is.na(PasientGlobalSykdomsaktivitet)) %>%
@@ -299,8 +299,8 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
 
   d_rem_totalt = d %>%
     mutate(ki_krit_teller = ifelse(ki_krit_nevner &
-                                     mrs_OmmeLeddAntall <= 1 &
-                                     mrs_HovneLeddAntall <= 1 &
+                                     OmmeLeddAntall <= 1 &
+                                     HovneLeddAntall <= 1 &
                                      Crp <= 10 & !is.na(Crp) &
                                      PasientGlobalSykdomsaktivitet <= 10 &
                                      !is.na(PasientGlobalSykdomsaktivitet),
