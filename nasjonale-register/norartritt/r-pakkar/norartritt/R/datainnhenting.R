@@ -66,16 +66,33 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
   kb = rapwhale::les_kb_mrs(mappe_dd, dato = dato)
 
   # les inn data
-  les_inn_data = function(skjema_id, kb = kb, dato = parent.frame()$dato, versjon = parent.frame()$versjon) {
-    d = rapwhale::les_dd_mrs(mappe_dd, dato = parent.frame()$dato, versjon = parent.frame()$versjon, skjema_id = skjema_id, kodebok = kb)
+  les_inn_data = function(skjema_id,
+                          kb = kb,
+                          dato = parent.frame()$dato,
+                          versjon = parent.frame()$versjon) {
 
-    # if(skjema_id == "Medisineringskjema") {
-    #   valider_legemiddeltype(mappe_dd)
-    # }
+    # skjekk at skjema finnes i datadump-mappe, hvis ikke hopper vi over den
+    if (any(str_detect(
+      string = list.files(paste0(mappe_dd, "\\", dato, "\\")),
+      pattern = skjema_id
+    ))) {
+      d = rapwhale::les_dd_mrs(mappe_dd,
+        dato = parent.frame()$dato,
+        versjon = parent.frame()$versjon,
+        skjema_id = skjema_id,
+        kodebok = kb
+      )
 
-    # returnerer dataene
-    objektnamn = paste0("d_full_", skjema_id)
-    assign(objektnamn, d, envir = omgjevnad)
+      # if(skjema_id == "Medisineringskjema") {
+      #   valider_legemiddeltype(mappe_dd)
+      # }
+
+      # returnerer dataene
+      objektnamn = paste0("d_full_", skjema_id)
+      assign(objektnamn, d, envir = omgjevnad)
+    } else {
+      print(paste0(skjema_id, " finnes ikke i mappe med datadumper. "))
+    }
   }
 
   les_inn_data(skjema_id = "Inklusjonskjema", kb = kb, versjon = versjon)
