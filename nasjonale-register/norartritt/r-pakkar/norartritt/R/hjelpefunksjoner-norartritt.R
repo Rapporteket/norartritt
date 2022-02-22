@@ -356,7 +356,7 @@ valider_legemiddeltype = function(mappe_dd) {
 #' @export
 #'
 #' @examples
-#' Leser inn data for NorArtritt
+#' # Leser inn data for NorArtritt
 #' norartritt::les_data_norartritt()
 #' d_inkl_full_rettet = konverter_skjematype(
 #' inkl = d_full_Inklusjonsskjema,
