@@ -200,7 +200,7 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
 #' @export
 #'
 #' @examples
-#' d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
+#' # d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
 #' d_ki_remisjon = ki_remisjon(d_diag, d_inkl_oppf)
 ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
 
