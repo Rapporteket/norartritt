@@ -270,8 +270,8 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
 #' @export
 #'
 #' @examples
-#' # d_diag og d_inkl_oppf er diagnose og sammenslått
-#' inklusjon og oppfølgingsdatasett
+#' # d_diag og d_inkl_oppf er diagnose og sammenslått 
+#' # inklusjon og oppfølgingsdatasett
 #' d_remisjon_totalt = remisjon_totalt(d_diag, d_inkl_oppf)
 remisjon_totalt = function(d_diag, d_inkl_oppf) {
   # FIXME - Legge inn støtte for grupperingsvariabler.
