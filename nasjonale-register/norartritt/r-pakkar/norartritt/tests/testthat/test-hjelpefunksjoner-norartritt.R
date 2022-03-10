@@ -177,24 +177,6 @@ test_that("Leser inn diagnoseinformasjon som forventet", {
 # velg_tidligste_inklusjonsdato -------------------------------------------
 context("velg_tidligste_inklusjondato")
 
-test_that("NA returneres hvis ingen inklusjonsdato finnes", {
-  dato = c("NA", "NA", "2020-11-23", "2020-08-27")
-  d = tibble::tibble(
-    PasientGUID = c("A", "A", "B", "B"),
-    InklusjonDato = (as.POSIXct(dato, tz = "UTC", format = "%Y-%m-%d"))
-  ) # Sjekke om det skal være HMS her
-
-  d_ut_forventet = tibble::tibble(
-    PasientGUID = c("A", "A", "B", "B"),
-    InklusjonDato = as.Date(c(NA, NA, "2020-08-27", "2020-08-27"))
-  )
-
-  expect_identical(
-    velg_tidligste_inklusjondato(pas_id = PasientGUID, d),
-    d_ut_forventet
-  )
-})
-
 test_that("Tidligste dato returneres hvis det også finnes NA", {
   dato = c("NA", "2019-11-12", "2020-11-23", "2020-08-27")
   d = tibble::tibble(
