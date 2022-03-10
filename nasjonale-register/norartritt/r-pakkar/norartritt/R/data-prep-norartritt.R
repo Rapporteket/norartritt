@@ -145,18 +145,13 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     legg_til_medisinnavn() %>%
     filter(!(LegemiddelType == 999 & is.na(Legemiddel))) %>%
     left_join(d_dodsdato, by = "PasientGUID") %>%
-    mutate(SluttDato = if_else(is.na(SluttDato) & !is.na(DeathDate),
-      DeathDate,
-      if_else(SluttDato > DeathDate,
-        DeathDate,
-        SluttDato
-      )
-    )) %>%
-    mutate(
-      startaar = lubridate::year(StartDato),
-      sluttaar = lubridate::year(SluttDato)
-    )
-
+    mutate(SluttDato = case_when(is.na(SluttDato) & !is.na(DeathDate) ~ DeathDate, 
+                                 SluttDato > DeathDate ~ DeathDate,
+                                 DeathDate > SluttDato ~ SluttDato,
+                                 TRUE ~ SluttDato),
+           startaar = lubridate::year(StartDato),
+           sluttaar = lubridate::year(SluttDato)) %>% 
+    filter(StartDato < DeathDate | is.na(DeathDate))
 
   # medisinforløp for hver pasient hvor duplikater er fjernet
   if (nrow(d_med %>% filter(legemiddel_navn_kode == 999)) > 0) {
