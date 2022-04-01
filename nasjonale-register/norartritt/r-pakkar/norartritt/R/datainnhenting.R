@@ -72,7 +72,7 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
                           versjon = parent.frame()$versjon) {
 
     # skjekk at skjema finnes i datadump-mappe, hvis ikke hopper vi over den
-    if (any(str_detect(
+    if (any(stringr::str_detect(
       string = list.files(paste0(mappe_dd, "\\", dato, "\\")),
       pattern = skjema_id
     ))) {
