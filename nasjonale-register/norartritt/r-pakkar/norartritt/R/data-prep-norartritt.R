@@ -142,8 +142,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     filter(is.na(DeathDate) | DeathDate >= dato_diag)
 
   d_med = d_med %>%
-    legg_til_medisinnavn() %>%
     filter(!(LegemiddelType == 999 & is.na(Legemiddel))) %>%
+    legg_til_medisinnavn() %>%
     left_join(d_dodsdato, by = "PasientGUID") %>%
     mutate(
       SluttDato = case_when(
