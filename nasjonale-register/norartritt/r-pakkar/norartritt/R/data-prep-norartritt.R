@@ -191,7 +191,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     ) %>%
     left_join(d_med_vasket %>%
       select(
-        PasientGUID, Enhet, Mengde, LegemiddelType, Legemiddel, Intervall,
+        PasientGUID, Enhet, Mengde, LegemiddelType, Intervall,
         EndringArsak, StartDato, SluttDato, EndringsDato, DeathDate,
         startaar, sluttaar, legemiddel_navn, legemiddel_navn_kode,
         biokat, csdmard, dmard, tsdmard, bio_og_tsdmard,
