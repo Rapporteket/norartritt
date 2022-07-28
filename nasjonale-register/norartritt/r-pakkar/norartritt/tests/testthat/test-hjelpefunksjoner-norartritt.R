@@ -22,9 +22,8 @@ test_that("Leser inn data fra medisinkodebok som forventet", {
   )
 
   d_ut_forventet = tibble::tibble(
-    LegemiddelType = c(1, 2, 3),
-    Legemiddel = c(NA, NA, NA),
     legemiddel_navn_kode = c(1L, 2L, 3L),
+    LegemiddelType = c(1L, 2L, 3L),
     legemiddel_navn = c(
       "Cimzia (certolizumab pegol)",
       "Enbrel (etanercept)",
