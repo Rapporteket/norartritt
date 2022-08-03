@@ -1,13 +1,20 @@
 Package: norartritt
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Diverse funksjoner for registeret NorArtritt
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: 
+    person(given = "Endre",
+           family = "Kvåle Evjen",
+           role = c("aut", "cre"),
+           email = "endre.kvale.evjen@helse-bergen.no")
+Description: Diverse funksjoner for håndtering, analyse og rapportering av data
+    for det medisinske kvalitetsregisteret 
+    NorArtritt (Norsk kvalitetsregister for artrittsykdommer). 
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Roxygen: list(markdown = TRUE)
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
