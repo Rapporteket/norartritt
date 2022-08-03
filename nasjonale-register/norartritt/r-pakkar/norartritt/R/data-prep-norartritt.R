@@ -36,6 +36,29 @@ NULL
 #' @param d_med Medisindatasett, vanligvis d_full_Medisineringskjema.
 #'
 #' @return
+#' Returnerer filtrerte og *vaskede* datasett for ulike skjema i NorArtritt.
+#'
+#' Basisskjema:
+#' * \strong{d_diag, d_med, d_inkl, d_oppf, d_inkl_oppf} \cr
+#' Tilsvarer de fullstendige datasettene men med grunnleggende filtrering, slik
+#' at blant annet ugyldige skjema er filtrert ut og datovariabler er kontrollert.
+#'
+#' Koblede skjema:
+#' * \strong{d_med_vasket} \cr
+#' Inneholder alle medisinskjema for alle pasienter i
+#' registeret som har en aktuell diagnose. Skjema uten startdato er fjernet, og
+#' dupliserte skjema er tatt bort. For duplikater er skjema som har en
+#' sluttdato beholdt.
+#' * \strong{d_diag_pers} \cr
+#' Inneholder siste diagnose for hver pasient.
+#' * \strong{d_diag_med} \cr
+#' Inneholder siste diagnose for hver pasient, i tillegg
+#' til hele medisinhistorikken for pasientene. Her legges det også til
+#' "Ingen medisin" for pasienter som ikke får medisinsk behandling.
+#'
+#' * \strong{d_dodsdato} \cr
+#' Inneholder oversikt over dødsdato, hvor tilgjengelig.
+#'
 #' @export
 vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
 
