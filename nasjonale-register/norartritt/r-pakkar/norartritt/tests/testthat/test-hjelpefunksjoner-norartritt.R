@@ -1,8 +1,6 @@
 # tester hjelpefunksjoner-norartritt.R
 
 # legg_til_medisinnavn ----------------------------------------------------
-context("legg_til_medisinnavn")
-
 test_that("Advarsel hvis data inneholder LegemiddelType som ikke har navn i kodebok", {
   d = tibble::tibble(
     LegemiddelType = c(1, 2, 3, 765),
@@ -55,8 +53,6 @@ test_that("Leser inn data fra medisinkodebok som forventet", {
 
 
 # legg_til_sykehusnavn ----------------------------------------------------
-context("legg_til_sykehusnavn")
-
 test_that("Feilmelding hvis UnitID i datasett ikke finnes i kodebok", {
   d = tibble::tibble(UnitId = c(1, 2, 34))
   feilmelding = "Det mangler kobling for UnitId: 1, 2, 34"
@@ -88,7 +84,6 @@ test_that("Leser inn enhetsinformasjon fra sykehusfil som forventet", {
 
 
 # legg_til_diagnosegrupper ------------------------------------------------
-context("legg_til_diagnosegrupper")
 # Gir advarsel om det finnes diagnosekoder som ikke har navn i kodebok
 test_that("Feilmelding hvis diagnosekoder ikke finnes i diagnosekodebok", {
   d = tibble::tibble(
@@ -174,8 +169,6 @@ test_that("Leser inn diagnoseinformasjon som forventet", {
 
 
 # velg_tidligste_inklusjonsdato -------------------------------------------
-context("velg_tidligste_inklusjondato")
-
 test_that("Tidligste dato returneres hvis det også finnes NA", {
   dato = c("NA", "2019-11-12", "2020-11-23", "2020-08-27")
   d = tibble::tibble(
@@ -214,8 +207,6 @@ test_that("Fungerer med alternativ pasientidentifikator", {
 
 
 # konverter_skjematype ----------------------------------------------------
-context("Konverter skjematype")
-
 test_that("Oppfølgingsskjema blir konvertert til inklusjon hvis inklusjon mangler", {
   d_inkl = tibble::tibble(
     PasientGUID = c("a", "b"),
@@ -315,7 +306,6 @@ test_that("Duplikate inklusjonsskjema konverteres til oppfølging", {
 
 
 # fjern_uaktuelle_diagnoser -----------------------------------------------
-context("fjern_uaktuelle_diagnoser")
 test_that("Uaktuelle diagnoser blir filtrert bort som forventet", {
   diagnose_med_uakt = tibble::tibble(
     pas_id = c(1, 2, 3),
@@ -336,7 +326,6 @@ test_that("Uaktuelle diagnoser blir filtrert bort som forventet", {
 })
 
 # fjerne_skjema_hjelpefunksjon --------------------------------------------
-context("fjerne_skjema_hjelpefunksjon")
 test_that("skjema filtreres ut som forventet", {
   a = tibble::tibble(PasientGUID = c("1", "2", "3", "4"))
   b = tibble::tibble(PasientGUID = c("1", "2", "3", "5"))
