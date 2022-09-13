@@ -104,7 +104,7 @@ legg_til_medisinnavn = function(d_medisin) {
 
   # Legger til ekstra informasjon om hvert legemiddel
   d_medisin = d_medisin %>%
-    select(-Legemiddel, - LegemiddelType, -legemiddel_navn, 
+    select(-Legemiddel, - LegemiddelType, -legemiddel_navn,
            -medisin, -legemiddel_kodebok_kode) %>%
     left_join(medisin_fil,
       by = "legemiddel_navn_kode") %>%
@@ -445,8 +445,8 @@ konverter_skjematype = function(inkl, oppf) {
         TRUE ~ Skjematype
       ),
       FormTypeId = case_when(
-        SkjemaGUID %in% inkl_til_oppf_skjemaGUID ~ 2L,
-        SkjemaGUID %in% oppf_til_inkl_skjemaGUID ~ 1L,
+        SkjemaGUID %in% inkl_til_oppf_skjemaGUID ~ 2,
+        SkjemaGUID %in% oppf_til_inkl_skjemaGUID ~ 1,
         TRUE ~ FormTypeId
       )
     ) %>%
