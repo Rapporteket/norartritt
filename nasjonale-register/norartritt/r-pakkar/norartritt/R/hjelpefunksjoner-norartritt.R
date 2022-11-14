@@ -106,8 +106,8 @@ legg_til_medisinnavn = function(d_medisin) {
   d_medisin = d_medisin %>%
     select(-Legemiddel, - LegemiddelType, -legemiddel_navn,
            -medisin, -legemiddel_kodebok_kode) %>%
-    left_join(medisin_fil,
-      by = "legemiddel_navn_kode") %>%
+    left_join(medisin_fil %>% distinct(legemiddel_gruppert, .keep_all = TRUE),  
+                by = "legemiddel_navn_kode") %>% 
     select(-legemiddelnavn_i_kodebok)
 
   d_medisin
