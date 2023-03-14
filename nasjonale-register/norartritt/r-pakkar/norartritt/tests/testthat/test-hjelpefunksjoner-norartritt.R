@@ -211,7 +211,7 @@ test_that("Oppfølgingsskjema blir konvertert til inklusjon hvis inklusjon mangl
   d_inkl = tibble::tibble(
     PasientGUID = c("a", "b"),
     Skjematype = c("Inklusjonskjema", "Inklusjonskjema"),
-    FormTypeId = c(1L, 1L),
+    FormTypeId = c(1, 1),
     FormDate = as.POSIXct(c("2021-02-23", "2021-02-23")),
     SkjemaGUID = c("skjema_1", "skjema_2")
   )
@@ -225,7 +225,7 @@ test_that("Oppfølgingsskjema blir konvertert til inklusjon hvis inklusjon mangl
       "Oppfølgingskjema",
       "Oppfølgingskjema"
     ),
-    FormTypeId = c(2L, 2L, 2L),
+    FormTypeId = c(2, 2, 2),
     FormDate = as.POSIXct(c(
       "2021-02-24",
       "2021-02-24",
@@ -242,7 +242,7 @@ test_that("Oppfølgingsskjema blir konvertert til inklusjon hvis inklusjon mangl
       "Inklusjonskjema", "Oppfølgingskjema",
       "Oppfølgingskjema"
     ),
-    FormTypeId = c(1L, 1L, 1L, 2L, 2L),
+    FormTypeId = c(1, 1, 1, 2, 2),
     FormDate = as.POSIXct(c(
       "2021-02-23", "2021-02-23",
       "2021-02-25", "2021-02-24",
@@ -263,7 +263,7 @@ test_that("Duplikate inklusjonsskjema konverteres til oppfølging", {
   d_inkl_duplikat = tibble::tibble(
     PasientGUID = c("a", "a", "a", "b"),
     Skjematype = c("Inklusjonskjema", "Inklusjonskjema", "Inklusjonskjema", "Inklusjonskjema"),
-    FormTypeId = c(1L, 1L, 1L, 1L),
+    FormTypeId = c(1, 1, 1, 1),
     FormDate = as.POSIXct(c("2021-02-23", "2020-01-15", "2021-01-01", "2021-02-23")),
     SkjemaGUID = c("skjema_1", "skjema_2", "skjema_6", "skjema_3")
   )
@@ -274,7 +274,7 @@ test_that("Duplikate inklusjonsskjema konverteres til oppfølging", {
       "Oppfølgingskjema",
       "Oppfølgingskjema"
     ),
-    FormTypeId = c(2L, 2L),
+    FormTypeId = c(2, 2),
     FormDate = as.POSIXct(c(
       "2021-02-24",
       "2021-02-24"
@@ -289,7 +289,7 @@ test_that("Duplikate inklusjonsskjema konverteres til oppfølging", {
       "Oppfølgingskjema", "Oppfølgingskjema",
       "Oppfølgingskjema", "Oppfølgingskjema"
     ),
-    FormTypeId = c(1L, 1L, 2L, 2L, 2L, 2L),
+    FormTypeId = c(1, 1, 2, 2, 2, 2),
     FormDate = as.POSIXct(c(
       "2020-01-15", "2021-02-23",
       "2021-02-23", "2021-01-01",
