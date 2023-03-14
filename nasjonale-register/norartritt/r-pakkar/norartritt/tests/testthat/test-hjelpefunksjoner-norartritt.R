@@ -60,9 +60,7 @@ test_that("Feilmelding hvis UnitID i datasett ikke finnes i kodebok", {
   d = tibble::tibble(UnitId = c(1, 2, 34))
   feilmelding = "Det mangler kobling for UnitId: 1, 2, 34"
 
-  expect_error(legg_til_sykehusnavn(d),
-    error = feilmelding
-  )
+  expect_error(legg_til_sykehusnavn(d), feilmelding)
 })
 
 test_that("Leser inn enhetsinformasjon fra sykehusfil som forventet", {
