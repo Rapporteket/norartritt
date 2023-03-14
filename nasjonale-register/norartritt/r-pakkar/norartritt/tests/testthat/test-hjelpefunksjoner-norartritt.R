@@ -15,32 +15,35 @@ test_that("Advarsel hvis data inneholder LegemiddelType som ikke har navn i kode
 
 test_that("Leser inn data fra medisinkodebok som forventet", {
   d = tibble::tibble(
-    LegemiddelType = c(1, 2, 3),
-    Legemiddel = c(NA, NA, NA)
+    LegemiddelType = c(1, 2, 3, 38),
+    Legemiddel = c(NA, NA, NA, NA)
   )
 
   d_ut_forventet = tibble::tibble(
-    legemiddel_navn_kode = c(1L, 2L, 3L),
-    LegemiddelType = c(1L, 2L, 3L),
+    legemiddel_navn_kode = c(1L, 2L, 3L, 38L),
+    LegemiddelType = c(1L, 2L, 3L, 38L),
     legemiddel_navn = c(
       "Cimzia (certolizumab pegol)",
       "Enbrel (etanercept)",
-      "Humira (adalimumab)"
+      "Humira (adalimumab)",
+      "Hyrimoz (adalimumab)"
     ),
-    biokat = c(1L, 1L, 1L),
-    dmard = c(1L, 1L, 1L),
-    csdmard = c(0L, 0L, 0L),
-    tsdmard = c(0L, 0L, 0L),
-    bio_og_tsdmard = c(1L, 1L, 1L),
-    legemiddel_gruppert = c(1L, 2L, 3L),
+    biokat = c(1L, 1L, 1L, 1L),
+    dmard = c(1L, 1L, 1L, 1L),
+    csdmard = c(0L, 0L, 0L, 0L),
+    tsdmard = c(0L, 0L, 0L, 0L),
+    bio_og_tsdmard = c(1L, 1L, 1L, 1L),
+    legemiddel_gruppert = c(1L, 2L, 3L, 3L),
     legemiddel_gruppert_navn = c(
       "Cimzia (certolizumab pegol)",
       "Enbrel (etanercept)",
-      "Humira (adalimumab)"
+      "Humira (adalimumab)",
+      "Hyrimoz (adalimumab)"
     ),
     Virkestoff = c(
       "certolizumab pegol",
       "etanercept",
+      "adalimumab",
       "adalimumab"
     )
   )
