@@ -309,15 +309,17 @@ test_that("Duplikate inklusjonsskjema konverteres til oppfølging", {
 # fjern_uaktuelle_diagnoser -----------------------------------------------
 test_that("Uaktuelle diagnoser blir filtrert bort som forventet", {
   diagnose_med_uakt = tibble::tibble(
-    pas_id = c(1, 2, 3),
+    pas_id = c(1, 2, 3, 4, 5),
     Navn = c(
       "Revmatoid artritt", "Psoriasisartritt",
-      "Artrose"
-    )
+      "Artrose", "Polyartritt", "Septisk Artritt"
+    ),
+    Kode = c("M058", "M073", NA_character_, "M130", NA_character_)
   )
   diagnose_med_uakt_ut = tibble::tibble(
     pas_id = c(1, 2),
-    Navn = c("Revmatoid artritt", "Psoriasisartritt")
+    Navn = c("Revmatoid artritt", "Psoriasisartritt"),
+    Kode = c("M058", "M073")
   )
 
   expect_identical(
