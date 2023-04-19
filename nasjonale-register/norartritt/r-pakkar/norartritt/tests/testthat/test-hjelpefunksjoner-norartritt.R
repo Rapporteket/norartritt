@@ -311,13 +311,13 @@ test_that("Uaktuelle diagnoser blir filtrert bort som forventet", {
   diagnose_med_uakt = tibble::tibble(
     pas_id = c(1, 2, 3),
     Navn = c(
-      "Revmatoid artritt", "Psoreasisartritt",
+      "Revmatoid artritt", "Psoriasisartritt",
       "Artrose"
     )
   )
   diagnose_med_uakt_ut = tibble::tibble(
     pas_id = c(1, 2),
-    Navn = c("Revmatoid artritt", "Psoreasisartritt")
+    Navn = c("Revmatoid artritt", "Psoriasisartritt")
   )
 
   expect_identical(
