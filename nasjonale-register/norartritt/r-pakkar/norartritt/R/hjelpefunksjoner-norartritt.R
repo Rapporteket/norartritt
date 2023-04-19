@@ -511,7 +511,8 @@ fjern_ugyldige_skjema = function(inkl, oppf, med, diag) {
 #' @return
 #' Returnerer diagnosedatasett hvor diagnosene
 #' Artrose, Juvenil Idiopatisk Artritt (JIA), Kondrokalsinose,
-#' Krystallartritter, Pyogen Artritt og Urinsyregikt er filtrert bort.
+#' Krystallartritter, Pyogen Artritt, Urinsyregikt, Septisk Artritt
+#' og Polyartritt er filtrert bort.
 #'
 #' @export
 #'
@@ -524,12 +525,13 @@ fjern_uaktuelle_diagnoser = function(diag) {
   # uaktuelle diagnoser----------
   uakt_diag = c(
     "Artrose", "Juvenil Idiopatisk Artritt (JIA)", "Kondrokalsinose",
-    "Krystallartritter", "Pyogen Artritt", "Urinsyregikt"
+    "Krystallartritter", "Pyogen Artritt", "Urinsyregikt", "Septisk Artritt"
   )
+  uakt_koder = c("M130", "M131", "M138", "M139") # Polyartritt
 
   # Fjerner diagnoseskjema for pasienter som mangler andre diagnoser enn de overnevnte
   diag = diag %>%
-    filter(!Navn %in% uakt_diag)
+    filter(!Navn %in% !!uakt_diag, !Kode %in% !!uakt_koder)
 
   diag
 }
