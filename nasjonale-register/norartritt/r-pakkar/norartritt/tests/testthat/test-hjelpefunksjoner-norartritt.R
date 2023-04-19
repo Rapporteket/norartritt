@@ -36,7 +36,7 @@ test_that("Leser inn data fra medisinkodebok som forventet", {
     legemiddel_gruppert = c(1L, 2L, 3L, 3L),
     legemiddel_gruppert_navn = c(
       "Cimzia (certolizumab pegol)",
-      "Enbrel (etanercept)",
+      "etanercept",
       "Humira (adalimumab)",
       "Hyrimoz (adalimumab)"
     ),
