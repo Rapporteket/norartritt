@@ -491,3 +491,85 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
 
   d_ki_dapsa
 }
+
+#' Gjennomsnittlig ASDAS-CRP for spondyloartrittpasienter 1 år etter diagnose.
+#'
+#' @description
+#' Indikatoren viser gjennomsnittlig ASDAS-CRP 1 år etter diagnosedato
+#' for pasienter med spondyloartritt
+#'
+#' @details
+#' `tisdrom_start` og `tidsrom_slutt` indikerer start og slutt for hva som skal
+#' regnes som 1-års kontroll i NorArtritt da det ikke er en fast kontroll etter
+#' 1 år. Pasienten må ha spondyloartritt som siste diagnose,
+#' stilt i 2014 eller senere.
+#' Pasienten må ha hatt diagnosen i minst 1 år ved datadumpdato, og ha vært
+#' til kontroll i tidsrommet avgrenset med `tidsrom_start` og `tidsrom_slutt`.
+#' I tillegg kan ikke variabelen for ASDAS-CRP være missing.
+#'
+#' Dersom en pasient har hatt flere kontroller i det gyldige tidsintervallet
+#' blir bare den kontrollen (som ikke har missing ASDAS-CRP-verdi)
+#' som er nærmest 365 dager etter diagnose inkludert.
+#'
+#' @param d_diag Diagnosedatasett.
+#' @param d_inkl_oppf Sammenslått inklusjon- og oppfølgingsdatasett.
+#' @param tidsrom_start
+#' Nedre grense av tidsrom for beregning av hva som er 1-års kontroll.
+#' Antall dager etter diagnose.
+#' @param tidsrom_slutt
+#' Øvre grense av tidsrom for beregning av hva som er 1-års kontroll.
+#' Antall dager etter diagnose.
+#'
+#' @return
+#' Returnerer et datasett med følgende variabler:
+#' * \strong{PasientGUID} Pasientidentifikator.
+#' * \strong{ki_x} Numerisk verdi for ASDAS-CRP for pasienten.
+#' * \strong{ki_aktuell} Indikator for om pasienten oppfyller
+#' kriterier for nevner. Kan ta verdiene TRUE eller FALSE.
+#' * \strong{...} Eventuelle grupperingsvariabler blir også med i utdata.
+#'
+#' @export
+#'
+#' @examples
+#' # d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
+#' d_ki_asdas = ki_asdas(d_diag, d_inkl_oppf)
+ki_asdas = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
+
+  # FIXME - Dato for datadump må hentes dynamisk!
+  # FIXME - Legge inn støtte for grupperingsvariabler.
+  # FIXME - Validering og håndtering av variabler med "mrs_" prefiks.
+
+  # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
+  id_diagnose = d_diag %>%
+    select(PasientGUID, diaggrupper_med, dato_diag, diag_stilt_aar, dager_diag_til_datadump) %>%
+    arrange(desc(dato_diag)) %>%
+    distinct(PasientGUID, .keep_all = TRUE) %>%
+    filter(
+      diaggrupper_med %in% 5:6, # Spondyloartritt
+      diag_stilt_aar >= 2014,
+      dager_diag_til_datadump >= 365
+    ) %>%
+    pull(PasientGUID)
+
+  # Kobler diagnosedata med skjema for de ulike kontrollene for hver pasient i utvalget.
+  d = d_inkl_oppf %>%
+    left_join(d_diag %>% select(
+      PasientGUID, diaggrupper_med, dato_diag,
+      dager_diag_til_datadump, diag_stilt_aar
+    ), by = "PasientGUID") %>%
+    mutate(dager_siden_diagnose = ymd(dato_ktrl) - ymd(dato_diag)) %>%
+    mutate(ki_aktuell = PasientGUID %in% id_diagnose &
+             dager_siden_diagnose >= tidsrom_start &
+             dager_siden_diagnose <= tidsrom_slutt &
+             !(is.na(Asdas)))
+
+  # Finner hvem som oppfyller krav for teller og reduserer til en rad per pasient.
+  d_ki_asdas = d %>%
+    mutate(ki_x = Asdas) %>%
+    group_by(PasientGUID) %>%
+    arrange(desc(ki_aktuell), abs(365 - dager_siden_diagnose), .by_group = TRUE) %>%
+    distinct(PasientGUID, .keep_all = TRUE) %>%
+    ungroup()
+
+  d_ki_asdas
+}
