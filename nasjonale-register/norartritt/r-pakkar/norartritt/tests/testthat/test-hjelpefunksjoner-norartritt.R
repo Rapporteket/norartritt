@@ -37,14 +37,17 @@ test_that("Leser inn data fra medisinkodebok som forventet", {
     legemiddel_gruppert_navn = c(
       "Cimzia (certolizumab pegol)",
       "etanercept",
-      "Humira (adalimumab)",
-      "Hyrimoz (adalimumab)"
+      "adalimumab",
+      "adalimumab"
     ),
     Virkestoff = c(
       "certolizumab pegol",
       "etanercept",
       "adalimumab",
       "adalimumab"
+    ),
+    Kommentar = c(
+      rep(NA_character_, 4)
     )
   )
 
