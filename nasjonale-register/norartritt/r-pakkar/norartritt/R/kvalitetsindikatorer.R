@@ -150,14 +150,19 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
   # vha legg_til_medisingrupper).
   # FIXME - Fjerne avhengighet av PasientGUID (må kunne ta inn fødselsnummer også).
   d_ki = d_diagnose %>%
-    left_join(d_medisin %>%
+  left_join(
+    d_medisin %>%
       select(
         PasientGUID, StartDato,
         SluttDato, startaar, sluttaar, legemiddel_navn,
         legemiddel_navn_kode
-      ), by = "PasientGUID") %>%
-    mutate(ki_krit_nevner = diaggrupper_med == 1 &
-      diag_stilt_aar <= aarstall)
+      ),
+    by = "PasientGUID",
+    relationship = "many-to-many"
+  ) %>%
+  mutate(ki_krit_nevner = diaggrupper_med == 1 &
+    diag_stilt_aar <= aarstall &
+    (year(DeathDate) >= aarstall | is.na(DeathDate)))
 
   d_ki_med_krit = d_ki %>%
     filter(ki_krit_nevner) %>%
