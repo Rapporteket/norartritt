@@ -2,7 +2,7 @@
 
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter group_by ungroup arrange desc distinct n_distinct select left_join mutate pull
-#' @importFrom lubridate as_date ymd
+#' @importFrom lubridate as_date ymd days
 NULL
 #'
 #' Kvalitetsindikator for tidlig oppstart av behandling
@@ -92,7 +92,8 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
       diaggrupper_med == 1 &
       diag_stilt_aar >= 2014 &
       dager_fra_diag_til_inkl >= 0 &
-      dager_fra_diag_til_inkl <= 90)
+      dager_fra_diag_til_inkl <= 90 &
+      (DeathDate >= dato_diag + days(14) | is.na(DeathDate)))
 
   # Legge til teller og reduserer til en rad per pasient
   d_ki = d_ki_med_krit_nevner %>%
@@ -244,7 +245,8 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
     left_join(d_diag %>% select(
       PasientGUID, diaggrupper_med, dato_diag,
       dager_diag_til_datadump, diag_stilt_aar
-    ), by = "PasientGUID") %>%
+    ), by = "PasientGUID",
+    relationship = "many-to-one") %>%
     mutate(dager_siden_diagnose = ymd(dato_ktrl) - ymd(dato_diag)) %>%
     mutate(ki_krit_nevner = PasientGUID %in% id_diagnose &
       dager_siden_diagnose >= tidsrom_start &
@@ -252,7 +254,8 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
       !(is.na(OmmeLeddAntall)) &
       !(is.na(HovneLeddAntall)) &
       !(is.na(Crp)) &
-      !(is.na(PasientGlobalSykdomsaktivitet)))
+      !(is.na(PasientGlobalSykdomsaktivitet)) &
+        (DeathDate >= dato_diag + days(tidsrom_slutt) | is.na(DeathDate)))
 
   # Finner hvem som oppfyller krav for teller og reduserer til en rad per pasient.
   d_ki_rem = d %>%
@@ -392,7 +395,9 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
     mutate(ki_krit_nevner = ifelse(PasientGUID %in% id_diagnose &
       diaggrupper_med == 1 &
       tid_til_inkl >= 0 &
-      tid_til_inkl <= 180, # fixme (QA): Er inklusjon+diagnose der tid til inklusjon er negativ rett handtert?
+      tid_til_inkl <= 180 &
+        (DeathDate >= dato_diag + days(90) | is.na(DeathDate)),
+      # fixme (QA): Er inklusjon+diagnose der tid til inklusjon er negativ rett handtert?
     yes = TRUE, no = FALSE
     )) # fixme (QA): igjen håplaus bruk av ifelse().
 
@@ -484,7 +489,8 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
     mutate(ki_aktuell = PasientGUID %in% id_diagnose &
              dager_siden_diagnose >= tidsrom_start &
              dager_siden_diagnose <= tidsrom_slutt &
-             !(is.na(DAPSA)))
+             !(is.na(DAPSA)) &
+             (DeathDate >= dato_diag + days(tidsrom_slutt) | is.na(DeathDate)))
 
   # Finner hvem som oppfyller krav for teller og reduserer til en rad per pasient.
   d_ki_dapsa = d %>%
@@ -566,7 +572,8 @@ ki_asdas = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
     mutate(ki_aktuell = PasientGUID %in% id_diagnose &
              dager_siden_diagnose >= tidsrom_start &
              dager_siden_diagnose <= tidsrom_slutt &
-             !(is.na(Asdas)))
+             !(is.na(Asdas)) &
+             (DeathDate >= dato_diag + days(tidsrom_slutt) | is.na(DeathDate)))
 
   # Finner hvem som oppfyller krav for teller og reduserer til en rad per pasient.
   d_ki_asdas = d %>%
