@@ -616,7 +616,6 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
 
   d_diag = d_diag %>%
     mutate(
-      aar = year(Dato),
       dato_diag = as_date(FormDate),
       diag_stilt_aar = year(FormDate)
     )
