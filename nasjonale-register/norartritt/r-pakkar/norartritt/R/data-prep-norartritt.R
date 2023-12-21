@@ -185,8 +185,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     stop(error = "Det finnes legemiddel med LegemiddelType 999 som ikke er definert i kodebok")
   }
 
-  # Fjerner duplikate medisinforløp og legger inn DeathDate som SluttDato hvis
-  # død inntreffer før medisinforløp er registrert avsluttet.
+  # Fjerner duplikate medisinforløp og medisinforløp som mangler startdato
   d_med_vasket_uten_na = d_med %>%
     filter(!is.na(StartDato))
 
