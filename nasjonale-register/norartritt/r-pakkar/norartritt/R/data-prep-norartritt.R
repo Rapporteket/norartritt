@@ -154,9 +154,11 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 
   # Baseobjekter for alle skjema
   d_inkl = d_inkl %>%
+    konverter_missing_til_na() |>
     legg_til_sykehusnavn()
 
   d_oppf = d_oppf %>%
+    konverter_missing_til_na() |>
     legg_til_sykehusnavn()
 
   d_diag = d_diag %>%

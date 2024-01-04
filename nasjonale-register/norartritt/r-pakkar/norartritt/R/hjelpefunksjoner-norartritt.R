@@ -628,3 +628,39 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
 # legg_til_dager_diag_til_datadump = function() {
 
 # }
+
+#' Konverter missing til na
+#'
+#' @description
+#' Konverterer manglende besvarelser til NA for variablene
+#' `BASDAI`, `Das28`, `Das283`, `Das28Crp`, `Das28Crp3`,
+#' `Cdai`, `Sdai`, `Asdas`, `DAPSA` og `Total`. Disse variablene er numeriske
+#' verdier og manglende besvarelser er kodet som henholdsvis 0 for `BASDAI` og
+#' -1 ellers i datasettet. Disse konverteres her til `NA_real_`.
+#' `vask_data_norartritt()` kaller på denne funksjonen når
+#' `lag_filtrerte_objekter()` kjøres.
+#'
+#' @param d datasett med disse variablene. `inklusjonsskjema` eller
+#' `oppfølgingsskjema`.
+#'
+#' @return
+#' Returnerer opprinnelig datasett hvor manglende besvarelser er erstattet med
+#' `NA_real_`
+#' @export
+#'
+#' @examples
+#' d_inkl = konverter_missing_til_na(d_inkl)
+konverter_missing_til_na = function(d) {
+
+  vars_fra_0 = c("BASDAI")
+  vars_fra_1 = c("Das28", "Das283", "Das28Crp", "Das28Crp3", "Cdai",
+                 "Sdai", "Asdas", "DAPSA", "Total")
+
+  d = d |>
+    mutate(across(all_of(vars_fra_0),
+                  \(x) replace(x, x == 0, NA_real_)),
+           across(all_of(vars_fra_1),
+                  \(x) replace(x, x == -1, NA_real_)))
+
+}
+
