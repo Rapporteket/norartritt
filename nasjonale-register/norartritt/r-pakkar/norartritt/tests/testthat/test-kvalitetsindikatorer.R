@@ -21,7 +21,8 @@ test_that("ki_dapsa() gjev ut forventa resultat", {
         "2019-09-30", "2013-02-20", "2022-06-02"
       )
     ),
-    DAPSA = c(17.4, 50, 35.2, NA_real_, 5, 10)
+    DAPSA = c(17.4, 50, 35.2, NA_real_, 5, 10),
+    DeathDate = c(rep(NA, 6))
   )
 
   d_forventa = tibble::tibble(
@@ -32,6 +33,7 @@ test_that("ki_dapsa() gjev ut forventa resultat", {
       )
     ),
     DAPSA = c(17.4, 35.2, NA_real_, 5, 10),
+    DeathDate = c(rep(NA,5)),
     diaggrupper_med = c(2, 2, 2, 2, 1),
     dato_diag = as.Date(
       c("2022-04-05", "2020-01-15",  "2018-10-30",  "2012-02-24",  "2021-05-17")
@@ -67,7 +69,8 @@ test_that("ki_asdas() gjev ut forventa resultat", {
         "2019-09-30", "2013-02-20", "2022-06-02"
       )
     ),
-    Asdas = c(2.8, 3.2, 3, NA_real_, 2.5, 3.4)
+    Asdas = c(2.8, 3.2, 3, NA_real_, 2.5, 3.4),
+    DeathDate = c(rep(NA, 6))
   )
 
   d_forventa = tibble::tibble(
@@ -78,6 +81,7 @@ test_that("ki_asdas() gjev ut forventa resultat", {
       )
     ),
     Asdas = c(2.8, 3, NA_real_, 2.5, 3.4),
+    DeathDate = c(rep(NA, 5)),
     diaggrupper_med = c(5, 5, 5, 5, 1),
     dato_diag = as.Date(
       c("2022-04-05", "2020-01-15",  "2018-10-30",  "2012-02-24",  "2021-05-17")
