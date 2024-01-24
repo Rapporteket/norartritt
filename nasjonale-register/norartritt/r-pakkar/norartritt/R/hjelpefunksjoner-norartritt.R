@@ -652,15 +652,20 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
 #' d_inkl = konverter_missing_til_na(d_inkl)
 konverter_missing_til_na = function(d) {
 
-  vars_fra_0 = c("BASDAI")
-  vars_fra_1 = c("Das28", "Das283", "Das28Crp", "Das28Crp3", "Cdai",
+  vars_fra_0_real = c("BASDAI")
+  vars_fra_1_real = c("Das28", "Das283", "Das28Crp", "Das28Crp3", "Cdai",
                  "Sdai", "Asdas", "DAPSA", "Total")
+  vars_fra_1_int = c("KlePaaSelv", "OppISengen", "LofteKopp",
+                 "Utendors", "Vaske", "Boye", "Skru", "KommeInn")
 
   d = d |>
-    mutate(across(all_of(vars_fra_0),
+    mutate(across(all_of(vars_fra_0_real),
                   \(x) replace(x, x == 0, NA_real_)),
-           across(all_of(vars_fra_1),
-                  \(x) replace(x, x == -1, NA_real_)))
+           across(all_of(vars_fra_1_real),
+                  \(x) replace(x, x == -1, NA_real_)),
+           across(all_of(vars_fra_1_int),
+                  \(x) replace(x, x == -1, NA_integer_))
+           )
 
 }
 
