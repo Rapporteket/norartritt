@@ -209,7 +209,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
   d_diag_med = d_diag_pers %>%
     select(
       PasientGUID, UnitId, FormDate, PatientAge, PatientGender, Kode, Navn, Dato, DiagnoseDato,
-      dato_diag, diag_stilt_aar, diaggrupper_med, diaggrupper_med_tekst,
+      dato_diag, diag_stilt_aar, dager_diag_til_datadump, diaggrupper_med, diaggrupper_med_tekst,
       diaggrupper_rem, diaggrupper_rem_tekst, rem_maal, diaggrupper_hoved,
       diaggrupper_hoved_tekst, perifer_aksial_diaggruppe,
       perifer_aksial_diaggruppe_tekst
