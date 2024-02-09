@@ -361,7 +361,15 @@ d = tibble::tibble(BASDAI = c(4.1, 0, 0, 0, 0, 0.7),
                    Sdai = c(5.3, -1, 9.1, -1, -1, 1.4),
                    Asdas = c(1.84, -1, -1, -1, -1, 0.94),
                    DAPSA = c(-1, -1, 1.2, 1.4, -1, -1),
-                   Total = c(-1, -1, 0.12, 0.88, 0.5, -1)
+                   Total = c(-1, -1, 0.12, 0.88, 0.5, -1),
+                  KlePaaSelv = c(-1, 2, 3, -1, 2, 3),
+                  OppISengen = c(1, 2, -1, 1, 2, 3),
+                  LofteKopp = c(1, -1, 3, -1, 2, 3),
+                  Utendors = c(-1, 2, 3, -1, 2, 3),
+                  Vaske = c(1, 2, 3, -1, 2, -1),
+                  Boye = c(1, 2, 3, -1, 2, 3),
+                  Skru = c(1, 2, 3, -1, 2, 3),
+                  KommeInn = c(1, 2, 3, -1, 2, 3)
 )
 
 d_forventet = tibble::tibble(BASDAI = c(4.1, NA_real_, NA_real_,
@@ -383,7 +391,15 @@ d_forventet = tibble::tibble(BASDAI = c(4.1, NA_real_, NA_real_,
                              DAPSA = c(NA_real_, NA_real_, 1.2,
                                        1.4, NA_real_, NA_real_),
                              Total = c(NA_real_, NA_real_, 0.12,
-                                       0.88, 0.5, NA_real_)
+                                       0.88, 0.5, NA_real_),
+                             KlePaaSelv = c(NA_integer_, 2, 3, NA_integer_, 2, 3),
+                             OppISengen = c(1, 2, NA_integer_, 1, 2, 3),
+                             LofteKopp = c(1, NA_integer_, 3, NA_integer_, 2, 3),
+                             Utendors = c(NA_integer_, 2, 3, NA_integer_, 2, 3),
+                             Vaske = c(1, 2, 3, NA_integer_, 2, NA_integer_),
+                             Boye = c(1, 2, 3, NA_integer_, 2, 3),
+                             Skru = c(1, 2, 3, NA_integer_, 2, 3),
+                             KommeInn = c(1, 2, 3, NA_integer_, 2, 3)
 )
 
 expect_identical(konverter_missing_til_na(d), d_forventet)
