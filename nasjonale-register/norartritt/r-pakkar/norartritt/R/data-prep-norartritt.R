@@ -181,7 +181,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
       sluttaar = lubridate::year(SluttDato)
     ) %>%
     filter(StartDato < DeathDate | is.na(DeathDate),
-           SluttDato <= datadump_dato | is.na(SluttDato))
+           SluttDato <= datadump_dato | is.na(SluttDato),
+           StartDato <= SluttDato)
 
   # medisinforløp for hver pasient hvor duplikater er fjernet
   if (nrow(d_med %>% filter(legemiddel_navn_kode == 999)) > 0) {
