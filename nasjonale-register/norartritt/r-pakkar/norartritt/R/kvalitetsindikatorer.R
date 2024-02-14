@@ -66,15 +66,15 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
         PasientGUID, InklusjonDato,
         sykehusnavn, sykehus_kortnavn
       ),
-    by = "PasientGUID"
-    ) %>%
+    by = "PasientGUID",
+    relationship = "many-to-one") %>%
     left_join(d_medisin %>%
       select(
         PasientGUID, StartDato,
         legemiddel_navn, legemiddel_navn_kode
       ),
-    by = "PasientGUID"
-    ) %>%
+    by = "PasientGUID",
+    relationship = "many-to-many") %>%
     mutate(
       dager_fra_diag_til_inkl =
         as.numeric(as_date(InklusjonDato) - as_date(dato_diag))
