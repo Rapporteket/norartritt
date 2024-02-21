@@ -1,4 +1,3 @@
-
 #' Fjern Jia fra datasett
 #'
 #' @description
@@ -26,8 +25,10 @@
 #' @export
 #'
 #' @examples
-#' fjern_jia(d_full_Inklusjonskjema, d_full_Oppfølgingskjema,
-#' d_full_Diagnoseskjema, d_full_Medisinskjema)
+#' fjern_jia(
+#'   d_full_Inklusjonskjema, d_full_Oppfølgingskjema,
+#'   d_full_Diagnoseskjema, d_full_Medisinskjema
+#' )
 #'
 #' @keywords internal
 filtrer_jia = function(inkl, oppf, diag, med) {
