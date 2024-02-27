@@ -524,14 +524,16 @@ fjern_ugyldige_skjema = function(inkl, oppf, med, diag) {
 fjern_uaktuelle_diagnoser = function(diag) {
   # uaktuelle diagnoser----------
   uakt_diag = c(
-    "Artrose", "Juvenil Idiopatisk Artritt (JIA)", "Kondrokalsinose",
-    "Krystallartritter", "Pyogen Artritt", "Urinsyregikt", "Septisk Artritt"
+    "Artrose", "Juvenil Idiopatisk Artritt (JIA)", "Juvenil Idiopatisk Artritt",
+    "Kondrokalsinose", "Krystallartritter", "Pyogen Artritt",
+    "Urinsyregikt", "Septisk Artritt"
   )
-  uakt_koder = c("M130", "M131", "M138", "M139") # Polyartritt
+  uakt_koder = c("M130", "M131", "M138", "M139",
+                 "M080", "M081", "M083", "M088") # Polyartritt
 
   # Fjerner diagnoseskjema for pasienter som mangler andre diagnoser enn de overnevnte
   diag = diag %>%
-    filter(!Navn %in% !!uakt_diag, !Kode %in% !!uakt_koder)
+    filter(!Navn %in% !!uakt_diag & !Kode %in% !!uakt_koder)
 
   diag
 }
