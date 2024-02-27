@@ -473,7 +473,7 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
     arrange(desc(dato_diag)) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
     filter(
-      diaggrupper_med %in% 2:3, # Psoriasisartritt
+      diaggrupper_med == 2, # Psoriasisartritt
       diag_stilt_aar >= 2014,
       dager_diag_til_datadump >= 365
     ) %>%
