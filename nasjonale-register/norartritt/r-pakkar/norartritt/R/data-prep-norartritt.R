@@ -173,7 +173,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     # med interne kodebøker for å ta imot data fra HP, og det er ikke aktuelt.
     # Tar de derfor bort fra analyse.
     # Fjern filtrering når data er korrigert og import er fikset i MRS/HP.
-    filter(!(LegemiddelType == 999 & Hospital == "St. Olav" & date(CreationDate) > "2023-05-29")) |>
+    filter(!(LegemiddelType == 999 & Hospital == "St. Olav" & lubridate::date(CreationDate) > "2023-05-29")) |>
     legg_til_medisinnavn() %>%
     left_join(d_dodsdato, by = "PasientGUID") %>%
     mutate(
@@ -188,7 +188,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     ) %>%
     filter(StartDato < DeathDate | is.na(DeathDate),
            SluttDato <= datadump_dato | is.na(SluttDato),
-           StartDato <= SluttDato)
+           StartDato <= SluttDato | is.na(SluttDato))
 
   # medisinforløp for hver pasient hvor duplikater er fjernet
   if (nrow(d_med %>% filter(legemiddel_navn_kode == 999)) > 0) {
