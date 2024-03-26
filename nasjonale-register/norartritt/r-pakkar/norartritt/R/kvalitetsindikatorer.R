@@ -56,10 +56,7 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
   # FIXME - Fjerne avhengighet av PasientGUID (må kunne ta inn fødselsnummer også).
   # FIXME - Sjekke at jeg ikke importerer flere funksjoner en nødvendig i toppen
 
-  # Sykdomsmodifiserende midler:
-  sykmod_medisin = c(1:8, 10:12, 14:16, 18, 20, 22, 24:26, 28:32)
-
-  # Koble på inklusjonsskjema for å hente ut inklusjonstidspunkt og sykehustilhørighet
+# Koble på inklusjonsskjema for å hente ut inklusjonstidspunkt og sykehustilhørighet
   d_inkl_diag_med = d_diagnose %>%
     left_join(d_inklusjon %>%
       select(
@@ -70,8 +67,8 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
     relationship = "many-to-one") %>%
     left_join(d_medisin %>%
       select(
-        PasientGUID, StartDato,
-        legemiddel_navn, legemiddel_navn_kode
+        PasientGUID, StartDato, SluttDato,
+        legemiddel_navn, legemiddel_navn_kode, dmard
       ),
     by = "PasientGUID",
     relationship = "many-to-many") %>%
@@ -99,18 +96,18 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
   d_ki = d_ki_med_krit_nevner %>%
     mutate(
       tid_til_oppstart_medisin = as_date(StartDato) - as_date(dato_diag),
-      ki_krit_teller = ki_krit_nevner &
-        legemiddel_navn_kode %in% sykmod_medisin &
-        tid_til_oppstart_medisin >= 0 &
-        tid_til_oppstart_medisin <= 14
+      ki_krit_teller =
+        case_when(is.na(tid_til_oppstart_medisin) ~ FALSE,
+                  ki_krit_nevner &
+                    dmard == 1 &
+                    tid_til_oppstart_medisin >= 0 &
+                    tid_til_oppstart_medisin <= 14 ~ TRUE,
+                  TRUE ~ FALSE)
+
     ) %>%
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
-    select(
-      PasientGUID, UnitId, diag_stilt_aar, ki_krit_teller,
-      ki_krit_nevner, tid_til_oppstart_medisin, dato_diag
-    ) %>%
     ungroup()
 
   d_ki
@@ -158,11 +155,9 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
         SluttDato, startaar, sluttaar, legemiddel_navn,
         legemiddel_navn_kode
       ),
-    by = "PasientGUID",
-    relationship = "many-to-many"
-  ) %>%
+    by = "PasientGUID") %>%
   mutate(ki_krit_nevner = diaggrupper_med == 1 &
-    diag_stilt_aar <= aarstall &
+    diag_stilt_aar <= aarstall) &
     (year(DeathDate) >= aarstall | is.na(DeathDate)))
 
   d_ki_med_krit = d_ki %>%
@@ -176,7 +171,6 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
-    select(PasientGUID, UnitId, ki_krit_teller, ki_krit_nevner, diag_stilt_aar) %>%
     ungroup()
 
   d_ki_med_krit
