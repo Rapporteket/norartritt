@@ -56,41 +56,37 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
   # FIXME - Fjerne avhengighet av PasientGUID (må kunne ta inn fødselsnummer også).
   # FIXME - Sjekke at jeg ikke importerer flere funksjoner en nødvendig i toppen
 
+
 # Koble på inklusjonsskjema for å hente ut inklusjonstidspunkt og sykehustilhørighet
   d_inkl_diag_med = d_diagnose %>%
+    arrange(dato_diag) |>
+    distinct(PasientGUID, .keep_all = TRUE) |>
     left_join(d_inklusjon %>%
       select(
         PasientGUID, InklusjonDato,
         sykehusnavn, sykehus_kortnavn
       ),
     by = "PasientGUID",
-    relationship = "many-to-one") %>%
+    relationship = "one-to-one") %>%
     left_join(d_medisin %>%
       select(
         PasientGUID, StartDato, SluttDato,
         legemiddel_navn, legemiddel_navn_kode, dmard
       ),
     by = "PasientGUID",
-    relationship = "many-to-many") %>%
+    relationship = "one-to-many") %>%
     mutate(
       dager_fra_diag_til_inkl =
         as.numeric(as_date(InklusjonDato) - as_date(dato_diag))
     )
 
-  # Skal se på pasienter som kun har én diagnose
-  d_ki_n_diag = d_inkl_diag_med %>%
-    group_by(PasientGUID) %>%
-    mutate(n_diag = n_distinct(diaggrupper_med)) %>%
-    ungroup()
-
   # Lage ki_krit_nevner
-  d_ki_med_krit_nevner = d_ki_n_diag %>%
-    mutate(ki_krit_nevner = n_diag == 1 &
-      diaggrupper_med == 1 &
-      diag_stilt_aar >= 2014 &
-      dager_fra_diag_til_inkl >= 0 &
-      dager_fra_diag_til_inkl <= 90 &
-      (DeathDate >= dato_diag + days(14) | is.na(DeathDate)))
+  d_ki_med_krit_nevner = d_inkl_diag_med  |>
+    mutate(ki_krit_nevner = diaggrupper_med == 1 &
+             diag_stilt_aar >= 2014 &
+             dager_fra_diag_til_inkl >= 0 &
+             dager_fra_diag_til_inkl <= 365 &
+             (DeathDate >= dato_diag + days(14) | is.na(DeathDate)))
 
   # Legge til teller og reduserer til en rad per pasient
   d_ki = d_ki_med_krit_nevner %>%
@@ -157,7 +153,7 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
       ),
     by = "PasientGUID") %>%
   mutate(ki_krit_nevner = diaggrupper_med == 1 &
-    diag_stilt_aar <= aarstall) &
+    diag_stilt_aar <= aarstall &
     (year(DeathDate) >= aarstall | is.na(DeathDate)))
 
   d_ki_med_krit = d_ki %>%
