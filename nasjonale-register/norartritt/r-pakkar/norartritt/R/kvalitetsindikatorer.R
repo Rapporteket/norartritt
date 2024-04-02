@@ -85,7 +85,7 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
     mutate(ki_krit_nevner = diaggrupper_med == 1 &
              diag_stilt_aar >= 2014 &
              dager_fra_diag_til_inkl >= 0 &
-             dager_fra_diag_til_inkl <= 365 &
+             dager_fra_diag_til_inkl <= 90 &
              (DeathDate >= dato_diag + days(14) | is.na(DeathDate)))
 
   # Legge til teller og reduserer til en rad per pasient
@@ -370,7 +370,7 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
   # Pasienter som oppfyller kriterier for diagnose og diagnosetidspunkt.
   id_diagnose = d_diag %>%
     group_by(PasientGUID) %>%
-    arrange(desc(dato_diag), .by_group = TRUE) %>%
+    arrange(dato_diag, .by_group = TRUE) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
     filter(
       diaggrupper_med == 1,
