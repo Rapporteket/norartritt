@@ -56,48 +56,63 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
       dplyr::last()
   }
   dato = lubridate::as_date(dato)
-  assign("datadump_dato", dato, envir = omgjevnad)
 
   if (is.null(versjon)) {
     versjon = "MRS-PROD"
   }
 
-  # les inn kodebok
-  kb = rapwhale::les_kb_mrs(mappe_dd, dato = dato)
+  if (file.exists(paste0(mappe_dd, dato, "\\datadump.RData"))) {
+    load(paste0(mappe_dd, dato, "\\datadump.RData"),
+         envir = omgjevnad)
+  } else {
 
-  # les inn data
-  les_inn_data = function(skjema_id,
-                          kb = kb,
-                          dato = parent.frame()$dato,
-                          versjon = parent.frame()$versjon) {
+    assign("datadump_dato", dato, envir = omgjevnad)
+    # les inn kodebok
+    kb = rapwhale::les_kb_mrs(mappe_dd, dato = dato)
 
-    # skjekk at skjema finnes i datadump-mappe, hvis ikke hopper vi over den
-    if (any(stringr::str_detect(
-      string = list.files(paste0(mappe_dd, "\\", dato, "\\")),
-      pattern = skjema_id
-    ))) {
-      d = rapwhale::les_dd_mrs(mappe_dd,
-        dato = parent.frame()$dato,
-        versjon = parent.frame()$versjon,
-        skjema_id = skjema_id,
-        kodebok = kb
-      )
+    # les inn data
+    les_inn_data = function(skjema_id,
+                            kb = kb,
+                            dato = parent.frame()$dato,
+                            versjon = parent.frame()$versjon) {
+      # skjekk at skjema finnes i datadump-mappe, hvis ikke hopper vi over den
+      if (any(stringr::str_detect(
+        string = list.files(paste0(mappe_dd, "\\", dato, "\\")),
+        pattern = skjema_id
+      ))) {
+        d = rapwhale::les_dd_mrs(mappe_dd,
+          dato = parent.frame()$dato,
+          versjon = parent.frame()$versjon,
+          skjema_id = skjema_id,
+          kodebok = kb
+        )
 
-      # if(skjema_id == "Medisineringskjema") {
-      #   valider_legemiddeltype(mappe_dd)
-      # }
+        # if(skjema_id == "Medisineringskjema") {
+        #   valider_legemiddeltype(mappe_dd)
+        # }
 
-      # returnerer dataene
-      objektnamn = paste0("d_full_", skjema_id)
-      assign(objektnamn, d, envir = omgjevnad)
-    } else {
-      print(paste0(skjema_id, " finnes ikke i mappe med datadumper. "))
+        # returnerer dataene
+        objektnamn = paste0("d_full_", skjema_id)
+        assign(objektnamn, d, envir = omgjevnad)
+      } else {
+        print(paste0(skjema_id, " finnes ikke i mappe med datadumper. "))
+      }
     }
-  }
 
-  les_inn_data(skjema_id = "Inklusjonskjema", kb = kb, versjon = versjon)
-  les_inn_data(skjema_id = "Diagnoseskjema", kb = kb, versjon = versjon)
-  les_inn_data(skjema_id = "Oppfølgingskjema", kb = kb, versjon = versjon)
-  les_inn_data(skjema_id = "Oppfølgingskjema2", kb = kb, versjon = versjon)
-  les_inn_data(skjema_id = "Medisineringskjema", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Inklusjonskjema", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Diagnoseskjema", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Oppfølgingskjema", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Oppfølgingskjema2", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Medisineringskjema", kb = kb, versjon = versjon)
+
+    save(kb,
+      datadump_dato,
+      d_full_Inklusjonskjema,
+      d_full_Diagnoseskjema,
+      d_full_Oppfølgingskjema,
+      d_full_Oppfølgingskjema2,
+      d_full_Medisineringskjema,
+      file = paste0(mappe_dd, dato, "\\datadump.RData")
+    )
+  }
 }
