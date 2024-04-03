@@ -385,7 +385,7 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
     mutate(ki_krit_nevner = ifelse(PasientGUID %in% id_diagnose &
       diaggrupper_med == 1 &
       tid_til_inkl >= 0 &
-      tid_til_inkl <= 180 &
+      tid_til_inkl <= 90 &
         (DeathDate >= dato_diag + days(90) | is.na(DeathDate)),
       # fixme (QA): Er inklusjon+diagnose der tid til inklusjon er negativ rett handtert?
     yes = TRUE, no = FALSE
