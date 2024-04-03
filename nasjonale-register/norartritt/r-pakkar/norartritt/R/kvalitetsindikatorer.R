@@ -221,7 +221,7 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
   # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
   id_diagnose = d_diag %>%
     select(PasientGUID, diaggrupper_med, dato_diag, diag_stilt_aar, dager_diag_til_datadump) %>%
-    arrange(desc(dato_diag)) %>%
+    arrange(dato_diag) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
     filter(
       diaggrupper_med == 1,
@@ -302,7 +302,7 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
   # Henter ut id til pasientene som oppfyller kriterier for diagnose
   id_diagnose = d_diag %>%
     select(PasientGUID, diaggrupper_med, dato_diag, dager_diag_til_datadump) %>%
-    arrange(desc(dato_diag)) %>%
+    arrange(dato_diag) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
     filter(diaggrupper_med == 1) %>%
     pull(PasientGUID)
