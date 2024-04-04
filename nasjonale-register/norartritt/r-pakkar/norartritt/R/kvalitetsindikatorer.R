@@ -461,7 +461,7 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
     arrange(dato_diag) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
     filter(
-      diaggrupper_med == 2, # Psoriasisartritt
+      diaggrupper_rem == 2, # Psoriasisartritt
       diag_stilt_aar >= 2014,
       dager_diag_til_datadump >= 365
     ) %>%
@@ -470,7 +470,7 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
   # Kobler diagnosedata med skjema for de ulike kontrollene for hver pasient i utvalget.
   d = d_inkl_oppf %>%
     left_join(d_diag %>% select(
-      PasientGUID, diaggrupper_med, dato_diag,
+      PasientGUID, diaggrupper_rem, dato_diag,
       dager_diag_til_datadump, diag_stilt_aar
     ), by = "PasientGUID") %>%
     mutate(dager_siden_diagnose = ymd(dato_ktrl) - ymd(dato_diag)) %>%
