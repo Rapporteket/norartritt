@@ -453,14 +453,12 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
 #' d_ki_dapsa = ki_dapsa(d_diag, d_inkl_oppf)
 ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
 
-  # FIXME - Dato for datadump må hentes dynamisk!
   # FIXME - Legge inn støtte for grupperingsvariabler.
-  # FIXME - Validering og håndtering av variabler med "mrs_" prefiks.
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
   id_diagnose = d_diag %>%
     select(PasientGUID, diaggrupper_med, dato_diag, diag_stilt_aar, dager_diag_til_datadump) %>%
-    arrange(desc(dato_diag)) %>%
+    arrange(dato_diag) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
     filter(
       diaggrupper_med == 2, # Psoriasisartritt
