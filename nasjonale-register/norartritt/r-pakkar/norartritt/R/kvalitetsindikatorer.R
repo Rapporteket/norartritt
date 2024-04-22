@@ -457,7 +457,7 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
   id_diagnose = d_diag %>%
-    select(PasientGUID, diaggrupper_med, dato_diag, diag_stilt_aar, dager_diag_til_datadump) %>%
+    select(PasientGUID, diaggrupper_med, diaggrupper_rem, dato_diag, diag_stilt_aar, dager_diag_til_datadump) %>%
     arrange(dato_diag) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
     filter(
