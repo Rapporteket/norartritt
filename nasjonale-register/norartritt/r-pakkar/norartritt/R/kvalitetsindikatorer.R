@@ -47,7 +47,6 @@ NULL
 #' # inklusjonsdata, diagnosedata og medisindata for NorArtitt.
 #' d_ki_sykmod = ki_sykmod(d_inkl, d_diag, d_medisin)
 ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
-
   # FIXME - Vurder behov for å lage nye dataobjekter for å forenkle
   # kobling i diverse figurer/beregninger.
   # FIXME - Oppdatere bruk av sykehusnavn og legemiddel_navn.
@@ -57,49 +56,54 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
   # FIXME - Sjekke at jeg ikke importerer flere funksjoner en nødvendig i toppen
 
 
-# Koble på inklusjonsskjema for å hente ut inklusjonstidspunkt og sykehustilhørighet
+  # Koble på inklusjonsskjema for å hente ut inklusjonstidspunkt og sykehustilhørighet
   d_inkl_diag_med = d_diagnose %>%
     arrange(dato_diag) |>
     distinct(PasientGUID, .keep_all = TRUE) |>
-    left_join(d_inklusjon %>%
-      select(
-        PasientGUID, InklusjonDato,
-        sykehusnavn, sykehus_kortnavn
-      ),
-    by = "PasientGUID",
-    relationship = "one-to-one") %>%
-    left_join(d_medisin %>%
-      select(
-        PasientGUID, StartDato, SluttDato,
-        legemiddel_navn, legemiddel_navn_kode, dmard
-      ),
-    by = "PasientGUID",
-    relationship = "one-to-many") %>%
+    left_join(
+      d_inklusjon %>%
+        select(
+          PasientGUID, InklusjonDato,
+          sykehusnavn, sykehus_kortnavn
+        ),
+      by = "PasientGUID",
+      relationship = "one-to-one"
+    ) %>%
+    left_join(
+      d_medisin %>%
+        select(
+          PasientGUID, StartDato, SluttDato,
+          legemiddel_navn, legemiddel_navn_kode, dmard
+        ),
+      by = "PasientGUID",
+      relationship = "one-to-many"
+    ) %>%
     mutate(
       dager_fra_diag_til_inkl =
         as.numeric(as_date(InklusjonDato) - as_date(dato_diag))
     )
 
   # Lage ki_krit_nevner
-  d_ki_med_krit_nevner = d_inkl_diag_med  |>
+  d_ki_med_krit_nevner = d_inkl_diag_med |>
     mutate(ki_krit_nevner = diaggrupper_med == 1 &
-             diag_stilt_aar >= 2014 &
-             dager_fra_diag_til_inkl >= 0 &
-             dager_fra_diag_til_inkl <= 90 &
-             (DeathDate >= dato_diag + days(14) | is.na(DeathDate)))
+      diag_stilt_aar >= 2014 &
+      dager_fra_diag_til_inkl >= 0 &
+      dager_fra_diag_til_inkl <= 90 &
+      (DeathDate >= dato_diag + days(14) | is.na(DeathDate)))
 
   # Legge til teller og reduserer til en rad per pasient
   d_ki = d_ki_med_krit_nevner %>%
     mutate(
       tid_til_oppstart_medisin = as_date(StartDato) - as_date(dato_diag),
       ki_krit_teller =
-        case_when(is.na(tid_til_oppstart_medisin) ~ FALSE,
-                  ki_krit_nevner &
-                    dmard == 1 &
-                    tid_til_oppstart_medisin >= 0 &
-                    tid_til_oppstart_medisin <= 14 ~ TRUE,
-                  TRUE ~ FALSE)
-
+        case_when(
+          is.na(tid_til_oppstart_medisin) ~ FALSE,
+          ki_krit_nevner &
+            dmard == 1 &
+            tid_til_oppstart_medisin >= 0 &
+            tid_til_oppstart_medisin <= 14 ~ TRUE,
+          TRUE ~ FALSE
+        )
     ) %>%
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
@@ -135,7 +139,6 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
 #' # d_diag og d_medisin er diagnosedata og medisindata
 #' d_ki_medisinbruk = ki_medisinbruk(d_diag, d_medisin, 2020, 20)
 ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
-
   # FIXME - Legge inn støtte for å definere hvilke diagnosegrupper det skal
   # beregnes KI for.
   # FIXME - Ta ut årstall fra argumentlisten. Tilrettelegg for at det kan løses
@@ -144,17 +147,18 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
   # vha legg_til_medisingrupper).
   # FIXME - Fjerne avhengighet av PasientGUID (må kunne ta inn fødselsnummer også).
   d_ki = d_diagnose %>%
-  left_join(
-    d_medisin %>%
-      select(
-        PasientGUID, StartDato,
-        SluttDato, startaar, sluttaar, legemiddel_navn,
-        legemiddel_navn_kode
-      ),
-    by = "PasientGUID") %>%
-  mutate(ki_krit_nevner = diaggrupper_med == 1 &
-    diag_stilt_aar <= aarstall &
-    (year(DeathDate) >= aarstall | is.na(DeathDate)))
+    left_join(
+      d_medisin %>%
+        select(
+          PasientGUID, StartDato,
+          SluttDato, startaar, sluttaar, legemiddel_navn,
+          legemiddel_navn_kode
+        ),
+      by = "PasientGUID"
+    ) %>%
+    mutate(ki_krit_nevner = diaggrupper_med == 1 &
+      diag_stilt_aar <= aarstall &
+      (year(DeathDate) >= aarstall | is.na(DeathDate)))
 
   d_ki_med_krit = d_ki %>%
     filter(ki_krit_nevner) %>%
@@ -213,7 +217,6 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
 #' # d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
 #' d_ki_remisjon = ki_remisjon(d_diag, d_inkl_oppf)
 ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
-
   # FIXME - Dato for datadump må hentes dynamisk!
   # FIXME - Legge inn støtte for grupperingsvariabler.
   # FIXME - Validering og håndtering av variabler med "mrs_" prefiks.
@@ -232,11 +235,14 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
 
   # Kobler diagnosedata med skjema for de ulike kontrollene for hver pasient i utvalget.
   d = d_inkl_oppf %>%
-    left_join(d_diag %>% select(
-      PasientGUID, diaggrupper_med, dato_diag,
-      dager_diag_til_datadump, diag_stilt_aar
-    ), by = "PasientGUID",
-    relationship = "many-to-one") %>%
+    left_join(
+      d_diag %>% select(
+        PasientGUID, diaggrupper_med, dato_diag,
+        dager_diag_til_datadump, diag_stilt_aar
+      ),
+      by = "PasientGUID",
+      relationship = "many-to-one"
+    ) %>%
     mutate(dager_siden_diagnose = ymd(dato_ktrl) - ymd(dato_diag)) %>%
     mutate(ki_krit_nevner = PasientGUID %in% id_diagnose &
       dager_siden_diagnose >= tidsrom_start &
@@ -245,7 +251,7 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
       !(is.na(HovneLeddAntall)) &
       !(is.na(Crp)) &
       !(is.na(PasientGlobalSykdomsaktivitet)) &
-        (DeathDate >= dato_diag + days(tidsrom_slutt) | is.na(DeathDate)))
+      (DeathDate >= dato_diag + days(tidsrom_slutt) | is.na(DeathDate)))
 
   # Finner hvem som oppfyller krav for teller og reduserer til en rad per pasient.
   d_ki_rem = d %>%
@@ -317,13 +323,14 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
     )) # fixme (QA): Igjen tullete bruk av ifelse().
 
   d_rem_totalt = d %>%
-    mutate(ki_krit_teller = ifelse(ki_krit_nevner &
-      OmmeLeddAntall <= 1 &
-      HovneLeddAntall <= 1 &
-      Crp <= 10 & !is.na(Crp) &
-      PasientGlobalSykdomsaktivitet <= 10 &
-      !is.na(PasientGlobalSykdomsaktivitet),
-    yes = TRUE, no = FALSE
+    mutate(ki_krit_teller = ifelse(
+      ki_krit_nevner &
+        OmmeLeddAntall <= 1 &
+        HovneLeddAntall <= 1 &
+        Crp <= 10 & !is.na(Crp) &
+        PasientGlobalSykdomsaktivitet <= 10 &
+        !is.na(PasientGlobalSykdomsaktivitet),
+      yes = TRUE, no = FALSE
     )) %>%
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
@@ -363,7 +370,6 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
 #' # d_diag er diagnosedatasett
 #' d_ki_kontroll = ki_kontroll(d_inkl_oppf, d_diag)
 ki_kontroll = function(d_inkl_oppf, d_diag) {
-
   # FIXME - støtte for grupperingsvariabler
   # FIXME - fixme's fra QA under.
   # FIXME - støtte for annen identifikator enn PasientGUID.
@@ -382,24 +388,26 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
   d_base = d_inkl_oppf %>%
     left_join(d_diag %>% select(PasientGUID, diaggrupper_med, diaggrupper_hoved, dato_diag, diag_stilt_aar), by = "PasientGUID") %>%
     mutate(tid_til_inkl = InklusjonDato - dato_diag) %>%
-    mutate(ki_krit_nevner = ifelse(PasientGUID %in% id_diagnose &
-      diaggrupper_med == 1 &
-      tid_til_inkl >= 0 &
-      tid_til_inkl <= 90 &
+    mutate(ki_krit_nevner = ifelse(
+      PasientGUID %in% id_diagnose &
+        diaggrupper_med == 1 &
+        tid_til_inkl >= 0 &
+        tid_til_inkl <= 90 &
         (DeathDate >= dato_diag + days(90) | is.na(DeathDate)),
       # fixme (QA): Er inklusjon+diagnose der tid til inklusjon er negativ rett handtert?
-    yes = TRUE, no = FALSE
+      yes = TRUE, no = FALSE
     )) # fixme (QA): igjen håplaus bruk av ifelse().
 
   d_ki_kontroll = d_base %>%
     mutate(
       dager_til_ktrl = dato_ktrl - dato_diag,
-      ki_krit_teller = ifelse(ki_krit_nevner & Skjematype == "Inklusjonskjema" & # fixme (QA): teit bruk av ifelse().
-        dager_til_ktrl > 7 & # fixme (QA): Mange magiske konstantar her. Gjer dei om til variablar.
-        dager_til_ktrl <= 90 | # fixme (QA): For så vidt rett, men for alle som ikkje har pugga detaljane i operatorpresedensane i R kunne det med fordel ha vore nokre parentesar!
-        ki_krit_nevner & Skjematype == "Oppfølgingskjema" &
-          dager_til_ktrl <= 90,
-      yes = TRUE, no = FALSE
+      ki_krit_teller = ifelse(
+        ki_krit_nevner & Skjematype == "Inklusjonskjema" & # fixme (QA): teit bruk av ifelse().
+          dager_til_ktrl > 7 & # fixme (QA): Mange magiske konstantar her. Gjer dei om til variablar.
+          dager_til_ktrl <= 90 | # fixme (QA): For så vidt rett, men for alle som ikkje har pugga detaljane i operatorpresedensane i R kunne det med fordel ha vore nokre parentesar!
+          ki_krit_nevner & Skjematype == "Oppfølgingskjema" &
+            dager_til_ktrl <= 90,
+        yes = TRUE, no = FALSE
       )
     ) %>% # fixme (QA): I skildringa sto det noko med ulike intervall, eks. 28 dagar. Men talet 28 dagar er ingen plass å sjå her, så indikatoren *må* vera rekna ut feil.
     group_by(PasientGUID) %>%
@@ -452,7 +460,6 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
 #' # d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
 #' d_ki_dapsa = ki_dapsa(d_diag, d_inkl_oppf)
 ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
-
   # FIXME - Legge inn støtte for grupperingsvariabler.
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
@@ -475,10 +482,10 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
     ), by = "PasientGUID") %>%
     mutate(dager_siden_diagnose = ymd(dato_ktrl) - ymd(dato_diag)) %>%
     mutate(ki_aktuell = PasientGUID %in% id_diagnose &
-             dager_siden_diagnose >= tidsrom_start &
-             dager_siden_diagnose <= tidsrom_slutt &
-             !(is.na(DAPSA)) &
-             (DeathDate >= dato_diag + days(tidsrom_slutt) | is.na(DeathDate)))
+      dager_siden_diagnose >= tidsrom_start &
+      dager_siden_diagnose <= tidsrom_slutt &
+      !(is.na(DAPSA)) &
+      (DeathDate >= dato_diag + days(tidsrom_slutt) | is.na(DeathDate)))
 
   # Finner hvem som oppfyller krav for teller og reduserer til en rad per pasient.
   d_ki_dapsa = d %>%
@@ -533,7 +540,6 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
 #' # d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
 #' d_ki_asdas = ki_asdas(d_diag, d_inkl_oppf)
 ki_asdas = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
-
   # FIXME - Dato for datadump må hentes dynamisk!
   # FIXME - Legge inn støtte for grupperingsvariabler.
   # FIXME - Validering og håndtering av variabler med "mrs_" prefiks.
@@ -558,10 +564,10 @@ ki_asdas = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
     ), by = "PasientGUID") %>%
     mutate(dager_siden_diagnose = ymd(dato_ktrl) - ymd(dato_diag)) %>%
     mutate(ki_aktuell = PasientGUID %in% id_diagnose &
-             dager_siden_diagnose >= tidsrom_start &
-             dager_siden_diagnose <= tidsrom_slutt &
-             !(is.na(Asdas)) &
-             (DeathDate >= dato_diag + days(tidsrom_slutt) | is.na(DeathDate)))
+      dager_siden_diagnose >= tidsrom_start &
+      dager_siden_diagnose <= tidsrom_slutt &
+      !(is.na(Asdas)) &
+      (DeathDate >= dato_diag + days(tidsrom_slutt) | is.na(DeathDate)))
 
   # Finner hvem som oppfyller krav for teller og reduserer til en rad per pasient.
   d_ki_asdas = d %>%

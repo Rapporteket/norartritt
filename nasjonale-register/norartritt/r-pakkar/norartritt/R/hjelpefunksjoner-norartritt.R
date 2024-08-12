@@ -50,7 +50,6 @@ NULL
 #'
 #' d_medisin_med_navn = legg_til_medisinnavn(d_medisin)
 legg_til_medisinnavn = function(d_medisin) {
-
   # Leser inn kodebøker for medisiner
   mappe = paste0(***FJERNET ADRESSE***)
   medisin_grupper = "medisin-grupper.csv"
@@ -85,12 +84,13 @@ legg_til_medisinnavn = function(d_medisin) {
 
   # Henter ut navn og riktig kode for medisiner med LegemiddelType 999
   d_medisin = d_medisin %>%
-    left_join(medisin_fil %>%
-      select(
-        LegemiddelType, legemiddel_navn,
-        legemiddel_navn_kode
-      ),
-    by = "LegemiddelType"
+    left_join(
+      medisin_fil %>%
+        select(
+          LegemiddelType, legemiddel_navn,
+          legemiddel_navn_kode
+        ),
+      by = "LegemiddelType"
     ) %>%
     mutate(medisin = dplyr::coalesce(Legemiddel, legemiddel_navn)) %>%
     left_join(medisin_kode_999, by = c("medisin" = "legemiddel_kodebok")) %>%
@@ -104,8 +104,10 @@ legg_til_medisinnavn = function(d_medisin) {
 
   # Legger til ekstra informasjon om hvert legemiddel
   d_medisin = d_medisin %>%
-    select(-Legemiddel, - LegemiddelType, -legemiddel_navn,
-           -medisin, -legemiddel_kodebok_kode) %>%
+    select(
+      -Legemiddel, -LegemiddelType, -legemiddel_navn,
+      -medisin, -legemiddel_kodebok_kode
+    ) %>%
     left_join(distinct(medisin_fil, legemiddel_navn_kode, .keep_all = TRUE),
       by = "legemiddel_navn_kode"
     ) %>%
@@ -407,7 +409,6 @@ valider_legemiddeltype = function(mappe_dd) {
 #'   oppf = d_full_Oppfølgingsskjema
 #' )
 konverter_skjematype = function(inkl, oppf) {
-
   # ID for pasienter med skjema som skal konverteres
   id_oppf_uten_inkl = setdiff(oppf$PasientGUID, inkl$PasientGUID)
   id_flere_inklusjon = inkl$PasientGUID[which(duplicated(inkl$PasientGUID))]
@@ -528,8 +529,10 @@ fjern_uaktuelle_diagnoser = function(diag) {
     "Kondrokalsinose", "Krystallartritter", "Pyogen Artritt",
     "Urinsyregikt", "Septisk Artritt"
   )
-  uakt_koder = c("M130", "M131", "M138", "M139",
-                 "M080", "M081", "M083", "M088") # Polyartritt
+  uakt_koder = c(
+    "M130", "M131", "M138", "M139",
+    "M080", "M081", "M083", "M088"
+  ) # Polyartritt
 
   # Fjerner diagnoseskjema for pasienter som mangler andre diagnoser enn de overnevnte
   diag = diag %>%
@@ -654,25 +657,33 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
 #' @examples
 #' d_inkl = konverter_missing_til_na(d_inkl)
 konverter_missing_til_na = function(d) {
-
   vars_fra_0_real = c("BASDAI")
-  vars_fra_1_real = c("Das28", "Das283", "Das28Crp", "Das28Crp3", "Cdai",
-                 "Sdai", "Asdas", "DAPSA", "Total")
-  vars_fra_1_int = c("KlePaaSelv", "OppISengen", "LofteKopp",
-                 "Utendors", "Vaske", "Boye", "Skru", "KommeInn",
-                 "Rand12Q01", "Rand12Q02", "Rand12Q03", "Rand12Q04",
-                 "Rand12Q05", "Rand12Q06", "Rand12Q07", "Rand12Q08",
-                 "Rand12Q09", "Rand12Q10", "Rand12Q11", "Rand12Q12")
+  vars_fra_1_real = c(
+    "Das28", "Das283", "Das28Crp", "Das28Crp3", "Cdai",
+    "Sdai", "Asdas", "DAPSA", "Total"
+  )
+  vars_fra_1_int = c(
+    "KlePaaSelv", "OppISengen", "LofteKopp",
+    "Utendors", "Vaske", "Boye", "Skru", "KommeInn",
+    "Rand12Q01", "Rand12Q02", "Rand12Q03", "Rand12Q04",
+    "Rand12Q05", "Rand12Q06", "Rand12Q07", "Rand12Q08",
+    "Rand12Q09", "Rand12Q10", "Rand12Q11", "Rand12Q12"
+  )
 
 
   d = d |>
-    mutate(across(all_of(vars_fra_0_real),
-                  \(x) replace(x, x == 0, NA_real_)),
-           across(all_of(vars_fra_1_real),
-                  \(x) replace(x, x == -1, NA_real_)),
-           across(all_of(vars_fra_1_int),
-                  \(x) replace(x, x == -1, NA_integer_))
-           )
-
+    mutate(
+      across(
+        all_of(vars_fra_0_real),
+        \(x) replace(x, x == 0, NA_real_)
+      ),
+      across(
+        all_of(vars_fra_1_real),
+        \(x) replace(x, x == -1, NA_real_)
+      ),
+      across(
+        all_of(vars_fra_1_int),
+        \(x) replace(x, x == -1, NA_integer_)
+      )
+    )
 }
-

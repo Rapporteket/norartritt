@@ -63,9 +63,9 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
 
   if (file.exists(paste0(mappe_dd, dato, "\\datadump.RData"))) {
     load(paste0(mappe_dd, dato, "\\datadump.RData"),
-         envir = omgjevnad)
+      envir = omgjevnad
+    )
   } else {
-
     assign("datadump_dato", dato, envir = omgjevnad)
     # les inn kodebok
     kb = rapwhale::les_kb_mrs(mappe_dd, dato = dato)

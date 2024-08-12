@@ -61,7 +61,6 @@ NULL
 #'
 #' @export
 vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
-
   # Legger sammen inklusjon og oppfølging
   d_inkl_oppf = d_inkl %>%
     bind_rows(d_oppf)
@@ -144,7 +143,6 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
 #' globale miljøet.
 #' @export
 lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
-
   # Lager objekt med dødsdato for alle pasienter som har dødd
   d_dodsdato = d_inkl %>%
     select(PasientGUID, DeathDate) %>%
@@ -186,9 +184,11 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
       startaar = lubridate::year(StartDato),
       sluttaar = lubridate::year(SluttDato)
     ) %>%
-    filter(StartDato < DeathDate | is.na(DeathDate),
-           SluttDato <= datadump_dato | is.na(SluttDato),
-           StartDato <= SluttDato | is.na(SluttDato))
+    filter(
+      StartDato < DeathDate | is.na(DeathDate),
+      SluttDato <= datadump_dato | is.na(SluttDato),
+      StartDato <= SluttDato | is.na(SluttDato)
+    )
 
   # medisinforløp for hver pasient hvor duplikater er fjernet
   if (nrow(d_med %>% filter(legemiddel_navn_kode == 999)) > 0) {

@@ -7,7 +7,7 @@ test_that("ki_dapsa() gjev ut forventa resultat", {
     PasientGUID = as.character(1:5),
     diaggrupper_med = c(2, 2, 2, 2, 1),
     dato_diag = as.Date(
-      c("2022-04-05", "2020-01-15",  "2018-10-30",  "2012-02-24",  "2021-05-17")
+      c("2022-04-05", "2020-01-15", "2018-10-30", "2012-02-24", "2021-05-17")
     ),
     diag_stilt_aar = lubridate::year(dato_diag),
     dager_diag_til_datadump = as.Date("2022-12-31") - dato_diag
@@ -33,10 +33,10 @@ test_that("ki_dapsa() gjev ut forventa resultat", {
       )
     ),
     DAPSA = c(17.4, 35.2, NA_real_, 5, 10),
-    DeathDate = c(rep(NA,5)),
+    DeathDate = c(rep(NA, 5)),
     diaggrupper_med = c(2, 2, 2, 2, 1),
     dato_diag = as.Date(
-      c("2022-04-05", "2020-01-15",  "2018-10-30",  "2012-02-24",  "2021-05-17")
+      c("2022-04-05", "2020-01-15", "2018-10-30", "2012-02-24", "2021-05-17")
     ),
     dager_diag_til_datadump = as.Date("2022-12-31") - dato_diag,
     diag_stilt_aar = lubridate::year(dato_diag),
@@ -55,7 +55,7 @@ test_that("ki_asdas() gjev ut forventa resultat", {
     PasientGUID = as.character(1:5),
     diaggrupper_med = c(5, 5, 5, 5, 1),
     dato_diag = as.Date(
-      c("2022-04-05", "2020-01-15",  "2018-10-30",  "2012-02-24",  "2021-05-17")
+      c("2022-04-05", "2020-01-15", "2018-10-30", "2012-02-24", "2021-05-17")
     ),
     diag_stilt_aar = lubridate::year(dato_diag),
     dager_diag_til_datadump = as.Date("2022-12-31") - dato_diag
@@ -84,7 +84,7 @@ test_that("ki_asdas() gjev ut forventa resultat", {
     DeathDate = c(rep(NA, 5)),
     diaggrupper_med = c(5, 5, 5, 5, 1),
     dato_diag = as.Date(
-      c("2022-04-05", "2020-01-15",  "2018-10-30",  "2012-02-24",  "2021-05-17")
+      c("2022-04-05", "2020-01-15", "2018-10-30", "2012-02-24", "2021-05-17")
     ),
     dager_diag_til_datadump = as.Date("2022-12-31") - dato_diag,
     diag_stilt_aar = lubridate::year(dato_diag),

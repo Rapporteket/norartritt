@@ -352,55 +352,77 @@ test_that("skjema filtreres ut som forventet", {
 
 # konverter_missing_til_na ------------------------------------------------
 test_that("Konverterer 0 og -1 til NA som forventet ", {
-d = tibble::tibble(BASDAI = c(4.1, 0, 0, 0, 0, 0.7),
-                   Das28 = c(1.63, -1, 3.64, -1, -1, -1),
-                   Das283 = c(1.21, -1, 3.2, -1, -1, -1),
-                   Das28Crp = c(1.87, -1, 3.01, -1, -1, 1.48),
-                   Das28Crp3 = c(1.42, -1, 2.49, -1, -1, 1.59),
-                   Cdai = c(5.2, -1, 9, -1, 26.9, 1.2),
-                   Sdai = c(5.3, -1, 9.1, -1, -1, 1.4),
-                   Asdas = c(1.84, -1, -1, -1, -1, 0.94),
-                   DAPSA = c(-1, -1, 1.2, 1.4, -1, -1),
-                   Total = c(-1, -1, 0.12, 0.88, 0.5, -1),
-                  KlePaaSelv = c(-1, 2, 3, -1, 2, 3),
-                  OppISengen = c(1, 2, -1, 1, 2, 3),
-                  LofteKopp = c(1, -1, 3, -1, 2, 3),
-                  Utendors = c(-1, 2, 3, -1, 2, 3),
-                  Vaske = c(1, 2, 3, -1, 2, -1),
-                  Boye = c(1, 2, 3, -1, 2, 3),
-                  Skru = c(1, 2, 3, -1, 2, 3),
-                  KommeInn = c(1, 2, 3, -1, 2, 3)
-)
+  d = tibble::tibble(
+    BASDAI = c(4.1, 0, 0, 0, 0, 0.7),
+    Das28 = c(1.63, -1, 3.64, -1, -1, -1),
+    Das283 = c(1.21, -1, 3.2, -1, -1, -1),
+    Das28Crp = c(1.87, -1, 3.01, -1, -1, 1.48),
+    Das28Crp3 = c(1.42, -1, 2.49, -1, -1, 1.59),
+    Cdai = c(5.2, -1, 9, -1, 26.9, 1.2),
+    Sdai = c(5.3, -1, 9.1, -1, -1, 1.4),
+    Asdas = c(1.84, -1, -1, -1, -1, 0.94),
+    DAPSA = c(-1, -1, 1.2, 1.4, -1, -1),
+    Total = c(-1, -1, 0.12, 0.88, 0.5, -1),
+    KlePaaSelv = c(-1, 2, 3, -1, 2, 3),
+    OppISengen = c(1, 2, -1, 1, 2, 3),
+    LofteKopp = c(1, -1, 3, -1, 2, 3),
+    Utendors = c(-1, 2, 3, -1, 2, 3),
+    Vaske = c(1, 2, 3, -1, 2, -1),
+    Boye = c(1, 2, 3, -1, 2, 3),
+    Skru = c(1, 2, 3, -1, 2, 3),
+    KommeInn = c(1, 2, 3, -1, 2, 3)
+  )
 
-d_forventet = tibble::tibble(BASDAI = c(4.1, NA_real_, NA_real_,
-                                        NA_real_, NA_real_, 0.7),
-                             Das28 = c(1.63, NA_real_, 3.64,
-                                       NA_real_, NA_real_, NA_real_),
-                             Das283 = c(1.21, NA_real_, 3.2,
-                                        NA_real_, NA_real_, NA_real_),
-                             Das28Crp = c(1.87, NA_real_, 3.01,
-                                          NA_real_, NA_real_, 1.48),
-                             Das28Crp3 = c(1.42, NA_real_, 2.49,
-                                           NA_real_, NA_real_, 1.59),
-                             Cdai = c(5.2, NA_real_, 9,
-                                      NA_real_, 26.9, 1.2),
-                             Sdai = c(5.3, NA_real_, 9.1, NA_real_,
-                                      NA_real_, 1.4),
-                             Asdas = c(1.84, NA_real_, NA_real_,
-                                       NA_real_, NA_real_, 0.94),
-                             DAPSA = c(NA_real_, NA_real_, 1.2,
-                                       1.4, NA_real_, NA_real_),
-                             Total = c(NA_real_, NA_real_, 0.12,
-                                       0.88, 0.5, NA_real_),
-                             KlePaaSelv = c(NA_integer_, 2, 3, NA_integer_, 2, 3),
-                             OppISengen = c(1, 2, NA_integer_, 1, 2, 3),
-                             LofteKopp = c(1, NA_integer_, 3, NA_integer_, 2, 3),
-                             Utendors = c(NA_integer_, 2, 3, NA_integer_, 2, 3),
-                             Vaske = c(1, 2, 3, NA_integer_, 2, NA_integer_),
-                             Boye = c(1, 2, 3, NA_integer_, 2, 3),
-                             Skru = c(1, 2, 3, NA_integer_, 2, 3),
-                             KommeInn = c(1, 2, 3, NA_integer_, 2, 3)
-)
+  d_forventet = tibble::tibble(
+    BASDAI = c(
+      4.1, NA_real_, NA_real_,
+      NA_real_, NA_real_, 0.7
+    ),
+    Das28 = c(
+      1.63, NA_real_, 3.64,
+      NA_real_, NA_real_, NA_real_
+    ),
+    Das283 = c(
+      1.21, NA_real_, 3.2,
+      NA_real_, NA_real_, NA_real_
+    ),
+    Das28Crp = c(
+      1.87, NA_real_, 3.01,
+      NA_real_, NA_real_, 1.48
+    ),
+    Das28Crp3 = c(
+      1.42, NA_real_, 2.49,
+      NA_real_, NA_real_, 1.59
+    ),
+    Cdai = c(
+      5.2, NA_real_, 9,
+      NA_real_, 26.9, 1.2
+    ),
+    Sdai = c(
+      5.3, NA_real_, 9.1, NA_real_,
+      NA_real_, 1.4
+    ),
+    Asdas = c(
+      1.84, NA_real_, NA_real_,
+      NA_real_, NA_real_, 0.94
+    ),
+    DAPSA = c(
+      NA_real_, NA_real_, 1.2,
+      1.4, NA_real_, NA_real_
+    ),
+    Total = c(
+      NA_real_, NA_real_, 0.12,
+      0.88, 0.5, NA_real_
+    ),
+    KlePaaSelv = c(NA_integer_, 2, 3, NA_integer_, 2, 3),
+    OppISengen = c(1, 2, NA_integer_, 1, 2, 3),
+    LofteKopp = c(1, NA_integer_, 3, NA_integer_, 2, 3),
+    Utendors = c(NA_integer_, 2, 3, NA_integer_, 2, 3),
+    Vaske = c(1, 2, 3, NA_integer_, 2, NA_integer_),
+    Boye = c(1, 2, 3, NA_integer_, 2, 3),
+    Skru = c(1, 2, 3, NA_integer_, 2, 3),
+    KommeInn = c(1, 2, 3, NA_integer_, 2, 3)
+  )
 
-expect_identical(konverter_missing_til_na(d), d_forventet)
+  expect_identical(konverter_missing_til_na(d), d_forventet)
 })
