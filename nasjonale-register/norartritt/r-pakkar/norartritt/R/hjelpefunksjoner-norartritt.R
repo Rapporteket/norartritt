@@ -160,7 +160,7 @@ legg_til_sykehusnavn = function(d) {
   d = d %>%
     left_join(sykehus_navnefil, by = c("UnitId" = "resh_id"))
 
-  if (any(is.na(d$sykehusnavn))) {
+  if (anyNA(d$sykehusnavn)) {
     stop(paste0(
       "Det mangler kobling for UnitId: ",
       stringr::str_c(d %>%
