@@ -318,20 +318,15 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
       PasientGUID, diaggrupper_med, dato_diag,
       dager_diag_til_datadump, diag_stilt_aar
     ), by = "PasientGUID") %>%
-    mutate(ki_krit_nevner = ifelse(PasientGUID %in% id_diagnose,
-      yes = TRUE, no = FALSE
-    )) # fixme (QA): Igjen tullete bruk av ifelse().
+    mutate(ki_krit_nevner = PasientGUID %in% id_diagnose)
 
   d_rem_totalt = d %>%
-    mutate(ki_krit_teller = ifelse(
-      ki_krit_nevner &
-        OmmeLeddAntall <= 1 &
-        HovneLeddAntall <= 1 &
-        Crp <= 10 & !is.na(Crp) &
-        PasientGlobalSykdomsaktivitet <= 10 &
-        !is.na(PasientGlobalSykdomsaktivitet),
-      yes = TRUE, no = FALSE
-    )) %>%
+    mutate(ki_krit_teller = ki_krit_nevner &
+      OmmeLeddAntall <= 1 &
+      HovneLeddAntall <= 1 &
+      Crp <= 10 & !is.na(Crp) &
+      PasientGlobalSykdomsaktivitet <= 10 &
+      !is.na(PasientGlobalSykdomsaktivitet)) %>%
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
@@ -388,27 +383,23 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
   d_base = d_inkl_oppf %>%
     left_join(d_diag %>% select(PasientGUID, diaggrupper_med, diaggrupper_hoved, dato_diag, diag_stilt_aar), by = "PasientGUID") %>%
     mutate(tid_til_inkl = InklusjonDato - dato_diag) %>%
-    mutate(ki_krit_nevner = ifelse(
-      PasientGUID %in% id_diagnose &
+    mutate(
+      ki_krit_nevner = PasientGUID %in% id_diagnose &
         diaggrupper_med == 1 &
         tid_til_inkl >= 0 &
         tid_til_inkl <= 90 &
-        (DeathDate >= dato_diag + days(90) | is.na(DeathDate)),
+        (DeathDate >= dato_diag + days(90) | is.na(DeathDate))
       # fixme (QA): Er inklusjon+diagnose der tid til inklusjon er negativ rett handtert?
-      yes = TRUE, no = FALSE
-    )) # fixme (QA): igjen håplaus bruk av ifelse().
+    )
 
   d_ki_kontroll = d_base %>%
     mutate(
       dager_til_ktrl = dato_ktrl - dato_diag,
-      ki_krit_teller = ifelse(
-        ki_krit_nevner & Skjematype == "Inklusjonskjema" & # fixme (QA): teit bruk av ifelse().
-          dager_til_ktrl > 7 & # fixme (QA): Mange magiske konstantar her. Gjer dei om til variablar.
-          dager_til_ktrl <= 90 | # fixme (QA): For så vidt rett, men for alle som ikkje har pugga detaljane i operatorpresedensane i R kunne det med fordel ha vore nokre parentesar!
-          ki_krit_nevner & Skjematype == "Oppfølgingskjema" &
-            dager_til_ktrl <= 90,
-        yes = TRUE, no = FALSE
-      )
+      ki_krit_teller = ki_krit_nevner & Skjematype == "Inklusjonskjema" &
+        dager_til_ktrl > 7 & # fixme (QA): Mange magiske konstantar her. Gjer dei om til variablar.
+        dager_til_ktrl <= 90 | # fixme (QA): For så vidt rett, men for alle som ikkje har pugga detaljane i operatorpresedensane i R kunne det med fordel ha vore nokre parentesar!
+        ki_krit_nevner & Skjematype == "Oppfølgingskjema" &
+          dager_til_ktrl <= 90
     ) %>% # fixme (QA): I skildringa sto det noko med ulike intervall, eks. 28 dagar. Men talet 28 dagar er ingen plass å sjå her, så indikatoren *må* vera rekna ut feil.
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
