@@ -58,14 +58,14 @@ legg_til_medisinnavn = function(d_medisin) {
   medisin_fil = readr::read_delim(paste0(mappe, medisin_grupper),
     delim = ";",
     trim_ws = TRUE,
-    col_types = c("ici__iiiiiiccc"),
+    col_types = "ici__iiiiiiccc",
     locale = readr::locale(encoding = "windows-1252")
   )
 
   medisin_kode_999 = readr::read_delim(paste0(mappe, legemiddel_999),
     delim = ";",
     trim_ws = TRUE,
-    col_types = c("ic"),
+    col_types = "ic",
     locale = readr::locale(encoding = "windows-1252")
   )
 
@@ -153,7 +153,7 @@ legg_til_sykehusnavn = function(d) {
   adresse = ***FJERNET ADRESSE***
   sykehus_navnefil = readr::read_delim(adresse,
     delim = ";",
-    col_types = c("iccic_"),
+    col_types = "iccic_",
     locale = readr::locale(encoding = "windows-1252")
   )
 
@@ -223,7 +223,7 @@ legg_til_diagnosegrupper = function(d) {
   adresse = ***FJERNET ADRESSE***
   diagnosegrupper = readr::read_delim(adresse,
     delim = ";",
-    col_types = c("ciciccicic"),
+    col_types = "ciciccicic",
     locale = readr::locale(encoding = "windows-1252")
   )
 
@@ -362,7 +362,7 @@ valider_legemiddeltype = function(mappe_dd) {
   medisinfil = readr::read_delim(paste0(mappe, medisin_grupper),
     delim = ";",
     trim_ws = TRUE,
-    col_types = c("ici__iiiiiiccc"),
+    col_types = "ici__iiiiiiccc",
     locale = readr::locale(encoding = "windows-1252")
   )
 
@@ -661,7 +661,7 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
 #' @examples
 #' d_inkl = konverter_missing_til_na(d_inkl)
 konverter_missing_til_na = function(d) {
-  vars_fra_0_real = c("BASDAI")
+  vars_fra_0_real = "BASDAI"
   vars_fra_1_real = c(
     "Das28", "Das283", "Das28Crp", "Das28Crp3", "Cdai",
     "Sdai", "Asdas", "DAPSA", "Total"
