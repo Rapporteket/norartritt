@@ -75,11 +75,11 @@ legg_til_medisinnavn = function(d_medisin) {
     dplyr::pull(LegemiddelType)
 
   if (length(na_legemiddel_navn) > 0) {
-    stop(paste0(
+    stop(
       "LegemiddelType ",
       stringr::str_c(na_legemiddel_navn, collapse = ", "),
       " er ikke definert i medisinkodeboken"
-    ))
+    )
   }
 
   # Henter ut navn og riktig kode for medisiner med LegemiddelType 999
@@ -161,13 +161,13 @@ legg_til_sykehusnavn = function(d) {
     left_join(sykehus_navnefil, by = c("UnitId" = "resh_id"))
 
   if (anyNA(d$sykehusnavn)) {
-    stop(paste0(
+    stop(
       "Det mangler kobling for UnitId: ",
       stringr::str_c(d %>%
         filter(is.na(sykehusnavn)) %>%
         distinct(UnitId) %>%
         pull(UnitId), collapse = ", ")
-    ))
+    )
   }
   d
 }
@@ -229,7 +229,10 @@ legg_til_diagnosegrupper = function(d) {
   ukjent_kode = setdiff(d$Kode, diagnosegrupper$Kode)
   ukjent_kode = ukjent_kode[!is.na(ukjent_kode)]
   if (length(ukjent_kode) > 0) {
-    stop(paste0("Kode: ", stringr::str_c(ukjent_kode, collapse = ", "), " finnes ikke i diagnosekodebok"))
+    stop(
+      "Kode: ",
+      stringr::str_c(ukjent_kode, collapse = ", "),
+      " finnes ikke i diagnosekodebok")
   }
 
   d = d %>%
