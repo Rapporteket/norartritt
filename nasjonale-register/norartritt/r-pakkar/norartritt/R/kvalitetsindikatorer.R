@@ -381,7 +381,10 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
 
   # Finner de som oppfyller krav for nevner
   d_base = d_inkl_oppf %>%
-    left_join(d_diag %>% select(PasientGUID, diaggrupper_med, diaggrupper_hoved, dato_diag, diag_stilt_aar), by = "PasientGUID") %>%
+    left_join(
+      select(d_diag, PasientGUID, diaggrupper_med, diaggrupper_hoved, dato_diag, diag_stilt_aar),
+      by = "PasientGUID"
+    ) %>%
     mutate(tid_til_inkl = InklusjonDato - dato_diag) %>%
     mutate(
       ki_krit_nevner = PasientGUID %in% id_diagnose &
