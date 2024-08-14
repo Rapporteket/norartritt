@@ -163,10 +163,11 @@ legg_til_sykehusnavn = function(d) {
   if (anyNA(d$sykehusnavn)) {
     stop(
       "Det mangler kobling for UnitId: ",
-      stringr::str_c(d %>%
+      d %>%
         filter(is.na(sykehusnavn)) %>%
         distinct(UnitId) %>%
-        pull(UnitId), collapse = ", ")
+        pull(UnitId) |>
+        stringr::str_c(collapse = ", ")
     )
   }
   d
