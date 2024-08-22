@@ -186,7 +186,7 @@ test_that("Tidligste dato returneres hvis det også finnes NA", {
   )
 
   expect_identical(
-    velg_tidligste_inklusjondato(pas_id = PasientGUID, d),
+    velg_tidligste_inklusjondato(d, pas_id = PasientGUID),
     d_ut_forventet
   )
 })
@@ -204,7 +204,7 @@ test_that("Fungerer med alternativ pasientidentifikator", {
   )
 
   expect_identical(
-    velg_tidligste_inklusjondato(pas_id = fnr, d),
+    velg_tidligste_inklusjondato(d, pas_id = fnr),
     d_ut_forventet
   )
 })

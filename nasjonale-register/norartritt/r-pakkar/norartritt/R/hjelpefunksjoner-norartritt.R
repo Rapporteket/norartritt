@@ -297,11 +297,11 @@ legg_til_diagnosegrupper = function(d) {
 #' Hvis en pasient aldri har fått registrert inklusjonsdato returneres NA for
 #' denne pasienten.
 #'
+#' @param d_inkl_oppf Sammenkoblet datasett som inneholder alle aktuelle
+#' inklusjons- og oppfølgingsskjema for pasientgruppen.
 #' @param pas_id Variabel som brukes som pasientidentifikator. Standard verdi
 #' er `PasientGUID`, men for personidentifiserbare datadumper kan
 #' `Fødselsnummer` brukes.
-#' @param d_inkl_oppf Sammenkoblet datasett som inneholder alle aktuelle
-#' inklusjons- og oppfølgingsskjema for pasientgruppen.
 #'
 #' @return
 #' Returnerer inndata med oppdatert `InklusjonDato` for alle pasienter.
@@ -310,7 +310,7 @@ legg_til_diagnosegrupper = function(d) {
 #' @examples
 #' # d_inkl_oppf er sammenslått datasett med inklusjons- og oppfølgingsskjema
 #' d_inkl_oppf_dato = velg_tidligste_inklusjondato(d_inkl_oppf)
-velg_tidligste_inklusjondato = function(pas_id = PasientGUID, d_inkl_oppf) {
+velg_tidligste_inklusjondato = function(d_inkl_oppf, pas_id = PasientGUID) {
   min_na = function(x) {
     if (all(is.na(x))) {
       x[NA]
