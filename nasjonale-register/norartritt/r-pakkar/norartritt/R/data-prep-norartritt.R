@@ -171,7 +171,9 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     # med interne kodebøker for å ta imot data fra HP, og det er ikke aktuelt.
     # Tar de derfor bort fra analyse.
     # Fjern filtrering når data er korrigert og import er fikset i MRS/HP.
-    filter(!(LegemiddelType == 999 & Hospital == "St. Olav" & lubridate::date(CreationDate) > "2023-05-29")) |>
+    # FIXME - Har også lagt Ålesund til listen etter de fikk innført helseplattformen der
+    filter(!(LegemiddelType == 999 & Hospital == "St. Olav" & lubridate::date(CreationDate) > "2023-05-29"),
+           !(LegemiddelType == 999 & Hospital == "Ålesund" & lubridate::date(CreationDate) > "2024-06-05")) |>
     legg_til_medisinnavn() %>%
     left_join(d_dodsdato, by = "PasientGUID") %>%
     mutate(
