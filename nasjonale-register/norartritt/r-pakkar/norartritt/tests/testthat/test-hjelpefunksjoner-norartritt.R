@@ -363,14 +363,26 @@ test_that("Konverterer 0 og -1 til NA som forventet ", {
     Asdas = c(1.84, -1, -1, -1, -1, 0.94),
     DAPSA = c(-1, -1, 1.2, 1.4, -1, -1),
     Total = c(-1, -1, 0.12, 0.88, 0.5, -1),
-    KlePaaSelv = c(-1, 2, 3, -1, 2, 3),
-    OppISengen = c(1, 2, -1, 1, 2, 3),
-    LofteKopp = c(1, -1, 3, -1, 2, 3),
-    Utendors = c(-1, 2, 3, -1, 2, 3),
-    Vaske = c(1, 2, 3, -1, 2, -1),
-    Boye = c(1, 2, 3, -1, 2, 3),
-    Skru = c(1, 2, 3, -1, 2, 3),
-    KommeInn = c(1, 2, 3, -1, 2, 3)
+    KlePaaSelv = c(-1L, 2L, 3L, -1L, 2L, 3L),
+    OppISengen = c(1L, 2L, -1L, 1L, 2L, 3L),
+    LofteKopp = c(1L, -1L, 3L, -1L, 2L, 3L),
+    Utendors = c(-1L, 2L, 3L, -1L, 2L, 3L),
+    Vaske = c(1L, 2L, 3L, -1L, 2L, -1L),
+    Boye = c(1L, 2L, 3L, -1L, 2L, 3L),
+    Skru = c(1L, 2L, 3L, -1L, 2L, 3L),
+    KommeInn = c(1L, 2L, 3L, -1L, 2L, 3L),
+    Rand12Q01 = c(-1L, 1L, 2L, 3L, 4L, 5L),
+    Rand12Q02 = c(-1L, 1L, 2L, 3L, 1L, 2L),
+    Rand12Q03 = c(-1L, 1L, 2L, 1L, 2L, -1L),
+    Rand12Q04 = c(-1L, 1L, 2L, 1L, 2L, -1L),
+    Rand12Q05 = c(-1L, 1L, 2L, 1L, 2L, -1L),
+    Rand12Q06 = c(-1L, 1L, 2L, 1L, 2L, -1L),
+    Rand12Q07 = c(-1L, 1L, 2L, 1L, 2L, -1L),
+    Rand12Q08 = c(-1L, 1L, 2L, 3L, 4L, 5L),
+    Rand12Q09 = c(-1L, 1L, 2L, 3L, 4L, 5L),
+    Rand12Q10 = c(-1L, 1L, 2L, 3L, 4L, 5L),
+    Rand12Q11 = c(-1L, 1L, 2L, 3L, 4L, 5L),
+    Rand12Q12 = c(-1L, 1L, 2L, 3L, 4L, 5L)
   )
 
   d_forventet = tibble::tibble(
@@ -399,8 +411,8 @@ test_that("Konverterer 0 og -1 til NA som forventet ", {
       NA_real_, 26.9, 1.2
     ),
     Sdai = c(
-      5.3, NA_real_, 9.1, NA_real_,
-      NA_real_, 1.4
+      5.3, NA_real_, 9.1,
+      NA_real_, NA_real_, 1.4
     ),
     Asdas = c(
       1.84, NA_real_, NA_real_,
@@ -414,14 +426,86 @@ test_that("Konverterer 0 og -1 til NA som forventet ", {
       NA_real_, NA_real_, 0.12,
       0.88, 0.5, NA_real_
     ),
-    KlePaaSelv = c(NA_integer_, 2, 3, NA_integer_, 2, 3),
-    OppISengen = c(1, 2, NA_integer_, 1, 2, 3),
-    LofteKopp = c(1, NA_integer_, 3, NA_integer_, 2, 3),
-    Utendors = c(NA_integer_, 2, 3, NA_integer_, 2, 3),
-    Vaske = c(1, 2, 3, NA_integer_, 2, NA_integer_),
-    Boye = c(1, 2, 3, NA_integer_, 2, 3),
-    Skru = c(1, 2, 3, NA_integer_, 2, 3),
-    KommeInn = c(1, 2, 3, NA_integer_, 2, 3)
+    KlePaaSelv = c(
+      NA_integer_, 2L, 3L,
+      NA_integer_, 2L, 3L
+    ),
+    OppISengen = c(
+      1L, 2L, NA_integer_,
+      1L, 2L, 3L
+    ),
+    LofteKopp = c(
+      1L, NA_integer_, 3L,
+      NA_integer_, 2L, 3L
+    ),
+    Utendors = c(
+      NA_integer_, 2L, 3L,
+      NA_integer_, 2L, 3L
+    ),
+    Vaske = c(
+      1L, 2L, 3L,
+      NA_integer_, 2L, NA_integer_
+    ),
+    Boye = c(
+      1L, 2L, 3L, NA_integer_,
+      2L, 3L
+    ),
+    Skru = c(
+      1L, 2L, 3L, NA_integer_,
+      2L, 3L
+    ),
+    KommeInn = c(
+      1L, 2L, 3L,
+      NA_integer_, 2L, 3L
+    ),
+    Rand12Q01 = c(
+      NA_integer_, 1L, 2L,
+      3L, 4L, 5L
+    ),
+    Rand12Q02 = c(
+      NA_integer_, 1L, 2L,
+      3L, 1L, 2L
+    ),
+    Rand12Q03 = c(
+      NA_integer_, 1L, 2L,
+      1L, 2L, NA_integer_
+    ),
+    Rand12Q04 = c(
+      NA_integer_, 1L, 2L,
+      1L, 2L, NA_integer_
+    ),
+    Rand12Q05 = c(
+      NA_integer_, 1L, 2L,
+      1L, 2L, NA_integer_
+    ),
+    Rand12Q06 = c(
+      NA_integer_, 1L, 2L,
+      1L, 2L, NA_integer_
+    ),
+    Rand12Q07 = c(
+      NA_integer_, 1L, 2L,
+      1L, 2L, NA_integer_
+    ),
+    Rand12Q08 = c(
+      NA_integer_, 1L, 2L,
+      3L, 4L, 5L
+    ),
+    Rand12Q09 = c(
+      NA_integer_, 1L, 2L,
+      3L, 4L, 5L
+    ),
+    Rand12Q10 = c(
+      NA_integer_, 1L, 2L,
+      3L, 4L, 5L
+    ),
+    Rand12Q11 = c(
+      NA_integer_, 1L, 2L,
+      3L, 4L, 5L
+    ),
+    Rand12Q12 = c(
+      NA_integer_, 1L, 2L,
+      3L, 4L, 5L
+    )
   )
 
   expect_identical(konverter_missing_til_na(d), d_forventet)
