@@ -402,7 +402,7 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
         dager_til_ktrl > 7 & # fixme (QA): Mange magiske konstantar her. Gjer dei om til variablar.
         dager_til_ktrl <= 90 | # fixme (QA): For så vidt rett, men for alle som ikkje har pugga detaljane i operatorpresedensane i R kunne det med fordel ha vore nokre parentesar!
         ki_krit_nevner & Skjematype == "Oppfølgingskjema" &
-          dager_til_ktrl <= 90
+        dager_til_ktrl <= 90
     ) %>% # fixme (QA): I skildringa sto det noko med ulike intervall, eks. 28 dagar. Men talet 28 dagar er ingen plass å sjå her, så indikatoren *må* vera rekna ut feil.
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
@@ -458,7 +458,7 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
   id_diagnose = d_diag %>%
-    select(PasientGUID, diaggrupper_med, diaggrupper_rem, dato_diag, diag_stilt_aar, dager_diag_til_datadump) %>%
+    select(PasientGUID, diaggrupper_rem, dato_diag, diag_stilt_aar, dager_diag_til_datadump) %>%
     arrange(dato_diag) %>%
     distinct(PasientGUID, .keep_all = TRUE) %>%
     filter(

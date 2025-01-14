@@ -5,7 +5,7 @@
 test_that("ki_dapsa() gjev ut forventa resultat", {
   d_diag = tibble::tibble(
     PasientGUID = as.character(1:5),
-    diaggrupper_med = c(2, 2, 2, 2, 1),
+    diaggrupper_rem = c(2, 2, 2, 2, 1),
     dato_diag = as.Date(
       c("2022-04-05", "2020-01-15", "2018-10-30", "2012-02-24", "2021-05-17")
     ),
@@ -34,7 +34,7 @@ test_that("ki_dapsa() gjev ut forventa resultat", {
     ),
     DAPSA = c(17.4, 35.2, NA_real_, 5, 10),
     DeathDate = c(rep(NA, 5)),
-    diaggrupper_med = c(2, 2, 2, 2, 1),
+    diaggrupper_rem = c(2, 2, 2, 2, 1),
     dato_diag = as.Date(
       c("2022-04-05", "2020-01-15", "2018-10-30", "2012-02-24", "2021-05-17")
     ),
