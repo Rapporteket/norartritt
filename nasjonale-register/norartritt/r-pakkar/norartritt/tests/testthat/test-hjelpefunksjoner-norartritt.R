@@ -72,7 +72,7 @@ test_that("Leser inn enhetsinformasjon fra sykehusfil som forventet", {
   d_forventet_ut = tibble::tibble(
     UnitId = c(110629L, 102977L, 104579L),
     sykehusnavn = c(
-      "Martina Hansens hospital", "Haukeland universitetssykehus",
+      "Martina Hansens hospital", "Haukeland universitetsjukehus",
       "St. Olavs hospital"
     ),
     sykehus_kortnavn = c("MHH", "HUS", "St. Olav"),
