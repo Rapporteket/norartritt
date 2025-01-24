@@ -95,3 +95,95 @@ test_that("ki_asdas() gjev ut forventa resultat", {
 
   expect_identical(ki_asdas(d_diag, d_inkl_oppf), d_forventa)
 })
+
+# ki_sykmod ---------------------------------------------------------------
+
+
+# ki_medisinbruk ----------------------------------------------------------
+
+
+# ki_remisjon -------------------------------------------------------------
+
+
+# remisjon_totalt ---------------------------------------------------------
+
+
+# ki_kontroll -------------------------------------------------------------
+
+test_that("Funksjonen gir forventet resultat", {
+  # Må ha dekning for alle ulike potensielle kombinasjoner av inklusjonsskjema,
+  # oppfølgingsskjema, diagnosedato, kontrolldato, etc.
+
+  # Pasient inkludert før diagnose
+    # oppfølging innen 90
+    # oppfølging etter 90
+  # Pasient uten inklusjonsskjema
+    # oppfølging innen 90
+    # oppfølging innen 7 og 90
+    # oppfølging > 90
+  # Pasient med flere inklusjonsskjema
+    # innen 7 og 90
+    # etter 7 og før 90
+    # etter 7 og etter 90
+  # Pasient med inklusjon og oppfølging samme dag
+    # og oppfølging innen 90
+    # uten oppf innen 90
+  # Pasient med Inklusjon innen en uke og
+    # oppfølging innen 90
+    # oppfølging innen en uke
+    # oppfølging over 90 etter diag
+  # Pasient med inklusjon mellom 7 og 30 dager,
+    # ingen oppfølging,
+    # oppfølging innen 30,
+    # oppfølging innen 90,
+    # oppf etter 90
+  # Pasient med inklusjon > 30
+    # ingen oppfølging,
+    # oppfølging innen 90
+    # oppfølging > 90
+  # Pasient som har dødd innen 90 men oppfylt krav
+  # Pasient som har dødd innen 90 uten å oppfylle krav.
+
+
+
+  # Pasient inkludert før diagnose
+  # oppfølging innen 90
+  # oppfølging etter 90
+  d_inkl_oppf_test = tibble(
+    PasientGUID = c("1", "1", "1"),
+    Skjematype = c("Inklusjonskjema", "Oppfølgingskjema", "Oppfølgingskjema"),
+    InklusjonDato = c(lubridate::ymd("2024-01-01", "2024-01-01", "2024-01-01")),
+    DeathDate = c(lubridate::ymd(NA, NA, NA)),
+    dato_ktrl = c(lubridate::ymd("2024-01-01", "2024-02-01", "2024-06-01"))
+  )
+
+  d_diag_test = tibble(
+    PasientGUID = c("1"),
+    diaggrupper_med = c(1),
+    diaggrupper_hoved = c(1),
+    dato_diag = c(lubridate::ymd("2024-01-05")),
+    diag_stilt_aar = c(2024)
+  )
+
+  d_ki_kontroll_forventet = tibble(
+    PasientGUID = c("1"),
+    Skjematype = c("Inklusjonskjema"),
+    InklusjonDato = c(lubridate::ymd("2024-01-01")),
+    DeathDate = c(lubridate::ymd(NA)),
+    dato_ktrl = c(lubridate::ymd("2024-01-01")),
+    diaggrupper_med = c(1),
+    diaggrupper_hoved = c(1),
+    dato_diag = c(lubridate::ymd("2024-01-05")),
+    diag_stilt_aar = c(2024),
+    tid_til_inkl = c(lubridate::as.difftime(-4, units = "days")),
+    ki_krit_nevner = c(FALSE),
+    dager_til_ktrl = c(lubridate::as.difftime(-4, units = "days")),
+    ki_krit_teller = c(FALSE)
+  )
+
+  testthat::expect_identical(ki_kontroll(d_inkl_oppf_test, d_diag_test),
+                   d_ki_kontroll_forventet)
+
+})
+
+# FIXME - Oppdatere docs til å reflektere at hele inndatasettet blir med ut.
