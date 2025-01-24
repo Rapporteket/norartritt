@@ -104,6 +104,13 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
     les_inn_data(skjema_id = "Oppfølgingskjema", kb = kb, versjon = versjon)
     les_inn_data(skjema_id = "Oppfølgingskjema2", kb = kb, versjon = versjon)
     les_inn_data(skjema_id = "Medisineringskjema", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Billeddiagnostikkskjema", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Bivirkningskjema", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Historiskdose", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Infusjonslogg", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Injeksjonskjema", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Komorbidtilstandskjema", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Promsinklusjonsskjema", kb = kb, versjon = versjon)
 
     save(kb,
       datadump_dato,
@@ -112,7 +119,15 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
       d_full_Oppfølgingskjema,
       d_full_Oppfølgingskjema2,
       d_full_Medisineringskjema,
-      file = paste0(mappe_dd, dato, "\\datadump.RData")
+      d_full_Billeddiagnostikkskjema,
+      d_full_Bivirkningskjema,
+      d_full_Historiskdose,
+      d_full_Infusjonslogg,
+      d_full_Injeksjonskjema,
+      d_full_Komorbidtilstandskjema,
+      d_full_Promsinklusjonsskjema,
+      file = paste0(mappe_dd, dato, "\\datadump.RData"),
+      precheck = FALSE
     )
   }
 }
