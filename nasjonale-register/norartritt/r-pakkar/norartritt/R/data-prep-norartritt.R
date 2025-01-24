@@ -287,3 +287,23 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 
 strukturer_variabler_uten_kodebok = function(d_inkl, d_oppf, d_diag, d_med) {
 }
+
+
+# FIXME - utvide til alle skjematyper
+
+# TODO - Skal lage et nytt objekt som inneholder alle pasientforløp.
+# - Pasienter kan være registrert ved flere sykehus og dermed få dupliserte
+# inklusjonsskjema og diagnoseskjema osv.
+# Målet er å redusere dette i den grad det er mulig å prøve å få litt bedre
+# organiserte data.
+#
+# lag_sykdomsforlop = function(d_full_Inklusjonskjema, d_full_Oppfølgingskjema, d_full_Diagnoseskjema, d_full_Medisineringskjema){
+#
+#   PID = unique(c(d_full_Inklusjonskjema$PasientGUID, d_full_Oppfølgingskjema$PasientGUID, d_full_Diagnoseskjema$PasientGUID, d_full_Medisineringskjema$PasientGUID))
+#
+#   all(PID %in% unique(d_full_Inklusjonskjema$PasientGUID))
+#
+#   hovedskjemaGUID = d_full_Inklusjonskjema |> pull(SkjemaGUID)
+#
+#   nest
+# }
