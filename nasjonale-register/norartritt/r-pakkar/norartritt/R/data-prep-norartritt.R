@@ -159,10 +159,13 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     konverter_missing_til_na() |>
     legg_til_sykehusnavn()
 
-  d_diag = d_diag %>%
-    legg_til_diagnosegrupper() %>%
-    left_join(d_dodsdato, by = "PasientGUID") %>%
+  d_diag = d_diag  |>
+    legg_til_diagnosegrupper() |>
+    left_join(d_dodsdato, by = "PasientGUID")  |>
     filter(is.na(DeathDate) | DeathDate >= dato_diag)
+
+  d_diag = legg_til_kriteriedatoer(d_inkl = d_inkl,
+                                   d_diag = d_diag)
 
   d_med = d_med %>%
     filter(!(LegemiddelType == 999 & is.na(Legemiddel))) %>%
@@ -287,6 +290,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 
 strukturer_variabler_uten_kodebok = function(d_inkl, d_oppf, d_diag, d_med) {
 }
+
+
 
 
 # FIXME - utvide til alle skjematyper

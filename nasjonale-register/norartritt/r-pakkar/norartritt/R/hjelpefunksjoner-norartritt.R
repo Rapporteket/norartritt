@@ -626,12 +626,72 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
   d_diag = d_diag %>%
     mutate(
       dato_diag = as_date(FormDate),
-      diag_stilt_aar = year(FormDate),
-      dager_diag_til_datadump = as.integer(!!datadump_dato - dato_diag)
     )
 
   # Returnere alle objekter
   (list(d_inkl, d_oppf, d_diag, d_med))
+}
+
+
+#' Velg tidligste registrerte dato for diagnose
+#'
+#' @description
+#' Det finnes flere ulike kilder for det som kan anses å være en diagnosedato.
+#' Avhengig av diagnose er det ulike kriterier som skal oppfylles for at
+#' diagnosen skal kunne stilles. Disse registreres på inklusjonsskjema, og vil
+#' ikke nødvendigvis samsvare med dato fra diagnoseskjema.
+#'
+#' Kriterie-variabler er som følger:
+#' `Revmatoid Artritt`: `OppfyltacrEularKriterierDato`
+#' `Aksial Spondyloartritt`: `AsasKriterierAksialDato`
+#' `Perifer Spondyloartritt`: `AsasKriterierPeriferDato`
+#' `Psoriasisartritt`: `CasparKriterierDato`
+#'
+#' Tidligste dato av overnevnte og Dato fra Diagnoseskjema brukes som diagnosedato.
+#'
+#'
+#' @param d_inkl Inklusjonsskjema
+#' @param d_diag Diagnoseskjema
+#'
+#' @return
+#' @export
+#'
+#' @examples
+legg_til_kriteriedatoer = function(d_inkl, d_diag) {
+
+kriterievariabler = c("AcrEularKlassifikasjonsKriterier",
+                      "OppfyltacrEularKriterier",
+                      "OppfyltacrEularKriterierDato",
+                      "AsasKriterierAksial",
+                      "AsasKriterierAksialDato",
+                      "AsasKriterierPerifer",
+                      "AsasKriterierPeriferDato",
+                      "CasparKriterier",
+                      "CasparKriterierDato")
+
+d_diag = d_diag |>
+  left_join(d_inkl |>
+              select(PasientGUID,
+                     all_of(kriterievariabler)),
+            by = "PasientGUID") |>
+  mutate(dato_kriterier =
+           case_when(diaggrupper_med == 1 & OppfyltacrEularKriterier == 1 ~ as_date(OppfyltacrEularKriterierDato),
+                     diaggrupper_med == 5 & AsasKriterierAksial == 1 ~ as_date(AsasKriterierAksialDato),
+                     Kode == "M138" & AsasKriterierPerifer == 1 ~ as_date(AsasKriterierPeriferDato),
+                     diaggrupper_med %in% 2:3 & CasparKriterier == 1 ~ as_date(CasparKriterierDato),
+                     TRUE ~ NA
+                     )
+         ) |>
+    select(-all_of(kriterievariabler)) |>
+  group_by(PasientGUID) |>
+  mutate(dato_diag = pmin(dato_kriterier, dato_diag, na.rm = TRUE),
+         diag_stilt_aar = year(dato_diag),
+         dager_diag_til_datadump = as.integer(!!datadump_dato - dato_diag)) |>   # Tidligste av de to
+         #dato_prio_krit = coalesce(dato_kriterier, dato_diag)) |>             # Prioriterer kriterievariabel
+  ungroup()
+
+d_diag
+
 }
 
 
