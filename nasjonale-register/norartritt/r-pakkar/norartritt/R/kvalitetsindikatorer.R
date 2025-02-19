@@ -176,6 +176,39 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
   d_ki_med_krit
 }
 
+
+#' Median dager til oppstart medisinbruk
+#'
+#' @description
+#' Indikatorfunksjon for å beregne median tid fra diagnose til oppstart
+#' medisinering med aktuell medisin. Funksjonen er ment å brukes på
+#' forhåndsbehandlede datasett hvor kobling allerede er gjort. Se `data` for
+#' hvilke variabler som er nødvendig. Dette kravet er satt for å begrense
+#' kompleksitet i indikatorfunksjonen.
+#'
+#' @param d_ind Forhåndsbehandlet datasett som inkluderer de nødvendige
+#' variablene hentet fra aktuelle skjema. Vi må vite diagnosedato
+#' for hver pasient, og StartDato for hvert medisinskjema.
+#'
+#' @param meds Vektor med kode for aktuelle medisiner.
+#'
+#' @return
+#' Returnerer inndata med ekstra kolonner ki_x og ki_aktuell.
+#'
+#' @export
+#'
+#' @examples
+ki_medisin_median = function() {
+
+  d_ind_median = d_ind |>
+    mutate(ki_x = difftime(StartDato, dato_diag, units = "days"),
+           ki_aktuell = TRUE)
+
+}
+
+
+
+
 #' Andel RA-pasienter som oppnår remisjon 1 år etter diagnose.
 #'
 #' @description

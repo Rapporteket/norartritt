@@ -102,6 +102,32 @@ test_that("ki_asdas() gjev ut forventa resultat", {
 # ki_medisinbruk ----------------------------------------------------------
 
 
+
+
+# ki_medisin_median -------------------------------------------------------
+
+test_that("ki_medisin_median() gir forventet resultat", {
+
+  # Omfattende testdatasett
+  # Stiller krav i indikator om at inndata er filtrert for å kun
+  # inkludere aktuelle pasienter. Kan eventuelt lage det filtrerte datasettet
+  # i en annen funksjon?
+
+  # - Medisin fra liste og utenfor
+  # - Kun medisin utenfor liste
+  # - Medisin innenfor liste
+  # - Ingen medisin
+
+  # - Oppstart samme dag
+  # - Håndtering av startdato før diagnosedato
+  # - flere grensetilfeller?
+
+  d_test = tibble::tibble(
+    pasID = c(1:10),
+    dato_diag = c()
+  )
+})
+
 # ki_remisjon -------------------------------------------------------------
 
 
