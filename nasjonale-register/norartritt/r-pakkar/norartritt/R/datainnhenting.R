@@ -63,7 +63,7 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
 
   if (file.exists(paste0(mappe_dd, dato, "\\datadump.RData"))) {
     load(paste0(mappe_dd, dato, "\\datadump.RData"),
-      envir = omgjevnad
+         envir = omgjevnad
     )
   } else {
     assign("datadump_dato", dato, envir = omgjevnad)
@@ -81,10 +81,10 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
         pattern = skjema_id
       ))) {
         d = rapwhale::les_dd_mrs(mappe_dd,
-          dato = parent.frame()$dato,
-          versjon = parent.frame()$versjon,
-          skjema_id = skjema_id,
-          kodebok = kb
+                                 dato = parent.frame()$dato,
+                                 versjon = parent.frame()$versjon,
+                                 skjema_id = skjema_id,
+                                 kodebok = kb
         )
 
         # if(skjema_id == "Medisineringskjema") {
@@ -104,6 +104,7 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
     les_inn_data(skjema_id = "Oppfølgingskjema", kb = kb, versjon = versjon)
     les_inn_data(skjema_id = "Oppfølgingskjema2", kb = kb, versjon = versjon)
     les_inn_data(skjema_id = "Medisineringskjema", kb = kb, versjon = versjon)
+    les_inn_data(skjema_id = "Medisineringskjema2", kb = kb, versjon = versjon)
     les_inn_data(skjema_id = "Billeddiagnostikkskjema", kb = kb, versjon = versjon)
     les_inn_data(skjema_id = "Bivirkningskjema", kb = kb, versjon = versjon)
     les_inn_data(skjema_id = "Historiskdose", kb = kb, versjon = versjon)
@@ -113,15 +114,16 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
     les_inn_data(skjema_id = "Promsinklusjonsskjema", kb = kb, versjon = versjon)
 
     save(kb,
-      datadump_dato,
-      d_full_Inklusjonskjema,
-      d_full_Diagnoseskjema,
-      d_full_Oppfølgingskjema,
-      d_full_Oppfølgingskjema2,
-      d_full_Medisineringskjema,
-      d_full_Billeddiagnostikkskjema,
-      d_full_Bivirkningskjema,
-      d_full_Historiskdose,
+         datadump_dato,
+         d_full_Inklusjonskjema,
+         d_full_Diagnoseskjema,
+         d_full_Oppfølgingskjema,
+         d_full_Oppfølgingskjema2,
+         d_full_Medisineringskjema,
+         d_full_Medisineringskjema2,
+         d_full_Billeddiagnostikkskjema,
+         d_full_Bivirkningskjema,
+         d_full_Historiskdose,
       d_full_Infusjonslogg,
       d_full_Injeksjonskjema,
       d_full_Komorbidtilstandskjema,
