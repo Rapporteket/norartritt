@@ -186,28 +186,131 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
 #' hvilke variabler som er nødvendig. Dette kravet er satt for å begrense
 #' kompleksitet i indikatorfunksjonen.
 #'
-#' @param d_ind Forhåndsbehandlet datasett som inkluderer de nødvendige
-#' variablene hentet fra aktuelle skjema. Vi må vite diagnosedato
-#' for hver pasient, og StartDato for hvert medisinskjema.
+#' @note
+#' Pasienter som ikke har registrert medisinskjema vil få satt en sensurdato
+#' tilsvarende antall dager fra diagnose til dato datadump er tatt ut.
+#' Videre antas det også at pasienter som ikke har startet på medisinering
+#' innen 365 dager etter diagnosedato ikke er aktuelle for medisinering.
+#' Disse fjernes derfor fra indikatoren.
 #'
-#' @param meds Vektor med kode for aktuelle medisiner.
+#' @param d_ra_base Forhåndsbehandlet datasett som inkluderer et uttrekk fra
+#' registeret hvor vi har hentet ut pasienter som er aktuelle for de ulike
+#' indikatorene for Revmatoid Artritt. Består av data fra inklusjonsskjema og
+#' Diagnoseskjema.
+#' Funksjonen `lag_ra_indikator_base()` kan brukes for å generere datasettet.
+#'
+#' @param d_med Datasett med aktuelle medisinskjema.
 #'
 #' @return
-#' Returnerer inndata med ekstra kolonner ki_x og ki_aktuell.
+#' Returnerer et datasett med nødvendige koblingsnøkler.
+#' Kolonnene `ki_x` og `ki_aktuell` inneholder antall dager fra diagnose til
+#' oppstart medisinering og indikator for om raden skal inkluderes eller ikke.
 #'
 #' @export
 #'
 #' @examples
-ki_medisin_median = function() {
+ki_sykmod_median = function(d_ra_base, d_med) {
 
-  d_ind_median = d_ind |>
-    mutate(ki_x = difftime(StartDato, dato_diag, units = "days"),
-           ki_aktuell = TRUE)
+  # Hvis pasienten ikke har startet medisinering innen 365 dager etter diagnose
+  # antar vi at pasienten ikke er aktuell for medisinering.
+  ovre_grense_medisin = 365
 
+  # kontroller vars d_ra_base og d_med
+
+  d_ki_medisin_median = d_ra_base |>
+    left_join(d_med |>
+                filter(dmard == 1) |>
+                select(PasientGUID, StartDato, LegemiddelType, dmard),
+              by = "PasientGUID",
+              relationship = "one-to-many") |>
+    mutate(dager_til_medisin = as.numeric(difftime(StartDato, dato_diag, units = "days")
+      ),
+      sensurert = is.na(dager_til_medisin),
+       dager_til_medisin_sens = case_when(
+         is.na(dager_til_medisin) & dager_diag_til_datadump > ovre_grense_medisin ~ as.numeric(dager_diag_til_datadump),
+         is.na(dager_til_medisin) & dager_diag_til_datadump <= ovre_grense_medisin ~ ovre_grense_medisin,
+         TRUE ~ dager_til_medisin),
+      ) |>
+    select(-dmard, -sensurert, -dager_til_medisin,
+           -dager_diag_til_datadump, -dager_diag_til_inklusjon) |>
+    mutate(ki_aktuell = dager_til_medisin_sens >= 0 &
+           dager_til_medisin_sens <= ovre_grense_medisin &
+           (DeathDate >= dato_diag + days(14) | is.na(DeathDate)),
+           ki_x = dager_til_medisin_sens
+           ) |>
+    select(-dager_til_medisin_sens)
+
+  d_ki_medisin_median
 }
 
+#' Gjennomsnitt antall dager til oppstart medisinbruk
+#'
+#' @description
+#' Indikatorfunksjon for å beregne gjennomsnittlig tid fra diagnose til oppstart
+#' medisinering med aktuell medisin. Funksjonen er ment å brukes på
+#' forhåndsbehandlede datasett hvor kobling allerede er gjort. Se `data` for
+#' hvilke variabler som er nødvendig. Dette kravet er satt for å flytte
+#' kompleksitet fra indikatorfunksjoner til en egen filtreringsfunksjon.
+#'
+#' @note
+#' Pasienter som ikke har fått registrert medisinering innen 365 dager av diagnose
+#' antas å ikke skulle ha medisinering, så disse vil derfor fjernes fra indikatoren.
+#' Videre vil det være pasienter som ikke har startet medisinering og samtidig
+#' ha fått diagnosen for mindre enn 365 dager siden ved tidspunktet for datauttrekk.
+#' Disse pasientene (~ 5% av de som fikk diagnose mindre enn 365 dager før
+#' datadump-dato) fjernes fra indikator frem til enten det registreres
+#' et medisinskjema (hvorpå de inkluderes) eller det går 365 dager fra diagnose
+#' og de ekskluderes.
+#'
+#' @param d_ra_base Forhåndsbehandlet datasett som inkluderer et uttrekk fra
+#' registeret hvor vi har hentet ut pasienter som er aktuelle for de ulike
+#' indikatorene for Revmatoid Artritt. Består av data fra inklusjonsskjema og
+#' Diagnoseskjema.
+#' Funksjonen `lag_ra_indikator_base()` kan brukes for å generere datasettet.
+#'
+#' @param d_med Datasett med aktuelle medisinskjema.
+#'
+#' @return
+#' Returnerer et datasett med nødvendige koblingsnøkler.
+#' Kolonnene `ki_x` og `ki_aktuell` inneholder antall dager fra diagnose til
+#' oppstart medisinering og indikator for om raden skal inkluderes eller ikke.
+#'
+#' @export
+#'
+#' @examples
+ki_sykmod_snitt = function(d_ra_base, d_med) {
 
+  # Hvis pasienten ikke har startet medisinering innen 365 dager etter diagnose
+  # antar vi at pasienten ikke er aktuell for medisinering.
+  ovre_grense_medisin = 365
 
+  # FIXME - kontroller vars d_ra_base og d_med
+
+  d_ki_medisin_snitt = d_ra_base |>
+    left_join(d_med |>
+                filter(dmard == 1) |>
+                select(PasientGUID, StartDato, LegemiddelType, dmard),
+              by = "PasientGUID",
+              relationship = "one-to-many") |>
+    mutate(dager_til_medisin = as.numeric(
+      difftime(
+        StartDato,
+        dato_diag,
+        units = "days"
+        )
+      )
+    ) |>
+    filter(!is.na(dager_til_medisin)) |>
+    select(-dmard, -dager_diag_til_datadump, -dager_diag_til_inklusjon) |>
+    mutate(ki_aktuell = dager_til_medisin >= 0 &
+             dager_til_medisin <= ovre_grense_medisin &
+             (DeathDate >= dato_diag + days(14) | is.na(DeathDate)),
+           ki_x = dager_til_medisin
+    ) |>
+    select(-dager_til_medisin)
+
+  d_ki_medisin_snitt
+}
 
 #' Andel RA-pasienter som oppnår remisjon 1 år etter diagnose.
 #'
@@ -443,6 +546,80 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
     ungroup()
 
   d_ki_kontroll
+}
+
+#' Gjennomsnitt antall dager til første kontroll
+#'
+#' @description
+#' Indikatorfunksjon for å beregne gjennomsnittlig tid fra diagnose til første
+#' oppfølging for pasienter diagnostisert med Revmatoid Artritt.
+#' Funksjonen er ment å brukes på forhåndsbehandlede datasett hvor kobling
+#' allerede er gjort. Se `data` for
+#' hvilke variabler som er nødvendig. Dette kravet er satt for å flytte
+#' kompleksitet fra indikatorfunksjoner til en egen filtreringsfunksjon.
+#'
+#' @note
+#' Pasienter som ikke har vært til kontroll innen 365 dager fjernes fra
+#' indikatoren. Pasienter som fikk diagnose for under 365 dager siden men som
+#' enda ikke har vært til kontroll fjernes også.
+#' Det gjelder ca. X % av pasientene.
+#'
+#'
+#' @param d_ra_base Forhåndsbehandlet datasett som inkluderer et uttrekk fra
+#' registeret hvor vi har hentet ut pasienter som er aktuelle for de ulike
+#' indikatorene for Revmatoid Artritt. Består av data fra inklusjonsskjema og
+#' Diagnoseskjema.
+#' Funksjonen `lag_ra_indikator_base()` kan brukes for å generere datasettet.
+#'
+#' @param d_oppf Datasett med aktuelle oppfølgingsskjema.
+#'
+#' @return
+#' Returnerer et datasett med nødvendige koblingsnøkler.
+#' Kolonnene `ki_x` og `ki_aktuell` inneholder antall dager fra diagnose til
+#' første kontroll og indikator for om raden skal inkluderes eller ikke.
+#'
+#' @export
+#'
+#' @examples
+ki_kontroll_snitt = function(d_ra_base, d_inkl_oppf) {
+
+  # Hvis pasienten ikke har vært til kontroll innen 365 dager etter diagnose
+  # antar vi at pasienten ikke er aktuell for indikatoren. (Må høre med registeret)
+  ovre_grense_kontroll = 365
+  inklusjonskjema_grense = 7
+
+  # FIXME - kontroller vars d_ra_base og d_med
+  d_ki_kontroll_snitt = d_ra_base |>
+    left_join(d_oppf |>
+                select(PasientGUID, Skjematype, dato_ktrl),
+              by = "PasientGUID",
+              relationship = "one-to-many") |>
+    mutate(dager_til_kontroll = case_when(
+      is.na(dato_ktrl) ~ as.numeric(dager_diag_til_inklusjon),
+      TRUE ~ as.numeric(
+        difftime(
+          dato_ktrl,
+          dato_diag,
+          units = "days"
+          )
+        )
+      )
+      ) |>
+    mutate(er_oppf = case_when(
+      Skjematype == "Inklusjonskjema" & dager_diag_til_inklusjon > inklusjonskjema_grense ~ TRUE,
+      Skjematype == "Oppfølgingskjema" ~ TRUE,
+      TRUE ~ FALSE
+    )) |>
+    group_by(PasientGUID) |>
+    arrange(dager_til_kontroll) |>
+    mutate(ki_aktuell = first(dager_til_kontroll[er_oppf]))
+             #dager_til_kontroll <= ovre_grense_kontroll &
+             #(DeathDate >= dato_diag + days(90) | is.na(DeathDate)),
+           #ki_x = dager_til_kontroll
+    #) |>
+    #select(-dager_til_kontroll)
+
+  d_ki_kontroll_snitt
 }
 
 #' Gjennomsnittlig DAPSA for psoriasisartrittpasienter 1 år etter diagnose.
