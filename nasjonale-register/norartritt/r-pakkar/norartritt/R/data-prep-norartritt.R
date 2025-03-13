@@ -83,6 +83,40 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
   d_oppf = d_inkl_oppf %>%
     filter(FormTypeId == 2)
 
+  # Konsolidere skjemaGUIDs (For pasienter som har inklusjon/kontroll ved flere
+  # sykehus vil det være ulike HovedskjemaGUIDs). Dette sikrer at alle oppfølginger
+  # for den enkelte pasient følger med.
+  skjemaguid_kobling = d_inkl |>
+    group_by(PasientGUID) |>
+    arrange(FormDate) |>
+    distinct(PasientGUID, .keep_all = TRUE) |>
+    select(PasientGUID, SkjemaGUID = SkjemaGUID)
+
+  d_inkl = d_inkl |>
+    select(-SkjemaGUID) |>
+    left_join(skjemaguid_kobling , by = "PasientGUID")
+
+  d_oppf = d_oppf |>
+    select(-HovedskjemaGUID) |>
+    left_join(skjemaguid_kobling |>
+                rename(HovedskjemaGUID = SkjemaGUID),
+              by = "PasientGUID",
+              relationship = "many-to-one")
+
+  d_diag = d_diag |>
+    select(-HovedskjemaGUID) |>
+    left_join(skjemaguid_kobling |>
+                rename(HovedskjemaGUID = SkjemaGUID),
+              by = "PasientGUID",
+              relationship = "many-to-one")
+
+  d_med = d_med |>
+    select(-HovedskjemaGUID) |>
+    left_join(skjemaguid_kobling |>
+                rename(HovedskjemaGUID = SkjemaGUID),
+              by = "PasientGUID",
+              relationship = "many-to-one")
+
   # Filtrer bort ugyldige skjema
   filtrerte_skjema = fjern_ugyldige_skjema(
     inkl = d_inkl,
@@ -275,6 +309,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
   d_inkl_oppf = d_inkl %>%
     bind_rows(d_oppf)
 
+
   assign("d_med_vasket", d_med_vasket, envir = .GlobalEnv)
   assign("d_diag_pers", d_diag_pers, envir = .GlobalEnv)
   assign("d_diag_med", d_diag_med, envir = .GlobalEnv)
@@ -312,3 +347,42 @@ strukturer_variabler_uten_kodebok = function(d_inkl, d_oppf, d_diag, d_med) {
 #
 #   nest
 # }
+
+
+#' lag base-data for ra-indikatorer
+#'
+#' Lager et base-uttrekk for pasienter som skal inkluderes i indikatorer for
+#' RA-pasienter.
+#' Ytterligere skjema må kobles på for den enkelte indikator.
+#'
+#' @param d_diag Diagnosedatasett som skal brukes.
+#' @param d_inkl Inklusjonsdatasett som skal brukes.
+#'
+#' @return
+#' En tibble med aktuelle variabler fra diagnoseskjema og inklusjonsskjema
+#' filtrert for å kun inneholde pasienter som skal inkluderes i RA-indikatorer.
+#' @export
+#'
+#' @examples
+lag_ra_indikator_base = function(d_diag, d_inkl) {
+
+  d_ra_base = d_diag |>
+    arrange(dato_diag) |>
+    distinct(PasientGUID,
+             .keep_all = TRUE) |>
+    filter(diaggrupper_med == 1,
+           diag_stilt_aar >= 2014,
+           ) |>
+    select(PasientGUID, Kode, Navn, dato_diag, diag_stilt_aar, dager_diag_til_datadump) |>
+    left_join(d_inkl |>
+                select(PasientGUID, UnitId, InklusjonDato, DeathDate),
+              by = "PasientGUID",
+              relationship = "one-to-one") |>
+    mutate(dager_diag_til_inklusjon = difftime(InklusjonDato, dato_diag, units = "days")) |>
+    filter(dager_diag_til_inklusjon >= 0,
+           dager_diag_til_inklusjon <= 90) |>
+    relocate(UnitId, .after = PasientGUID)
+
+  return(d_ra_base)
+}
+
