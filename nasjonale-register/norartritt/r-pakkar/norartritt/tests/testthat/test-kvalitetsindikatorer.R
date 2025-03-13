@@ -98,20 +98,11 @@ test_that("ki_asdas() gjev ut forventa resultat", {
 
 # ki_sykmod ---------------------------------------------------------------
 
+# ki_sykmod_snitt -------------------------------------------------------
 
-# ki_medisinbruk ----------------------------------------------------------
-
-
-
-
-# ki_medisin_median -------------------------------------------------------
-
-test_that("ki_medisin_median() gir forventet resultat", {
+test_that("ki_sykmod_snitt() gir forventet resultat", {
 
   # Omfattende testdatasett
-  # Stiller krav i indikator om at inndata er filtrert for å kun
-  # inkludere aktuelle pasienter. Kan eventuelt lage det filtrerte datasettet
-  # i en annen funksjon?
 
   # - Medisin fra liste og utenfor
   # - Kun medisin utenfor liste
