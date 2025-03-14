@@ -586,38 +586,41 @@ ki_kontroll_snitt = function(d_ra_base, d_inkl_oppf) {
   # Hvis pasienten ikke har vært til kontroll innen 365 dager etter diagnose
   # antar vi at pasienten ikke er aktuell for indikatoren. (Må høre med registeret)
   ovre_grense_kontroll = 365
-  inklusjonskjema_grense = 7
 
-  # FIXME - kontroller vars d_ra_base og d_med
+  # Grense for hvilke inklusjonskjema som skal regnes som oppfølging.
+  inklusjonskjema_nedre_grense = 7
+  inklusjonskjema_ovre_grense = 90
+
   d_ki_kontroll_snitt = d_ra_base |>
-    left_join(d_oppf |>
+    left_join(d_inkl_oppf |>
                 select(PasientGUID, Skjematype, dato_ktrl),
               by = "PasientGUID",
               relationship = "one-to-many") |>
-    mutate(dager_til_kontroll = case_when(
-      is.na(dato_ktrl) ~ as.numeric(dager_diag_til_inklusjon),
-      TRUE ~ as.numeric(
-        difftime(
-          dato_ktrl,
-          dato_diag,
-          units = "days"
-          )
+    mutate(dager_til_kontroll = as.numeric(
+      difftime(
+        dato_ktrl,
+        dato_diag,
+        units = "days"
         )
       )
       ) |>
     mutate(er_oppf = case_when(
-      Skjematype == "Inklusjonskjema" & dager_diag_til_inklusjon > inklusjonskjema_grense ~ TRUE,
+      Skjematype == "Inklusjonskjema" & dager_til_kontroll >= inklusjonskjema_nedre_grense & dager_til_kontroll <= inklusjonskjema_ovre_grense ~ TRUE,
       Skjematype == "Oppfølgingskjema" ~ TRUE,
       TRUE ~ FALSE
     )) |>
     group_by(PasientGUID) |>
+    mutate(er_oppf_fiks = case_when(Skjematype == "Oppfølgingskjema" & dager_til_kontroll == min(dager_til_kontroll) ~ FALSE,
+                                    TRUE ~ er_oppf)) |>
     arrange(dager_til_kontroll) |>
-    mutate(ki_aktuell = first(dager_til_kontroll[er_oppf]))
-             #dager_til_kontroll <= ovre_grense_kontroll &
-             #(DeathDate >= dato_diag + days(90) | is.na(DeathDate)),
-           #ki_x = dager_til_kontroll
-    #) |>
-    #select(-dager_til_kontroll)
+    mutate(ki_aktuell = (er_oppf_fiks & dager_til_kontroll <= ovre_grense_kontroll),
+           ki_x = first(dager_til_kontroll[ki_aktuell])) |>
+    filter(DeathDate >= dato_diag + days(90) | is.na(DeathDate),
+           ki_x <= ovre_grense_kontroll) |>
+    arrange(desc(ki_aktuell)) |>
+    distinct(PasientGUID, .keep_all = TRUE) |>
+    select(-er_oppf, -er_oppf_fiks) |>
+    ungroup()
 
   d_ki_kontroll_snitt
 }
