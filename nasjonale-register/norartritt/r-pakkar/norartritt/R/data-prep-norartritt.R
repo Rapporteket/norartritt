@@ -62,26 +62,21 @@ NULL
 #' @export
 vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
   # Legger sammen inklusjon og oppfølging
-  d_inkl_oppf = d_inkl %>%
-    bind_rows(d_oppf)
+  d_inkl_oppf = bind_rows(d_inkl, d_oppf)
 
   # Rett inklusjonsdato
   d_inkl_oppf = velg_tidligste_inklusjondato(d_inkl_oppf = d_inkl_oppf)
 
   # Pakk ut inklusjons og oppfølgingsskjema.
-  d_inkl = d_inkl_oppf %>%
-    filter(FormTypeId == 1)
-  d_oppf = d_inkl_oppf %>%
-    filter(FormTypeId == 2)
+  d_inkl = filter(d_inkl_oppf, FormTypeId == 1)
+  d_oppf = filter(d_inkl_oppf, FormTypeId == 2)
 
   # Rett skjematype
   d_inkl_oppf = konverter_skjematype(inkl = d_inkl, oppf = d_oppf)
 
   # Pakk ut inklusjons og oppfølgingsskjema.
-  d_inkl = d_inkl_oppf %>%
-    filter(FormTypeId == 1)
-  d_oppf = d_inkl_oppf %>%
-    filter(FormTypeId == 2)
+  d_inkl = filter(d_inkl_oppf, FormTypeId == 1)
+  d_oppf = filter(d_inkl_oppf, FormTypeId == 2)
 
   # Konsolidere skjemaGUIDs (For pasienter som har inklusjon/kontroll ved flere
   # sykehus vil det være ulike HovedskjemaGUIDs). Dette sikrer at alle oppfølginger
@@ -234,7 +229,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     )
 
   # medisinforløp for hver pasient hvor duplikater er fjernet
-  if (nrow(d_med %>% filter(legemiddel_navn_kode == 999)) > 0) {
+  if (d_med |> filter(legemiddel_navn_kode == 999) |> nrow() > 0) {
     stop(error = "Det finnes legemiddel med LegemiddelType 999 som ikke er definert i kodebok")
   }
 
@@ -264,15 +259,14 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
       diaggrupper_hoved_tekst, perifer_aksial_diaggruppe,
       perifer_aksial_diaggruppe_tekst
     ) %>%
-    left_join(d_med_vasket %>%
-      select(
-        PasientGUID, Enhet, Mengde, LegemiddelType, Intervall,
-        EndringArsak, StartDato, SluttDato, EndringsDato, DeathDate,
-        startaar, sluttaar, legemiddel_navn, legemiddel_navn_kode,
-        biokat, csdmard, dmard, tsdmard, bio_og_tsdmard,
-        legemiddel_gruppert, legemiddel_gruppert_navn,
-        Virkestoff
-      ), by = "PasientGUID") %>%
+    left_join(select(d_med_vasket,
+      PasientGUID, Enhet, Mengde, LegemiddelType, Intervall,
+      EndringArsak, StartDato, SluttDato, EndringsDato, DeathDate,
+      startaar, sluttaar, legemiddel_navn, legemiddel_navn_kode,
+      biokat, csdmard, dmard, tsdmard, bio_og_tsdmard,
+      legemiddel_gruppert, legemiddel_gruppert_navn,
+      Virkestoff
+    ), by = "PasientGUID") %>%
     mutate(
       legemiddel_navn = replace(
         as.character(legemiddel_navn),
@@ -310,8 +304,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
       diagnose_aar = lubridate::year(dato_diag)
     )
 
-  d_inkl_oppf = d_inkl %>%
-    bind_rows(d_oppf)
+  d_inkl_oppf = bind_rows(d_inkl, d_oppf)
 
 
   assign("d_med_vasket", d_med_vasket, envir = .GlobalEnv)

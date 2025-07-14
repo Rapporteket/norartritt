@@ -60,21 +60,16 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
   d_inkl_diag_med = d_diagnose %>%
     arrange(dato_diag) |>
     distinct(PasientGUID, .keep_all = TRUE) |>
-    left_join(
-      d_inklusjon %>%
-        select(
-          PasientGUID, InklusjonDato,
-          sykehusnavn, sykehus_kortnavn
-        ),
+    left_join(select(d_inklusjon,
+        PasientGUID, InklusjonDato, sykehusnavn, sykehus_kortnavn
+      ),
       by = "PasientGUID",
       relationship = "one-to-one"
     ) %>%
-    left_join(
-      d_medisin %>%
-        select(
-          PasientGUID, StartDato, SluttDato,
-          legemiddel_navn, legemiddel_navn_kode, dmard
-        ),
+    left_join(select(d_medisin,
+        PasientGUID, StartDato, SluttDato,
+        legemiddel_navn, legemiddel_navn_kode, dmard
+      ),
       by = "PasientGUID",
       relationship = "one-to-many"
     ) %>%
@@ -147,13 +142,11 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
   # vha legg_til_medisingrupper).
   # FIXME - Fjerne avhengighet av PasientGUID (må kunne ta inn fødselsnummer også).
   d_ki = d_diagnose %>%
-    left_join(
-      d_medisin %>%
-        select(
-          PasientGUID, StartDato,
-          SluttDato, startaar, sluttaar, legemiddel_navn,
-          legemiddel_navn_kode
-        ),
+    left_join(select(d_medisin,
+        PasientGUID, StartDato,
+        SluttDato, startaar, sluttaar, legemiddel_navn,
+        legemiddel_navn_kode
+      ),
       by = "PasientGUID"
     ) %>%
     mutate(ki_krit_nevner = diaggrupper_med == 1 &
@@ -377,8 +370,7 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
 
   # Kobler diagnosedata med skjema for de ulike kontrollene for hver pasient i utvalget.
   d = d_inkl_oppf %>%
-    left_join(
-      d_diag %>% select(
+    left_join(select(d_diag,
         PasientGUID, diaggrupper_med, dato_diag,
         dager_diag_til_datadump, diag_stilt_aar
       ),
@@ -456,10 +448,12 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
     pull(PasientGUID)
 
   d = d_inkl_oppf %>%
-    left_join(d_diag %>% select(
-      PasientGUID, diaggrupper_med, dato_diag,
-      dager_diag_til_datadump, diag_stilt_aar
-    ), by = "PasientGUID") %>%
+    left_join(select(d_diag,
+        PasientGUID, diaggrupper_med, dato_diag,
+        dager_diag_til_datadump, diag_stilt_aar
+      ),
+      by = "PasientGUID"
+    ) %>%
     mutate(ki_krit_nevner = PasientGUID %in% id_diagnose)
 
   d_rem_totalt = d %>%
@@ -693,10 +687,12 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
 
   # Kobler diagnosedata med skjema for de ulike kontrollene for hver pasient i utvalget.
   d = d_inkl_oppf %>%
-    left_join(d_diag %>% select(
-      PasientGUID, diaggrupper_rem, dato_diag,
-      dager_diag_til_datadump, diag_stilt_aar
-    ), by = "PasientGUID") %>%
+    left_join(select(d_diag,
+        PasientGUID, diaggrupper_rem, dato_diag,
+        dager_diag_til_datadump, diag_stilt_aar
+      ),
+      by = "PasientGUID"
+    ) %>%
     mutate(dager_siden_diagnose = ymd(dato_ktrl) - ymd(dato_diag)) %>%
     mutate(ki_aktuell = PasientGUID %in% id_diagnose &
       dager_siden_diagnose >= tidsrom_start &
@@ -775,10 +771,12 @@ ki_asdas = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
 
   # Kobler diagnosedata med skjema for de ulike kontrollene for hver pasient i utvalget.
   d = d_inkl_oppf %>%
-    left_join(d_diag %>% select(
-      PasientGUID, diaggrupper_med, dato_diag,
-      dager_diag_til_datadump, diag_stilt_aar
-    ), by = "PasientGUID") %>%
+    left_join(select(d_diag,
+        PasientGUID, diaggrupper_med, dato_diag,
+        dager_diag_til_datadump, diag_stilt_aar
+      ),
+      by = "PasientGUID"
+    ) %>%
     mutate(dager_siden_diagnose = ymd(dato_ktrl) - ymd(dato_diag)) %>%
     mutate(ki_aktuell = PasientGUID %in% id_diagnose &
       dager_siden_diagnose >= tidsrom_start &

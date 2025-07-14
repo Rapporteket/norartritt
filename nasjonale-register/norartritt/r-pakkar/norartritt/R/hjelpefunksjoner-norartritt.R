@@ -84,12 +84,9 @@ legg_til_medisinnavn = function(d_medisin) {
 
   # Henter ut navn og riktig kode for medisiner med LegemiddelType 999
   d_medisin = d_medisin %>%
-    left_join(
-      medisin_fil %>%
-        select(
-          LegemiddelType, legemiddel_navn,
-          legemiddel_navn_kode
-        ),
+    left_join(select(medisin_fil,
+        LegemiddelType, legemiddel_navn, legemiddel_navn_kode
+      ),
       by = "LegemiddelType"
     ) %>%
     mutate(medisin = dplyr::coalesce(Legemiddel, legemiddel_navn)) %>%
@@ -237,8 +234,7 @@ legg_til_diagnosegrupper = function(d) {
     )
   }
 
-  d = d %>%
-    left_join(diagnosegrupper, by = "Kode")
+  d = left_join(d, diagnosegrupper, by = "Kode")
 
   # Leddsykdom har ikke kode i registeret, så den må håndteres manuelt.
   d = d %>%
@@ -375,7 +371,7 @@ valider_legemiddeltype = function(mappe_dd) {
 
   if (nrow(legemiddel_feil) > 0) {
     stop(stringr::str_c("Det er ikke samsvar mellom legemiddelnavn i kodebok og vår medisinfil
-         for legemiddeltype: ", legemiddel_feil %>% pull(verdi), collapse = ", "))
+         for legemiddeltype: ", legemiddel_feil$verdi, collapse = ", "))
   }
 }
 
@@ -419,8 +415,7 @@ konverter_skjematype = function(inkl, oppf) {
   id_flere_inklusjon = inkl$PasientGUID[which(duplicated(inkl$PasientGUID))]
 
   # Slå sammen inklusjon og oppfølgingsskjema
-  d_inkl_oppf = inkl %>%
-    bind_rows(oppf)
+  d_inkl_oppf = bind_rows(inkl, oppf)
 
   # Trekke ut skjemaGUID for skjema som skal konverteres
   inkl_til_oppf_skjemaGUID = d_inkl_oppf %>%
@@ -540,8 +535,7 @@ fjern_uaktuelle_diagnoser = function(diag) {
   ) # Polyartritt
 
   # Fjerner diagnoseskjema for pasienter som mangler andre diagnoser enn de overnevnte
-  diag = diag %>%
-    filter(!Navn %in% !!uakt_diag, !Kode %in% !!uakt_koder)
+  diag = filter(diag, !Navn %in% !!uakt_diag, !Kode %in% !!uakt_koder)
 
   diag
 }
@@ -563,8 +557,7 @@ fjern_uaktuelle_diagnoser = function(diag) {
 #' d_hoved er filtrert bort.
 fjerne_skjema_hjelpefunksjon = function(d_hoved, d_motpart) {
   id_mangler_i_hoved = setdiff(d_motpart$PasientGUID, d_hoved$PasientGUID)
-  d = d_motpart %>%
-    filter(!PasientGUID %in% id_mangler_i_hoved)
+  d = filter(d_motpart, !PasientGUID %in% id_mangler_i_hoved)
   d
 }
 
