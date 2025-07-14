@@ -233,7 +233,8 @@ legg_til_diagnosegrupper = function(d) {
     stop(
       "Kode: ",
       stringr::str_c(ukjent_kode, collapse = ", "),
-      " finnes ikke i diagnosekodebok")
+      " finnes ikke i diagnosekodebok"
+    )
   }
 
   d = d %>%
@@ -658,40 +659,43 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
 #'
 #' @examples
 legg_til_kriteriedatoer = function(d_inkl, d_diag) {
+  kriterievariabler = c(
+    "AcrEularKlassifikasjonsKriterier",
+    "OppfyltacrEularKriterier",
+    "OppfyltacrEularKriterierDato",
+    "AsasKriterierAksial",
+    "AsasKriterierAksialDato",
+    "AsasKriterierPerifer",
+    "AsasKriterierPeriferDato",
+    "CasparKriterier",
+    "CasparKriterierDato"
+  )
 
-kriterievariabler = c("AcrEularKlassifikasjonsKriterier",
-                      "OppfyltacrEularKriterier",
-                      "OppfyltacrEularKriterierDato",
-                      "AsasKriterierAksial",
-                      "AsasKriterierAksialDato",
-                      "AsasKriterierPerifer",
-                      "AsasKriterierPeriferDato",
-                      "CasparKriterier",
-                      "CasparKriterierDato")
-
-d_diag = d_diag |>
-  left_join(d_inkl |>
-              select(PasientGUID,
-                     all_of(kriterievariabler)),
-            by = "PasientGUID") |>
-  mutate(dato_kriterier =
-           case_when(diaggrupper_med == 1 & OppfyltacrEularKriterier == 1 ~ as_date(OppfyltacrEularKriterierDato),
-                     diaggrupper_med == 5 & AsasKriterierAksial == 1 ~ as_date(AsasKriterierAksialDato),
-                     Kode == "M138" & AsasKriterierPerifer == 1 ~ as_date(AsasKriterierPeriferDato),
-                     diaggrupper_med %in% 2:3 & CasparKriterier == 1 ~ as_date(CasparKriterierDato),
-                     TRUE ~ NA
-                     )
-         ) |>
+  d_diag = d_diag |>
+    left_join(select(d_inkl, PasientGUID, all_of(kriterievariabler)),
+      by = "PasientGUID"
+    ) |>
+    mutate(
+      dato_kriterier =
+        case_when(
+          diaggrupper_med == 1 & OppfyltacrEularKriterier == 1 ~ as_date(OppfyltacrEularKriterierDato),
+          diaggrupper_med == 5 & AsasKriterierAksial == 1 ~ as_date(AsasKriterierAksialDato),
+          Kode == "M138" & AsasKriterierPerifer == 1 ~ as_date(AsasKriterierPeriferDato),
+          diaggrupper_med %in% 2:3 & CasparKriterier == 1 ~ as_date(CasparKriterierDato),
+          TRUE ~ NA
+        )
+    ) |>
     select(-all_of(kriterievariabler)) |>
-  group_by(PasientGUID) |>
-  mutate(dato_diag = pmin(dato_kriterier, dato_diag, na.rm = TRUE),
-         diag_stilt_aar = year(dato_diag),
-         dager_diag_til_datadump = as.integer(!!datadump_dato - dato_diag)) |>   # Tidligste av de to
-         #dato_prio_krit = coalesce(dato_kriterier, dato_diag)) |>             # Prioriterer kriterievariabel
-  ungroup()
+    group_by(PasientGUID) |>
+    mutate(
+      dato_diag = pmin(dato_kriterier, dato_diag, na.rm = TRUE),
+      diag_stilt_aar = year(dato_diag),
+      dager_diag_til_datadump = as.integer(!!datadump_dato - dato_diag)
+    ) |> # Tidligste av de to
+    # dato_prio_krit = coalesce(dato_kriterier, dato_diag)) |>             # Prioriterer kriterievariabel
+    ungroup()
 
-d_diag
-
+  d_diag
 }
 
 

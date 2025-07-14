@@ -210,7 +210,6 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
 #'
 #' @examples
 ki_sykmod_median = function(d_ra_base, d_med) {
-
   # Hvis pasienten ikke har startet medisinering innen 365 dager etter diagnose
   # antar vi at pasienten ikke er aktuell for medisinering.
   ovre_grense_medisin = 365
@@ -218,26 +217,32 @@ ki_sykmod_median = function(d_ra_base, d_med) {
   # kontroller vars d_ra_base og d_med
 
   d_ki_medisin_median = d_ra_base |>
-    left_join(d_med |>
-                filter(dmard == 1) |>
-                select(PasientGUID, StartDato, LegemiddelType, dmard),
-              by = "PasientGUID",
-              relationship = "one-to-many") |>
-    mutate(dager_til_medisin = as.numeric(difftime(StartDato, dato_diag, units = "days")
-      ),
+    left_join(
+      d_med |>
+        filter(dmard == 1) |>
+        select(PasientGUID, StartDato, LegemiddelType, dmard),
+      by = "PasientGUID",
+      relationship = "one-to-many"
+    ) |>
+    mutate(
+      dager_til_medisin = as.numeric(difftime(StartDato, dato_diag, units = "days")),
       sensurert = is.na(dager_til_medisin),
-       dager_til_medisin_sens = case_when(
-         is.na(dager_til_medisin) & dager_diag_til_datadump > ovre_grense_medisin ~ as.numeric(dager_diag_til_datadump),
-         is.na(dager_til_medisin) & dager_diag_til_datadump <= ovre_grense_medisin ~ ovre_grense_medisin,
-         TRUE ~ dager_til_medisin),
-      ) |>
-    select(-dmard, -sensurert, -dager_til_medisin,
-           -dager_diag_til_datadump, -dager_diag_til_inklusjon) |>
-    mutate(ki_aktuell = dager_til_medisin_sens >= 0 &
-           dager_til_medisin_sens <= ovre_grense_medisin &
-           (DeathDate >= dato_diag + days(14) | is.na(DeathDate)),
-           ki_x = dager_til_medisin_sens
-           ) |>
+      dager_til_medisin_sens = case_when(
+        is.na(dager_til_medisin) & dager_diag_til_datadump > ovre_grense_medisin ~ as.numeric(dager_diag_til_datadump),
+        is.na(dager_til_medisin) & dager_diag_til_datadump <= ovre_grense_medisin ~ ovre_grense_medisin,
+        TRUE ~ dager_til_medisin
+      ),
+    ) |>
+    select(
+      -dmard, -sensurert, -dager_til_medisin,
+      -dager_diag_til_datadump, -dager_diag_til_inklusjon
+    ) |>
+    mutate(
+      ki_aktuell = dager_til_medisin_sens >= 0 &
+        dager_til_medisin_sens <= ovre_grense_medisin &
+        (DeathDate >= dato_diag + days(14) | is.na(DeathDate)),
+      ki_x = dager_til_medisin_sens
+    ) |>
     select(-dager_til_medisin_sens)
 
   d_ki_medisin_median
@@ -279,7 +284,6 @@ ki_sykmod_median = function(d_ra_base, d_med) {
 #'
 #' @examples
 ki_sykmod_snitt = function(d_ra_base, d_med) {
-
   # Hvis pasienten ikke har startet medisinering innen 365 dager etter diagnose
   # antar vi at pasienten ikke er aktuell for medisinering.
   ovre_grense_medisin = 365
@@ -287,25 +291,27 @@ ki_sykmod_snitt = function(d_ra_base, d_med) {
   # FIXME - kontroller vars d_ra_base og d_med
 
   d_ki_medisin_snitt = d_ra_base |>
-    left_join(d_med |>
-                filter(dmard == 1) |>
-                select(PasientGUID, StartDato, LegemiddelType, dmard),
-              by = "PasientGUID",
-              relationship = "one-to-many") |>
+    left_join(
+      d_med |>
+        filter(dmard == 1) |>
+        select(PasientGUID, StartDato, LegemiddelType, dmard),
+      by = "PasientGUID",
+      relationship = "one-to-many"
+    ) |>
     mutate(dager_til_medisin = as.numeric(
       difftime(
         StartDato,
         dato_diag,
         units = "days"
-        )
       )
-    ) |>
+    )) |>
     filter(!is.na(dager_til_medisin)) |>
     select(-dmard, -dager_diag_til_datadump, -dager_diag_til_inklusjon) |>
-    mutate(ki_aktuell = dager_til_medisin >= 0 &
-             dager_til_medisin <= ovre_grense_medisin &
-             (DeathDate >= dato_diag + days(14) | is.na(DeathDate)),
-           ki_x = dager_til_medisin
+    mutate(
+      ki_aktuell = dager_til_medisin >= 0 &
+        dager_til_medisin <= ovre_grense_medisin &
+        (DeathDate >= dato_diag + days(14) | is.na(DeathDate)),
+      ki_x = dager_til_medisin
     ) |>
     select(-dager_til_medisin)
 
@@ -538,7 +544,7 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
         dager_til_ktrl > 7 & # fixme (QA): Mange magiske konstantar her. Gjer dei om til variablar.
         dager_til_ktrl <= 90 | # fixme (QA): For så vidt rett, men for alle som ikkje har pugga detaljane i operatorpresedensane i R kunne det med fordel ha vore nokre parentesar!
         ki_krit_nevner & Skjematype == "Oppfølgingskjema" &
-        dager_til_ktrl <= 90
+          dager_til_ktrl <= 90
     ) %>% # fixme (QA): I skildringa sto det noko med ulike intervall, eks. 28 dagar. Men talet 28 dagar er ingen plass å sjå her, så indikatoren *må* vera rekna ut feil.
     group_by(PasientGUID) %>%
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) %>%
@@ -582,7 +588,6 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
 #'
 #' @examples
 ki_kontroll_snitt = function(d_ra_base, d_inkl_oppf) {
-
   # Hvis pasienten ikke har vært til kontroll innen 365 dager etter diagnose
   # antar vi at pasienten ikke er aktuell for indikatoren. (Må høre med registeret)
   ovre_grense_kontroll = 365
@@ -592,31 +597,36 @@ ki_kontroll_snitt = function(d_ra_base, d_inkl_oppf) {
   inklusjonskjema_ovre_grense = 90
 
   d_ki_kontroll_snitt = d_ra_base |>
-    left_join(d_inkl_oppf |>
-                select(PasientGUID, Skjematype, dato_ktrl),
-              by = "PasientGUID",
-              relationship = "one-to-many") |>
+    left_join(select(d_inkl_oppf, PasientGUID, Skjematype, dato_ktrl),
+      by = "PasientGUID",
+      relationship = "one-to-many"
+    ) |>
     mutate(dager_til_kontroll = as.numeric(
       difftime(
         dato_ktrl,
         dato_diag,
         units = "days"
-        )
       )
-      ) |>
+    )) |>
     mutate(er_oppf = case_when(
       Skjematype == "Inklusjonskjema" & dager_til_kontroll >= inklusjonskjema_nedre_grense & dager_til_kontroll <= inklusjonskjema_ovre_grense ~ TRUE,
       Skjematype == "Oppfølgingskjema" ~ TRUE,
       TRUE ~ FALSE
     )) |>
     group_by(PasientGUID) |>
-    mutate(er_oppf_fiks = case_when(Skjematype == "Oppfølgingskjema" & dager_til_kontroll == min(dager_til_kontroll) ~ FALSE,
-                                    TRUE ~ er_oppf)) |>
+    mutate(er_oppf_fiks = case_when(
+      Skjematype == "Oppfølgingskjema" & dager_til_kontroll == min(dager_til_kontroll) ~ FALSE,
+      TRUE ~ er_oppf
+    )) |>
     arrange(dager_til_kontroll) |>
-    mutate(ki_aktuell = (er_oppf_fiks & dager_til_kontroll <= ovre_grense_kontroll),
-           ki_x = first(dager_til_kontroll[ki_aktuell])) |>
-    filter(DeathDate >= dato_diag + days(90) | is.na(DeathDate),
-           ki_x <= ovre_grense_kontroll) |>
+    mutate(
+      ki_aktuell = (er_oppf_fiks & dager_til_kontroll <= ovre_grense_kontroll),
+      ki_x = first(dager_til_kontroll[ki_aktuell])
+    ) |>
+    filter(
+      DeathDate >= dato_diag + days(90) | is.na(DeathDate),
+      ki_x <= ovre_grense_kontroll
+    ) |>
     arrange(desc(ki_aktuell)) |>
     distinct(PasientGUID, .keep_all = TRUE) |>
     select(-er_oppf, -er_oppf_fiks) |>

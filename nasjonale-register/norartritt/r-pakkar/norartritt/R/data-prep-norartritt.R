@@ -94,28 +94,28 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
 
   d_inkl = d_inkl |>
     select(-SkjemaGUID) |>
-    left_join(skjemaguid_kobling , by = "PasientGUID")
+    left_join(skjemaguid_kobling, by = "PasientGUID")
 
   d_oppf = d_oppf |>
     select(-HovedskjemaGUID) |>
-    left_join(skjemaguid_kobling |>
-                rename(HovedskjemaGUID = SkjemaGUID),
-              by = "PasientGUID",
-              relationship = "many-to-one")
+    left_join(rename(skjemaguid_kobling, HovedskjemaGUID = SkjemaGUID),
+      by = "PasientGUID",
+      relationship = "many-to-one"
+    )
 
   d_diag = d_diag |>
     select(-HovedskjemaGUID) |>
-    left_join(skjemaguid_kobling |>
-                rename(HovedskjemaGUID = SkjemaGUID),
-              by = "PasientGUID",
-              relationship = "many-to-one")
+    left_join(rename(skjemaguid_kobling, HovedskjemaGUID = SkjemaGUID),
+      by = "PasientGUID",
+      relationship = "many-to-one"
+    )
 
   d_med = d_med |>
     select(-HovedskjemaGUID) |>
-    left_join(skjemaguid_kobling |>
-                rename(HovedskjemaGUID = SkjemaGUID),
-              by = "PasientGUID",
-              relationship = "many-to-one")
+    left_join(rename(skjemaguid_kobling, HovedskjemaGUID = SkjemaGUID),
+      by = "PasientGUID",
+      relationship = "many-to-one"
+    )
 
   # Filtrer bort ugyldige skjema
   filtrerte_skjema = fjern_ugyldige_skjema(
@@ -193,13 +193,15 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     konverter_missing_til_na() |>
     legg_til_sykehusnavn()
 
-  d_diag = d_diag  |>
+  d_diag = d_diag |>
     legg_til_diagnosegrupper() |>
-    left_join(d_dodsdato, by = "PasientGUID")  |>
+    left_join(d_dodsdato, by = "PasientGUID") |>
     filter(is.na(DeathDate) | DeathDate >= dato_diag)
 
-  d_diag = legg_til_kriteriedatoer(d_inkl = d_inkl,
-                                   d_diag = d_diag)
+  d_diag = legg_til_kriteriedatoer(
+    d_inkl = d_inkl,
+    d_diag = d_diag
+  )
 
   d_med = d_med %>%
     filter(!(LegemiddelType == 999 & is.na(Legemiddel))) %>%
@@ -209,8 +211,10 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     # Tar de derfor bort fra analyse.
     # Fjern filtrering når data er korrigert og import er fikset i MRS/HP.
     # FIXME - Har også lagt Ålesund til listen etter de fikk innført helseplattformen der
-    filter(!(LegemiddelType == 999 & Hospital == "St. Olav" & lubridate::date(CreationDate) > "2023-05-29"),
-           !(LegemiddelType == 999 & Hospital == "Ålesund" & lubridate::date(CreationDate) > "2024-06-05")) |>
+    filter(
+      !(LegemiddelType == 999 & Hospital == "St. Olav" & lubridate::date(CreationDate) > "2023-05-29"),
+      !(LegemiddelType == 999 & Hospital == "Ålesund" & lubridate::date(CreationDate) > "2024-06-05")
+    ) |>
     legg_til_medisinnavn() %>%
     left_join(d_dodsdato, by = "PasientGUID") %>%
     mutate(
@@ -365,24 +369,26 @@ strukturer_variabler_uten_kodebok = function(d_inkl, d_oppf, d_diag, d_med) {
 #'
 #' @examples
 lag_ra_indikator_base = function(d_diag, d_inkl) {
-
   d_ra_base = d_diag |>
     arrange(dato_diag) |>
     distinct(PasientGUID,
-             .keep_all = TRUE) |>
-    filter(diaggrupper_med == 1,
-           diag_stilt_aar >= 2014,
-           ) |>
+      .keep_all = TRUE
+    ) |>
+    filter(
+      diaggrupper_med == 1,
+      diag_stilt_aar >= 2014,
+    ) |>
     select(PasientGUID, Kode, Navn, dato_diag, diag_stilt_aar, dager_diag_til_datadump) |>
-    left_join(d_inkl |>
-                select(PasientGUID, UnitId, InklusjonDato, DeathDate),
-              by = "PasientGUID",
-              relationship = "one-to-one") |>
+    left_join(select(d_inkl, PasientGUID, UnitId, InklusjonDato, DeathDate),
+      by = "PasientGUID",
+      relationship = "one-to-one"
+    ) |>
     mutate(dager_diag_til_inklusjon = difftime(InklusjonDato, dato_diag, units = "days")) |>
-    filter(dager_diag_til_inklusjon >= 0,
-           dager_diag_til_inklusjon <= 90) |>
+    filter(
+      dager_diag_til_inklusjon >= 0,
+      dager_diag_til_inklusjon <= 90
+    ) |>
     relocate(UnitId, .after = PasientGUID)
 
   return(d_ra_base)
 }
-

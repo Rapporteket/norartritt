@@ -101,7 +101,6 @@ test_that("ki_asdas() gjev ut forventa resultat", {
 # ki_sykmod_snitt -------------------------------------------------------
 
 test_that("ki_sykmod_snitt() gir forventet resultat", {
-
   # Omfattende testdatasett
 
   # - Medisin fra liste og utenfor
@@ -199,8 +198,8 @@ test_that("Funksjonen gir forventet resultat", {
   )
 
   testthat::expect_identical(ki_kontroll(d_inkl_oppf_test, d_diag_test),
-                   d_ki_kontroll_forventet)
-
+    expected = d_ki_kontroll_forventet
+  )
 })
 
 # FIXME - Oppdatere docs til å reflektere at hele inndatasettet blir med ut.
