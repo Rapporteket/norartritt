@@ -174,27 +174,27 @@ test_that("Funksjonen gir forventet resultat", {
   )
 
   d_diag_test = tibble(
-    PasientGUID = c("1"),
-    diaggrupper_med = c(1),
-    diaggrupper_hoved = c(1),
-    dato_diag = c(lubridate::ymd("2024-01-05")),
-    diag_stilt_aar = c(2024)
+    PasientGUID = "1",
+    diaggrupper_med = 1,
+    diaggrupper_hoved = 1,
+    dato_diag = lubridate::ymd("2024-01-05"),
+    diag_stilt_aar = 2024
   )
 
   d_ki_kontroll_forventet = tibble(
-    PasientGUID = c("1"),
-    Skjematype = c("Inklusjonskjema"),
-    InklusjonDato = c(lubridate::ymd("2024-01-01")),
-    DeathDate = c(lubridate::ymd(NA)),
-    dato_ktrl = c(lubridate::ymd("2024-01-01")),
-    diaggrupper_med = c(1),
-    diaggrupper_hoved = c(1),
-    dato_diag = c(lubridate::ymd("2024-01-05")),
-    diag_stilt_aar = c(2024),
-    tid_til_inkl = c(lubridate::as.difftime(-4, units = "days")),
-    ki_krit_nevner = c(FALSE),
-    dager_til_ktrl = c(lubridate::as.difftime(-4, units = "days")),
-    ki_krit_teller = c(FALSE)
+    PasientGUID = "1",
+    Skjematype = "Inklusjonskjema",
+    InklusjonDato = lubridate::ymd("2024-01-01"),
+    DeathDate = lubridate::ymd(NA),
+    dato_ktrl = lubridate::ymd("2024-01-01"),
+    diaggrupper_med = 1,
+    diaggrupper_hoved = 1,
+    dato_diag = lubridate::ymd("2024-01-05"),
+    diag_stilt_aar = 2024,
+    tid_til_inkl = lubridate::as.difftime(-4, units = "days"),
+    ki_krit_nevner = FALSE,
+    dager_til_ktrl = lubridate::as.difftime(-4, units = "days"),
+    ki_krit_teller = FALSE
   )
 
   testthat::expect_identical(ki_kontroll(d_inkl_oppf_test, d_diag_test),
