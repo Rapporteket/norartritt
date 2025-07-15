@@ -19,6 +19,8 @@ Imports:
     dplyr,
     lubridate,
     rapwhale,
+    readr,
+    stringr,
     tibble
 Remotes:
     Rapporteket/rapwhale
