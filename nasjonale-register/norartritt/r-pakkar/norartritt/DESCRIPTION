@@ -20,12 +20,12 @@ Imports:
     lubridate,
     rapwhale,
     readr,
-    stringr,
-    tibble
+    stringr
 Remotes:
     Rapporteket/rapwhale
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tibble
 Depends:
     R (>= 4.1)
 Config/testthat/edition: 3
