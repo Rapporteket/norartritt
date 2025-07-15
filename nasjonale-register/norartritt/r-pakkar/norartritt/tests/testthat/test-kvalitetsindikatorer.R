@@ -165,7 +165,7 @@ test_that("Funksjonen gir forventet resultat", {
   # Pasient inkludert før diagnose
   # oppfølging innen 90
   # oppfølging etter 90
-  d_inkl_oppf_test = tibble(
+  d_inkl_oppf_test = tibble::tibble(
     PasientGUID = c("1", "1", "1"),
     Skjematype = c("Inklusjonskjema", "Oppfølgingskjema", "Oppfølgingskjema"),
     InklusjonDato = c(lubridate::ymd("2024-01-01", "2024-01-01", "2024-01-01")),
@@ -173,7 +173,7 @@ test_that("Funksjonen gir forventet resultat", {
     dato_ktrl = c(lubridate::ymd("2024-01-01", "2024-02-01", "2024-06-01"))
   )
 
-  d_diag_test = tibble(
+  d_diag_test = tibble::tibble(
     PasientGUID = "1",
     diaggrupper_med = 1,
     diaggrupper_hoved = 1,
@@ -181,7 +181,7 @@ test_that("Funksjonen gir forventet resultat", {
     diag_stilt_aar = 2024
   )
 
-  d_ki_kontroll_forventet = tibble(
+  d_ki_kontroll_forventet = tibble::tibble(
     PasientGUID = "1",
     Skjematype = "Inklusjonskjema",
     InklusjonDato = lubridate::ymd("2024-01-01"),
