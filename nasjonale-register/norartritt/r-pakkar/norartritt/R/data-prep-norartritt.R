@@ -380,5 +380,5 @@ lag_ra_indikator_base = function(d_diag, d_inkl) {
     ) |>
     relocate(UnitId, .after = PasientGUID)
 
-  return(d_ra_base)
+  d_ra_base
 }
