@@ -1,6 +1,5 @@
 # Hjelpefunksjoner som brukes i norartritt
 
-#' @importFrom magrittr %>%
 #' @importFrom dplyr mutate filter select left_join right_join case_when group_by summarise ungroup arrange slice pull bind_rows
 #' @importFrom lubridate as_date year
 NULL
@@ -70,8 +69,8 @@ legg_til_medisinnavn = function(d_medisin) {
   )
 
   # Sjekk at alle LegemiddelTyper i datasettet finnes i medisinkodebok
-  na_legemiddel_navn = d_medisin %>%
-    filter(!LegemiddelType %in% medisin_fil$LegemiddelType) %>%
+  na_legemiddel_navn = d_medisin |>
+    filter(!LegemiddelType %in% medisin_fil$LegemiddelType) |>
     dplyr::pull(LegemiddelType)
 
   if (length(na_legemiddel_navn) > 0) {
@@ -83,14 +82,14 @@ legg_til_medisinnavn = function(d_medisin) {
   }
 
   # Henter ut navn og riktig kode for medisiner med LegemiddelType 999
-  d_medisin = d_medisin %>%
+  d_medisin = d_medisin |>
     left_join(select(medisin_fil,
         LegemiddelType, legemiddel_navn, legemiddel_navn_kode
       ),
       by = "LegemiddelType"
-    ) %>%
-    mutate(medisin = dplyr::coalesce(Legemiddel, legemiddel_navn)) %>%
-    left_join(medisin_kode_999, by = c("medisin" = "legemiddel_kodebok")) %>%
+    ) |>
+    mutate(medisin = dplyr::coalesce(Legemiddel, legemiddel_navn)) |>
+    left_join(medisin_kode_999, by = c("medisin" = "legemiddel_kodebok")) |>
     mutate(
       legemiddel_navn_kode =
         case_when(
@@ -100,14 +99,14 @@ legg_til_medisinnavn = function(d_medisin) {
     )
 
   # Legger til ekstra informasjon om hvert legemiddel
-  d_medisin = d_medisin %>%
+  d_medisin = d_medisin |>
     select(
       -Legemiddel, -LegemiddelType, -legemiddel_navn,
       -medisin, -legemiddel_kodebok_kode
-    ) %>%
+    ) |>
     left_join(distinct(medisin_fil, legemiddel_navn_kode, .keep_all = TRUE),
       by = "legemiddel_navn_kode"
-    ) %>%
+    ) |>
     select(-legemiddelnavn_i_kodebok)
 
   d_medisin
@@ -154,15 +153,15 @@ legg_til_sykehusnavn = function(d) {
     locale = readr::locale(encoding = "windows-1252")
   )
 
-  d = d %>%
+  d = d |>
     left_join(sykehus_navnefil, by = c("UnitId" = "resh_id"))
 
   if (anyNA(d$sykehusnavn)) {
     stop(
       "Det mangler kobling for UnitId: ",
-      d %>%
-        filter(is.na(sykehusnavn)) %>%
-        distinct(UnitId) %>%
+      d |>
+        filter(is.na(sykehusnavn)) |>
+        distinct(UnitId) |>
         pull(UnitId) |>
         stringr::str_c(collapse = ", ")
     )
@@ -237,7 +236,7 @@ legg_til_diagnosegrupper = function(d) {
   d = left_join(d, diagnosegrupper, by = "Kode")
 
   # Leddsykdom har ikke kode i registeret, så den må håndteres manuelt.
-  d = d %>%
+  d = d |>
     mutate(
       diaggrupper_med =
         replace(
@@ -316,10 +315,10 @@ velg_tidligste_inklusjondato = function(d_inkl_oppf, pas_id = PasientGUID) {
     }
   }
 
-  d = d_inkl_oppf %>%
-    group_by({{ pas_id }}) %>%
-    mutate(InklusjonDato = as.Date(min_na(InklusjonDato))) %>%
-    filter(!is.na(InklusjonDato)) %>%
+  d = d_inkl_oppf |>
+    group_by({{ pas_id }}) |>
+    mutate(InklusjonDato = as.Date(min_na(InklusjonDato))) |>
+    filter(!is.na(InklusjonDato)) |>
     ungroup()
 
   d
@@ -346,11 +345,11 @@ velg_tidligste_inklusjondato = function(d_inkl_oppf, pas_id = PasientGUID) {
 valider_legemiddeltype = function(mappe_dd) {
   kb = les_kb_mrs(mappe_dd)
 
-  kb_legemiddeltype = kb %>%
+  kb_legemiddeltype = kb |>
     filter(
       skjema_id == "Medisineringskjema",
       variabel_id == "LegemiddelType"
-    ) %>%
+    ) |>
     select(verdi, verditekst)
 
   mappe = paste0(***FJERNET ADRESSE***)
@@ -363,8 +362,8 @@ valider_legemiddeltype = function(mappe_dd) {
     locale = readr::locale(encoding = "windows-1252")
   )
 
-  medisin_uttrekk = medisinfil %>%
-    select("verdi" = LegemiddelType, "verditekst" = legemiddelnavn_i_kodebok) %>%
+  medisin_uttrekk = medisinfil |>
+    select("verdi" = LegemiddelType, "verditekst" = legemiddelnavn_i_kodebok) |>
     mutate(verdi = as.character(verdi))
 
   legemiddel_feil = setdiff(kb_legemiddel_type, medisin_uttrekk)
@@ -418,28 +417,28 @@ konverter_skjematype = function(inkl, oppf) {
   d_inkl_oppf = bind_rows(inkl, oppf)
 
   # Trekke ut skjemaGUID for skjema som skal konverteres
-  inkl_til_oppf_skjemaGUID = d_inkl_oppf %>%
+  inkl_til_oppf_skjemaGUID = d_inkl_oppf |>
     filter(
       PasientGUID %in% id_flere_inklusjon,
       FormTypeId == 1L
-    ) %>%
-    group_by(PasientGUID) %>%
-    arrange(FormDate) %>%
-    slice(-1) %>%
+    ) |>
+    group_by(PasientGUID) |>
+    arrange(FormDate) |>
+    slice(-1) |>
     pull(SkjemaGUID)
 
-  oppf_til_inkl_skjemaGUID = d_inkl_oppf %>%
+  oppf_til_inkl_skjemaGUID = d_inkl_oppf |>
     filter(
       PasientGUID %in% id_oppf_uten_inkl,
       FormTypeId == 2L
-    ) %>%
-    group_by(PasientGUID) %>%
-    arrange(FormDate) %>%
-    slice(1) %>%
+    ) |>
+    group_by(PasientGUID) |>
+    arrange(FormDate) |>
+    slice(1) |>
     pull(SkjemaGUID)
 
   # Konvertere til riktig skjematype
-  d_inkl_oppf = d_inkl_oppf %>%
+  d_inkl_oppf = d_inkl_oppf |>
     mutate(
       Skjematype = case_when(
         SkjemaGUID %in% inkl_til_oppf_skjemaGUID ~ "Oppfølgingskjema",
@@ -451,7 +450,7 @@ konverter_skjematype = function(inkl, oppf) {
         SkjemaGUID %in% oppf_til_inkl_skjemaGUID ~ 1,
         TRUE ~ FormTypeId
       )
-    ) %>%
+    ) |>
     arrange(FormTypeId)
 
   d_inkl_oppf
@@ -597,19 +596,19 @@ fjerne_skjema_hjelpefunksjon = function(d_hoved, d_motpart) {
 #'   d_diag = d_full_Diagnoseskjema
 #' )
 legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
-  d_inkl = d_inkl %>%
+  d_inkl = d_inkl |>
     mutate(
       aar_ktrl = year(InklusjonDato),
       dato_ktrl = as_date(InklusjonDato)
     )
 
-  d_oppf = d_oppf %>%
+  d_oppf = d_oppf |>
     mutate(
       aar_ktrl = year(FormDate),
       dato_ktrl = as_date(FormDate)
     )
 
-  d_med = d_med %>%
+  d_med = d_med |>
     mutate(
       startaar = year(StartDato),
       sluttaar = year(SluttDato),
@@ -617,7 +616,7 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
       SluttDato = as_date(SluttDato)
     )
 
-  d_diag = d_diag %>%
+  d_diag = d_diag |>
     mutate(
       dato_diag = as_date(FormDate),
     )

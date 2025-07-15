@@ -1,6 +1,5 @@
 # Preprossesering av data for NorArtritt
 
-#' @importFrom magrittr %>%
 #' @importFrom dplyr add_count filter group_by arrange distinct select left_join mutate
 NULL
 #'
@@ -173,18 +172,18 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
 #' @export
 lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
   # Lager objekt med dødsdato for alle pasienter som har dødd
-  d_dodsdato = d_inkl %>%
-    select(PasientGUID, DeathDate) %>%
-    filter(!is.na(DeathDate)) %>%
-    distinct(PasientGUID, .keep_all = TRUE) %>%
+  d_dodsdato = d_inkl |>
+    select(PasientGUID, DeathDate) |>
+    filter(!is.na(DeathDate)) |>
+    distinct(PasientGUID, .keep_all = TRUE) |>
     mutate(DeathDate = as_date(DeathDate))
 
   # Baseobjekter for alle skjema
-  d_inkl = d_inkl %>%
+  d_inkl = d_inkl |>
     konverter_missing_til_na() |>
     legg_til_sykehusnavn()
 
-  d_oppf = d_oppf %>%
+  d_oppf = d_oppf |>
     konverter_missing_til_na() |>
     legg_til_sykehusnavn()
 
@@ -198,8 +197,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     d_diag = d_diag
   )
 
-  d_med = d_med %>%
-    filter(!(LegemiddelType == 999 & is.na(Legemiddel))) %>%
+  d_med = d_med |>
+    filter(!(LegemiddelType == 999 & is.na(Legemiddel))) |>
     # FIXME - Fjerner her medisinforløp med LegemiddelType 999 som kommer fra St. Olav etter innføring
     # av helseplattformen. Disse er på et format som gjør at vi må vedlikeholde et separat sett
     # med interne kodebøker for å ta imot data fra HP, og det er ikke aktuelt.
@@ -210,8 +209,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
       !(LegemiddelType == 999 & Hospital == "St. Olav" & lubridate::date(CreationDate) > "2023-05-29"),
       !(LegemiddelType == 999 & Hospital == "Ålesund" & lubridate::date(CreationDate) > "2024-06-05")
     ) |>
-    legg_til_medisinnavn() %>%
-    left_join(d_dodsdato, by = "PasientGUID") %>%
+    legg_til_medisinnavn() |>
+    left_join(d_dodsdato, by = "PasientGUID") |>
     mutate(
       SluttDato = case_when(
         is.na(SluttDato) & !is.na(DeathDate) ~ DeathDate,
@@ -221,7 +220,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
       ),
       startaar = lubridate::year(StartDato),
       sluttaar = lubridate::year(SluttDato)
-    ) %>%
+    ) |>
     filter(
       StartDato < DeathDate | is.na(DeathDate),
       SluttDato <= datadump_dato | is.na(SluttDato),
@@ -234,31 +233,31 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
   }
 
   # Fjerner duplikate medisinforløp og medisinforløp som mangler startdato
-  d_med_vasket_uten_na = d_med %>%
+  d_med_vasket_uten_na = d_med |>
     filter(!is.na(StartDato))
 
-  d_med_vasket = d_med_vasket_uten_na %>%
-    group_by(PasientGUID, StartDato, LegemiddelType) %>%
-    arrange(SluttDato) %>%
-    distinct(PasientGUID, StartDato, LegemiddelType, .keep_all = TRUE) %>%
+  d_med_vasket = d_med_vasket_uten_na |>
+    group_by(PasientGUID, StartDato, LegemiddelType) |>
+    arrange(SluttDato) |>
+    distinct(PasientGUID, StartDato, LegemiddelType, .keep_all = TRUE) |>
     ungroup()
 
   # Siste diagnose for hver pasient
-  d_diag_pers = d_diag %>%
-    arrange(desc(dato_diag)) %>%
+  d_diag_pers = d_diag |>
+    arrange(desc(dato_diag)) |>
     distinct(PasientGUID, .keep_all = TRUE)
 
   # d_diag_med: Siste diagnose og hele medisinhistorikken, inkludert Ingen medisin
   # for de som ikke har medisinsk behandling
   # FIXME - Forbedre select. Se hva som ekskluderes.
-  d_diag_med = d_diag_pers %>%
+  d_diag_med = d_diag_pers |>
     select(
       PasientGUID, UnitId, FormDate, PatientAge, PatientGender, Kode, Navn, Dato, DiagnoseDato,
       dato_diag, diag_stilt_aar, dager_diag_til_datadump, diaggrupper_med, diaggrupper_med_tekst,
       diaggrupper_rem, diaggrupper_rem_tekst, rem_maal, diaggrupper_hoved,
       diaggrupper_hoved_tekst, perifer_aksial_diaggruppe,
       perifer_aksial_diaggruppe_tekst
-    ) %>%
+    ) |>
     left_join(select(d_med_vasket,
       PasientGUID, Enhet, Mengde, LegemiddelType, Intervall,
       EndringArsak, StartDato, SluttDato, EndringsDato, DeathDate,
@@ -266,7 +265,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
       biokat, csdmard, dmard, tsdmard, bio_og_tsdmard,
       legemiddel_gruppert, legemiddel_gruppert_navn,
       Virkestoff
-    ), by = "PasientGUID") %>%
+    ), by = "PasientGUID") |>
     mutate(
       legemiddel_navn = replace(
         as.character(legemiddel_navn),

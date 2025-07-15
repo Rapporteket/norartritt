@@ -336,8 +336,7 @@ test_that("skjema filtreres ut som forventet", {
   a = tibble::tibble(PasientGUID = c("1", "2", "3", "4"))
   b = tibble::tibble(PasientGUID = c("1", "2", "3", "5"))
 
-  forventet_ut = b %>%
-    filter(dplyr::row_number() %in% 1:3)
+  forventet_ut = filter(b, dplyr::row_number() %in% 1:3)
 
   expect_identical(
     fjerne_skjema_hjelpefunksjon(d_hoved = a, d_motpart = b),

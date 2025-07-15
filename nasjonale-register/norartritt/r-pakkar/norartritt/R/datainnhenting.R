@@ -6,7 +6,6 @@ grunnmappe_norartritt = "***FJERNET ADRESSE***"
 # TODO Lage funksjoner for dataprep som gjøres i datainnhenting-norartritt.R
 # FIXME - Oppdatere dokumentasjon for å beskrive alle objektene som lastes inn og hva som gjøres med dem.
 
-#' @importFrom magrittr %>%
 NULL
 
 #' les data NorArtritt
@@ -51,8 +50,8 @@ les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omg
 
   # lagre dato for datadump
   if (is.null(dato)) {
-    dato = dir(mappe_dd, pattern = "^[0-9]{4}-[0-1][0-9]-[0-9]{2}$", full.names = FALSE) %>%
-      sort() %>%
+    dato = dir(mappe_dd, pattern = "^[0-9]{4}-[0-1][0-9]-[0-9]{2}$", full.names = FALSE) |>
+      sort() |>
       dplyr::last()
   }
   dato = lubridate::as_date(dato)
