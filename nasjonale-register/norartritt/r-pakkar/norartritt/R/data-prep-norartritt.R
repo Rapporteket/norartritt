@@ -1,7 +1,5 @@
 # Preprossesering av data for NorArtritt
 
-#' @importFrom dplyr add_count filter group_by arrange distinct select left_join mutate
-NULL
 #'
 # Lage en funksjon for å forberede alle datasett i NorArtritt for analyse.
 # Hovedfokus er for bruk i årsrapport, men jeg antar objektene vil være

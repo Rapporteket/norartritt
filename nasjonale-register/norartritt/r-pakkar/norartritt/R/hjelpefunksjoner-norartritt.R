@@ -1,9 +1,5 @@
 # Hjelpefunksjoner som brukes i norartritt
 
-#' @importFrom dplyr mutate filter select left_join right_join case_when group_by summarise ungroup arrange slice pull bind_rows
-#' @importFrom lubridate as_date year
-NULL
-
 #' Legg til medisinnavn
 #'
 #' Kobler på legemiddelnavn og ekstra informasjon om medisiner registrert

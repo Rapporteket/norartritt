@@ -1,8 +1,5 @@
 # Kvalitetsindikatorer for NorArtritt
 
-#' @importFrom dplyr filter group_by ungroup arrange desc distinct n_distinct select left_join mutate pull
-#' @importFrom lubridate as_date ymd days
-NULL
 #'
 #' Kvalitetsindikator for tidlig oppstart av behandling
 #'
