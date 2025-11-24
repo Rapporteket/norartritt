@@ -228,7 +228,6 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 
   # d_diag_med: Siste diagnose og hele medisinhistorikken, inkludert Ingen medisin
   # for de som ikke har medisinsk behandling
-  # FIXME - Forbedre select. Se hva som ekskluderes.
   d_diag_med = d_diag_pers |>
     select(
       PasientGUID, UnitId, FormDate, PatientAge, PatientGender, Kode, Navn, Dato, DiagnoseDato,

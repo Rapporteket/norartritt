@@ -1,4 +1,3 @@
-#'
 #' Kvalitetsindikator for tidlig oppstart av behandling
 #'
 #' @description
@@ -41,14 +40,6 @@
 #' # inklusjonsdata, diagnosedata og medisindata for NorArtitt.
 #' d_ki_sykmod = ki_sykmod(d_inkl, d_diag, d_medisin)
 ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
-  # FIXME - Vurder behov for å lage nye dataobjekter for å forenkle
-  # kobling i diverse figurer/beregninger.
-  # FIXME - Oppdatere bruk av sykehusnavn og legemiddel_navn.
-  # Må enten bruke nye funksjonene for å hente navn, eller ta utgangspunkt i at
-  # det gjøres i preprosseseringsfunksjon (som ikke er laget ferdig enda).
-  # FIXME - Fjerne avhengighet av PasientGUID (må kunne ta inn fødselsnummer også).
-  # FIXME - Sjekke at jeg ikke importerer flere funksjoner en nødvendig i toppen
-
 
   # Koble på inklusjonsskjema for å hente ut inklusjonstidspunkt og sykehustilhørighet
   d_inkl_diag_med = d_diagnose |>
@@ -128,13 +119,7 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
 #' # d_diag og d_medisin er diagnosedata og medisindata
 #' d_ki_medisinbruk = ki_medisinbruk(d_diag, d_medisin, 2020, 20)
 ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
-  # FIXME - Legge inn støtte for å definere hvilke diagnosegrupper det skal
-  # beregnes KI for.
-  # FIXME - Ta ut årstall fra argumentlisten. Tilrettelegg for at det kan løses
-  # vha gruppering av inndata og filtrering etterpå.
-  # FIXME - Håndtering av legemiddel_navn (kreve preprosessert data / hente
-  # vha legg_til_medisingrupper).
-  # FIXME - Fjerne avhengighet av PasientGUID (må kunne ta inn fødselsnummer også).
+
   d_ki = d_diagnose |>
     left_join(select(d_medisin,
         PasientGUID, StartDato,
@@ -169,9 +154,8 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
 #' @description
 #' Indikatorfunksjon for å beregne median tid fra diagnose til oppstart
 #' medisinering med aktuell medisin. Funksjonen er ment å brukes på
-#' forhåndsbehandlede datasett hvor kobling allerede er gjort. Se `data` for
-#' hvilke variabler som er nødvendig. Dette kravet er satt for å begrense
-#' kompleksitet i indikatorfunksjonen.
+#' forhåndsbehandlede datasett hvor kobling allerede er gjort.
+#' Dette kravet er satt for å begrense kompleksitet i indikatorfunksjonen.
 #'
 #' @note
 #' Pasienter som ikke har registrert medisinskjema vil få satt en sensurdato
@@ -197,11 +181,8 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
 #'
 #' @examples
 ki_sykmod_median = function(d_ra_base, d_med) {
-  # Hvis pasienten ikke har startet medisinering innen 365 dager etter diagnose
-  # antar vi at pasienten ikke er aktuell for medisinering.
-  ovre_grense_medisin = 365
 
-  # kontroller vars d_ra_base og d_med
+  ovre_grense_medisin = 365
 
   d_ki_medisin_median = d_ra_base |>
     left_join(
@@ -240,9 +221,8 @@ ki_sykmod_median = function(d_ra_base, d_med) {
 #' @description
 #' Indikatorfunksjon for å beregne gjennomsnittlig tid fra diagnose til oppstart
 #' medisinering med aktuell medisin. Funksjonen er ment å brukes på
-#' forhåndsbehandlede datasett hvor kobling allerede er gjort. Se `data` for
-#' hvilke variabler som er nødvendig. Dette kravet er satt for å flytte
-#' kompleksitet fra indikatorfunksjoner til en egen filtreringsfunksjon.
+#' forhåndsbehandlede datasett hvor kobling allerede er gjort.
+#' Dette kravet er satt for å begrense kompleksitet i indikatorfunksjonen.
 #'
 #' @note
 #' Pasienter som ikke har fått registrert medisinering innen 365 dager av diagnose
@@ -271,11 +251,8 @@ ki_sykmod_median = function(d_ra_base, d_med) {
 #'
 #' @examples
 ki_sykmod_snitt = function(d_ra_base, d_med) {
-  # Hvis pasienten ikke har startet medisinering innen 365 dager etter diagnose
-  # antar vi at pasienten ikke er aktuell for medisinering.
-  ovre_grense_medisin = 365
 
-  # FIXME - kontroller vars d_ra_base og d_med
+  ovre_grense_medisin = 365
 
   d_ki_medisin_snitt = d_ra_base |>
     left_join(
@@ -346,9 +323,6 @@ ki_sykmod_snitt = function(d_ra_base, d_med) {
 #' # d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
 #' d_ki_remisjon = ki_remisjon(d_diag, d_inkl_oppf)
 ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
-  # FIXME - Dato for datadump må hentes dynamisk!
-  # FIXME - Legge inn støtte for grupperingsvariabler.
-  # FIXME - Validering og håndtering av variabler med "mrs_" prefiks.
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
   id_diagnose = d_diag |>
@@ -424,14 +398,6 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
 #' # inklusjon og oppfølgingsdatasett
 #' d_remisjon_totalt = remisjon_totalt(d_diag, d_inkl_oppf)
 remisjon_totalt = function(d_diag, d_inkl_oppf) {
-  # FIXME - Legge inn støtte for grupperingsvariabler.
-
-  # fixme (QA): Funksjonen liknar veldig på ki_remisjon(). Er nok
-  #             mykje betre/sikrare/enklare om éin av funksjonane er
-  #             spesialtilfelle av den andre (eks. med argument
-  #             remisjon_innan, som kan vera 365 eller Inf).
-  #             Alt som gjeld førre funksjon gjeld òg denne, så
-  #             eg skriv det ikkje om igjen.
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose
   id_diagnose = d_diag |>
@@ -495,9 +461,7 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
 #' # d_diag er diagnosedatasett
 #' d_ki_kontroll = ki_kontroll(d_inkl_oppf, d_diag)
 ki_kontroll = function(d_inkl_oppf, d_diag) {
-  # FIXME - støtte for grupperingsvariabler
-  # FIXME - fixme's fra QA under.
-  # FIXME - støtte for annen identifikator enn PasientGUID.
+
   # Pasienter som oppfyller kriterier for diagnose og diagnosetidspunkt.
   id_diagnose = d_diag |>
     group_by(PasientGUID) |>
@@ -522,18 +486,17 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
         tid_til_inkl >= 0 &
         tid_til_inkl <= 90 &
         (DeathDate >= dato_diag + days(90) | is.na(DeathDate))
-      # fixme (QA): Er inklusjon+diagnose der tid til inklusjon er negativ rett handtert?
     )
 
   d_ki_kontroll = d_base |>
     mutate(
       dager_til_ktrl = dato_ktrl - dato_diag,
       ki_krit_teller = ki_krit_nevner & Skjematype == "Inklusjonskjema" &
-        dager_til_ktrl > 7 & # fixme (QA): Mange magiske konstantar her. Gjer dei om til variablar.
-        dager_til_ktrl <= 90 | # fixme (QA): For så vidt rett, men for alle som ikkje har pugga detaljane i operatorpresedensane i R kunne det med fordel ha vore nokre parentesar!
+        dager_til_ktrl > 7 &
+        dager_til_ktrl <= 90 |
         ki_krit_nevner & Skjematype == "Oppfølgingskjema" &
           dager_til_ktrl <= 90
-    ) |> # fixme (QA): I skildringa sto det noko med ulike intervall, eks. 28 dagar. Men talet 28 dagar er ingen plass å sjå her, så indikatoren *må* vera rekna ut feil.
+    ) |>
     group_by(PasientGUID) |>
     arrange(desc(ki_krit_teller), desc(ki_krit_nevner), .by_group = TRUE) |>
     distinct(PasientGUID, .keep_all = TRUE) |>
@@ -548,8 +511,7 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
 #' Indikatorfunksjon for å beregne gjennomsnittlig tid fra diagnose til første
 #' oppfølging for pasienter diagnostisert med Revmatoid Artritt.
 #' Funksjonen er ment å brukes på forhåndsbehandlede datasett hvor kobling
-#' allerede er gjort. Se `data` for
-#' hvilke variabler som er nødvendig. Dette kravet er satt for å flytte
+#' allerede er gjort. Dette kravet er satt for å flytte
 #' kompleksitet fra indikatorfunksjoner til en egen filtreringsfunksjon.
 #'
 #' @note
@@ -577,7 +539,7 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
 #' @examples
 ki_kontroll_snitt = function(d_ra_base, d_inkl_oppf) {
   # Hvis pasienten ikke har vært til kontroll innen 365 dager etter diagnose
-  # antar vi at pasienten ikke er aktuell for indikatoren. (Må høre med registeret)
+  # antar vi at pasienten ikke er aktuell for indikatoren.
   ovre_grense_kontroll = 365
 
   # Grense for hvilke inklusjonskjema som skal regnes som oppfølging.
@@ -665,7 +627,6 @@ ki_kontroll_snitt = function(d_ra_base, d_inkl_oppf) {
 #' # d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
 #' d_ki_dapsa = ki_dapsa(d_diag, d_inkl_oppf)
 ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
-  # FIXME - Legge inn støtte for grupperingsvariabler.
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
   id_diagnose = d_diag |>
@@ -747,9 +708,6 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
 #' # d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
 #' d_ki_asdas = ki_asdas(d_diag, d_inkl_oppf)
 ki_asdas = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
-  # FIXME - Dato for datadump må hentes dynamisk!
-  # FIXME - Legge inn støtte for grupperingsvariabler.
-  # FIXME - Validering og håndtering av variabler med "mrs_" prefiks.
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
   id_diagnose = d_diag |>
