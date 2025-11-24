@@ -348,7 +348,6 @@ test_that("skjema filtreres ut som forventet", {
   )
 })
 
-
 # konverter_missing_til_na ------------------------------------------------
 test_that("Konverterer 0 og -1 til NA som forventet ", {
   d = tibble::tibble(

@@ -100,29 +100,9 @@ test_that("ki_asdas() gjev ut forventa resultat", {
 
 # ki_sykmod_snitt -------------------------------------------------------
 
-test_that("ki_sykmod_snitt() gir forventet resultat", {
-  # Omfattende testdatasett
-
-  # - Medisin fra liste og utenfor
-  # - Kun medisin utenfor liste
-  # - Medisin innenfor liste
-  # - Ingen medisin
-
-  # - Oppstart samme dag
-  # - Håndtering av startdato før diagnosedato
-  # - flere grensetilfeller?
-
-  d_test = tibble::tibble(
-    pasID = c(1:10),
-    dato_diag = c()
-  )
-})
-
 # ki_remisjon -------------------------------------------------------------
 
-
 # remisjon_totalt ---------------------------------------------------------
-
 
 # ki_kontroll -------------------------------------------------------------
 
