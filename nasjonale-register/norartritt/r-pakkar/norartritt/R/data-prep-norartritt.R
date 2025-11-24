@@ -1,22 +1,3 @@
-# Preprossesering av data for NorArtritt
-
-#'
-# Lage en funksjon for å forberede alle datasett i NorArtritt for analyse.
-# Hovedfokus er for bruk i årsrapport, men jeg antar objektene vil være
-# å foretrekke i øvrige analyser også.
-
-# TODO
-# Liste opp alt som skal forbedres i alle de ulike objektene
-# Generelle ting som skal fikses i flere at objektene
-# Funksjonen skal implementeres i les_data_norartritt() slik at en får ut
-# både fullstendige datasett og ferdig prosseserte datasett.
-
-# Fjerne skjema - eksempel - fjerne diagnose hvis inklusjon mangler.
-# Filtrere bort pasienter som ikke har aktuelle diagnoser.
-# Har de kun uaktuelle diagnoser skal de ikke være med i registeret i det hele tatt
-
-# FIXME - Flytte hjelpefunksjoner til dette skriptet.
-
 #' vask data norartritt
 #'
 #' Funksjon som vasker data fra NorArtritt. Datadumper som lastes ned fra
@@ -314,34 +295,6 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
   assign("d_med", d_med, envir = .GlobalEnv)
   assign("d_dodsdato", d_dodsdato, envir = .GlobalEnv)
 }
-
-
-
-strukturer_variabler_uten_kodebok = function(d_inkl, d_oppf, d_diag, d_med) {
-}
-
-
-
-
-# FIXME - utvide til alle skjematyper
-
-# TODO - Skal lage et nytt objekt som inneholder alle pasientforløp.
-# - Pasienter kan være registrert ved flere sykehus og dermed få dupliserte
-# inklusjonsskjema og diagnoseskjema osv.
-# Målet er å redusere dette i den grad det er mulig å prøve å få litt bedre
-# organiserte data.
-#
-# lag_sykdomsforlop = function(d_full_Inklusjonskjema, d_full_Oppfølgingskjema, d_full_Diagnoseskjema, d_full_Medisineringskjema){
-#
-#   PID = unique(c(d_full_Inklusjonskjema$PasientGUID, d_full_Oppfølgingskjema$PasientGUID, d_full_Diagnoseskjema$PasientGUID, d_full_Medisineringskjema$PasientGUID))
-#
-#   all(PID %in% unique(d_full_Inklusjonskjema$PasientGUID))
-#
-#   hovedskjemaGUID = d_full_Inklusjonskjema |> pull(SkjemaGUID)
-#
-#   nest
-# }
-
 
 #' lag base-data for ra-indikatorer
 #'
