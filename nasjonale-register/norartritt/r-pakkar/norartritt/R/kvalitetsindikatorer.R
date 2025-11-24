@@ -1,5 +1,3 @@
-# Kvalitetsindikatorer for NorArtritt
-
 #'
 #' Kvalitetsindikator for tidlig oppstart av behandling
 #'
