@@ -1,5 +1,3 @@
-# Hjelpefunksjoner som brukes i norartritt
-
 #' Legg til medisinnavn
 #'
 #' Kobler på legemiddelnavn og ekstra informasjon om medisiner registrert
@@ -686,10 +684,6 @@ legg_til_kriteriedatoer = function(d_inkl, d_diag) {
   d_diag
 }
 
-
-# legg_til_dager_diag_til_datadump = function() {
-
-# }
 
 #' Konverter missing til na
 #'
