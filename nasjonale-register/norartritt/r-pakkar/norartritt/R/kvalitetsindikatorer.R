@@ -104,6 +104,7 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
 #' @param aarstall Årstallet indikatoren skal beregnes for
 #' @param legemiddel En heltallsvektor med legemiddel_navn_kode for hvilke
 #' medisiner som skal inkluderes.
+#' @param diagnosekoder Hvilke diagnoser som skal inkluderes i beregningen.
 #'
 #' @return
 #' Returnerer en tibble med følgende variabler:
@@ -117,8 +118,8 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
 #'
 #' @examples
 #' # d_diag og d_medisin er diagnosedata og medisindata
-#' d_ki_medisinbruk = ki_medisinbruk(d_diag, d_medisin, 2020, 20)
-ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
+#' d_ki_medisinbruk = ki_medisinbruk(d_diagnose = d_diag, d_medisin = d_medisin, aarstall = 2020, legemiddel = 20, diagnosekoder = 1)
+ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel, diagnosekoder) {
 
   d_ki = d_diagnose |>
     left_join(select(d_medisin,
@@ -128,7 +129,7 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel) {
       ),
       by = "PasientGUID"
     ) |>
-    mutate(ki_krit_nevner = diaggrupper_med == 1 &
+    mutate(ki_krit_nevner = diaggrupper_med == diagnosekoder &
       diag_stilt_aar <= aarstall &
       (year(DeathDate) >= aarstall | is.na(DeathDate)))
 
