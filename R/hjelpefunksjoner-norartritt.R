@@ -44,7 +44,7 @@
 #' d_medisin_med_navn = legg_til_medisinnavn(d_medisin)
 legg_til_medisinnavn = function(d_medisin) {
   # Leser inn kodebøker for medisiner
-  mappe = paste0(***FJERNET ADRESSE***)
+  mappe = paste0("***FJERNET ADRESSE***")
   medisin_grupper = "medisin-grupper.csv"
   legemiddel_999 = "legemiddel-kodebok.csv"
 
@@ -140,7 +140,7 @@ legg_til_medisinnavn = function(d_medisin) {
 #'
 #' d_med_sykehusnavn = legg_til_sykehusnavn(d)
 legg_til_sykehusnavn = function(d) {
-  adresse = ***FJERNET ADRESSE***
+  adresse = "***FJERNET ADRESSE***"
   sykehus_navnefil = readr::read_delim(adresse,
     delim = ";",
     col_types = "iccic_",
@@ -210,7 +210,7 @@ legg_til_sykehusnavn = function(d) {
 #' # d_diagnose er diagnosedata fra NorArtritt
 #' d_med_diagnosedata = legg_til_diagnosegrupper(d_diagnose)
 legg_til_diagnosegrupper = function(d) {
-  adresse = ***FJERNET ADRESSE***
+  adresse = "***FJERNET ADRESSE***"
   diagnosegrupper = readr::read_delim(adresse,
     delim = ";",
     col_types = "ciciccicic",
@@ -346,7 +346,7 @@ valider_legemiddeltype = function(mappe_dd) {
     ) |>
     select(verdi, verditekst)
 
-  mappe = paste0(***FJERNET ADRESSE***)
+  mappe = paste0("***FJERNET ADRESSE***")
   medisin_grupper = "medisin-grupper.csv"
 
   medisinfil = readr::read_delim(paste0(mappe, medisin_grupper),
