@@ -1,7 +1,3 @@
-# Grunnmappe for norartrittdata
-grunnmappe_norartritt = "***FJERNET ADRESSE***"
-
-NULL
 
 #' les data NorArtritt
 #'
@@ -38,7 +34,7 @@ NULL
 #' # Les inn data (nyeste datadumper)
 #' les_data_norartritt()
 #' }
-les_data_norartritt = function(mappe_dd = NULL, dato = NULL, versjon = NULL, omgjevnad = .GlobalEnv) {
+les_data_norartritt = function(mappe_dd, dato = NULL, versjon = NULL, omgjevnad = .GlobalEnv) {
   if (is.null(mappe_dd)) {
     mappe_dd = grunnmappe_norartritt
   }
