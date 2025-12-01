@@ -43,28 +43,10 @@
 #'
 #' d_medisin_med_navn = legg_til_medisinnavn(d_medisin)
 legg_til_medisinnavn = function(d_medisin) {
-  # Leser inn kodebøker for medisiner
-  mappe = paste0("***FJERNET ADRESSE***")
-  medisin_grupper = "medisin-grupper.csv"
-  legemiddel_999 = "legemiddel-kodebok.csv"
 
-  medisin_fil = readr::read_delim(paste0(mappe, medisin_grupper),
-    delim = ";",
-    trim_ws = TRUE,
-    col_types = "ici__iiiiiiccc",
-    locale = readr::locale(encoding = "windows-1252")
-  )
-
-  medisin_kode_999 = readr::read_delim(paste0(mappe, legemiddel_999),
-    delim = ";",
-    trim_ws = TRUE,
-    col_types = "ic",
-    locale = readr::locale(encoding = "windows-1252")
-  )
-
-  # Sjekk at alle LegemiddelTyper i datasettet finnes i medisinkodebok
+  # Sjekk at alle LegemiddelTyper i datasettet finnes i medisinkobling
   na_legemiddel_navn = d_medisin |>
-    filter(!LegemiddelType %in% medisin_fil$LegemiddelType) |>
+    filter(!LegemiddelType %in% norartritt::medisinkobling$LegemiddelType) |>
     dplyr::pull(LegemiddelType)
 
   if (length(na_legemiddel_navn) > 0) {
@@ -77,13 +59,13 @@ legg_til_medisinnavn = function(d_medisin) {
 
   # Henter ut navn og riktig kode for medisiner med LegemiddelType 999
   d_medisin = d_medisin |>
-    left_join(select(medisin_fil,
+    left_join(select(norartritt::medisinkobling,
         LegemiddelType, legemiddel_navn, legemiddel_navn_kode
       ),
       by = "LegemiddelType"
     ) |>
     mutate(medisin = dplyr::coalesce(Legemiddel, legemiddel_navn)) |>
-    left_join(medisin_kode_999, by = c("medisin" = "legemiddel_kodebok")) |>
+    left_join(norartritt::legemiddelkobling, by = c("medisin" = "legemiddel_kodebok")) |>
     mutate(
       legemiddel_navn_kode =
         case_when(
@@ -98,7 +80,7 @@ legg_til_medisinnavn = function(d_medisin) {
       -Legemiddel, -LegemiddelType, -legemiddel_navn,
       -medisin, -legemiddel_kodebok_kode
     ) |>
-    left_join(distinct(medisin_fil, legemiddel_navn_kode, .keep_all = TRUE),
+    left_join(distinct(norartritt::medisinkobling, legemiddel_navn_kode, .keep_all = TRUE),
       by = "legemiddel_navn_kode"
     ) |>
     select(-legemiddelnavn_i_kodebok)
@@ -140,15 +122,9 @@ legg_til_medisinnavn = function(d_medisin) {
 #'
 #' d_med_sykehusnavn = legg_til_sykehusnavn(d)
 legg_til_sykehusnavn = function(d) {
-  adresse = "***FJERNET ADRESSE***"
-  sykehus_navnefil = readr::read_delim(adresse,
-    delim = ";",
-    col_types = "iccic_",
-    locale = readr::locale(encoding = "windows-1252")
-  )
 
   d = d |>
-    left_join(sykehus_navnefil, by = c("UnitId" = "resh_id"))
+    left_join(norartritt::sykehuskobling, by = c("UnitId" = "resh_id"))
 
   if (anyNA(d$sykehusnavn)) {
     stop(
@@ -210,14 +186,8 @@ legg_til_sykehusnavn = function(d) {
 #' # d_diagnose er diagnosedata fra NorArtritt
 #' d_med_diagnosedata = legg_til_diagnosegrupper(d_diagnose)
 legg_til_diagnosegrupper = function(d) {
-  adresse = "***FJERNET ADRESSE***"
-  diagnosegrupper = readr::read_delim(adresse,
-    delim = ";",
-    col_types = "ciciccicic",
-    locale = readr::locale(encoding = "windows-1252")
-  )
 
-  ukjent_kode = setdiff(d$Kode, diagnosegrupper$Kode)
+  ukjent_kode = setdiff(d$Kode, norartritt::diagnosekobling$Kode)
   ukjent_kode = ukjent_kode[!is.na(ukjent_kode)]
   if (length(ukjent_kode) > 0) {
     stop(
@@ -227,7 +197,7 @@ legg_til_diagnosegrupper = function(d) {
     )
   }
 
-  d = left_join(d, diagnosegrupper, by = "Kode")
+  d = left_join(d, norartritt::diagnosekobling, by = "Kode")
 
   # Leddsykdom har ikke kode i registeret, så den må håndteres manuelt.
   d = d |>
