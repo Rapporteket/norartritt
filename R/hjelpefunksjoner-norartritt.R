@@ -316,17 +316,7 @@ valider_legemiddeltype = function(mappe_dd) {
     ) |>
     select(verdi, verditekst)
 
-  mappe = paste0("***FJERNET ADRESSE***")
-  medisin_grupper = "medisin-grupper.csv"
-
-  medisinfil = readr::read_delim(paste0(mappe, medisin_grupper),
-    delim = ";",
-    trim_ws = TRUE,
-    col_types = "ici__iiiiiiccc",
-    locale = readr::locale(encoding = "windows-1252")
-  )
-
-  medisin_uttrekk = medisinfil |>
+  medisin_uttrekk = norartritt::medisinkobling |>
     select("verdi" = LegemiddelType, "verditekst" = legemiddelnavn_i_kodebok) |>
     mutate(verdi = as.character(verdi))
 
