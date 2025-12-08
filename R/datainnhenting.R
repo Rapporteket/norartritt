@@ -36,7 +36,7 @@
 #' }
 les_data_norartritt = function(mappe_dd, dato = NULL, versjon = NULL, omgjevnad = .GlobalEnv) {
   if (is.null(mappe_dd)) {
-    mappe_dd = grunnmappe_norartritt
+    stop("Mappe_dd: filplassering av datadump må oppgis")
   }
 
   # lagre dato for datadump

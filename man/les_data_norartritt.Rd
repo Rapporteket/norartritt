@@ -5,7 +5,7 @@
 \title{les data NorArtritt}
 \usage{
 les_data_norartritt(
-  mappe_dd = NULL,
+  mappe_dd,
   dato = NULL,
   versjon = NULL,
   omgjevnad = .GlobalEnv
