@@ -187,8 +187,18 @@ legg_til_sykehusnavn = function(d) {
 #' d_med_diagnosedata = legg_til_diagnosegrupper(d_diagnose)
 legg_til_diagnosegrupper = function(d) {
 
+  uaktuelle_diagnoser_fra_HP =
+    c("M179","K076","M076","M120","M159","M182","M190","S631","M171",
+      "M472","M199","M659","M720","S698","T848","M169","M082","M009","S832",
+      "T845","M192","M230","M163","M246","M050","M232","M224","M064","M063",
+      "M109","M241","M000","M204","T840","S834","G98;","M180","M165","M150",
+      "D868","M191","S821","M100","M660","M713","M259","M125","M128","M779",
+      "M750","M463","M173")
+
   ukjent_kode = setdiff(d$Kode, norartritt::diagnosekobling$Kode)
+  ukjent_kode = ukjent_kode[!ukjent_kode %in% uaktuelle_diagnoser_fra_HP]
   ukjent_kode = ukjent_kode[!is.na(ukjent_kode)]
+
   if (length(ukjent_kode) > 0) {
     stop(
       "Kode: ",
