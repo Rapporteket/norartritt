@@ -42,52 +42,110 @@
 #' # d_medisin er medisindata fra NorArtritt.
 #'
 #' d_medisin_med_navn = legg_til_medisinnavn(d_medisin)
-legg_til_medisinnavn = function(d_medisin) {
+# legg_til_medisinnavn = function(d_medisin) {
+#
+#   # Sjekk at alle LegemiddelTyper i datasettet finnes i medisinkobling
+#   na_legemiddel_navn = d_medisin |>
+#     filter(!LegemiddelType %in% norartritt::medisinkobling$LegemiddelType) |>
+#     dplyr::pull(LegemiddelType)
+#
+#   if (length(na_legemiddel_navn) > 0) {
+#     stop(
+#       "LegemiddelType ",
+#       stringr::str_c(unique(na_legemiddel_navn), collapse = ", "),
+#       " er ikke definert i medisinkodeboken"
+#     )
+#   }
+#
+#   # Henter ut navn og riktig kode for medisiner med LegemiddelType 999
+#   d_medisin = d_medisin |>
+#     left_join(select(norartritt::medisinkobling,
+#         LegemiddelType, legemiddel_navn, legemiddel_navn_kode
+#       ),
+#       by = "LegemiddelType"
+#     ) |>
+#     mutate(medisin = dplyr::coalesce(Legemiddel, legemiddel_navn)) |>
+#     left_join(norartritt::legemiddelkobling, by = c("medisin" = "legemiddel_kodebok")) |>
+#     mutate(
+#       legemiddel_navn_kode =
+#         case_when(
+#           !is.na(legemiddel_kodebok_kode) ~ legemiddel_kodebok_kode,
+#           TRUE ~ legemiddel_navn_kode
+#         )
+#     )
+#
+#   # Legger til ekstra informasjon om hvert legemiddel
+#   d_medisin = d_medisin |>
+#     select(
+#       -Legemiddel, -LegemiddelType, -legemiddel_navn,
+#       -medisin, -legemiddel_kodebok_kode
+#     ) |>
+#     left_join(distinct(norartritt::medisinkobling, legemiddel_navn_kode, .keep_all = TRUE),
+#       by = "legemiddel_navn_kode"
+#     ) |>
+#     select(-legemiddelnavn_i_kodebok)
+#
+#   d_medisin
+# }
 
-  # Sjekk at alle LegemiddelTyper i datasettet finnes i medisinkobling
-  na_legemiddel_navn = d_medisin |>
-    filter(!LegemiddelType %in% norartritt::medisinkobling$LegemiddelType) |>
-    dplyr::pull(LegemiddelType)
-
-  if (length(na_legemiddel_navn) > 0) {
-    stop(
-      "LegemiddelType ",
-      stringr::str_c(na_legemiddel_navn, collapse = ", "),
-      " er ikke definert i medisinkodeboken"
-    )
-  }
-
-  # Henter ut navn og riktig kode for medisiner med LegemiddelType 999
-  d_medisin = d_medisin |>
-    left_join(select(norartritt::medisinkobling,
-        LegemiddelType, legemiddel_navn, legemiddel_navn_kode
-      ),
-      by = "LegemiddelType"
+#' Legg til medisinnavn
+#'
+#' @description
+#' Funksjon som grupperer legemiddel som har flere LegemiddelTyper og fjerner
+#' 'generisk' fra navn. Kobler også legemiddel som ikke importeres riktig ved
+#' å bruke ATC kode og matche med eksisterende ATC-koder for kjente legemiddel.
+#'
+#' @param d Medisindatasett fra NorArtritt.
+#'
+#' @returns
+#' Returnerer opprinnelig datasett med ekstra kolonner legemiddel_navn og
+#' legemiddel_navn_kode som er vasket slik det er nevnt i beskrivelsen over.
+#' @export
+#'
+#' @examples
+#'
+#' d_medisin_raa = tibble::tibble(ATC = c("L04AB04", "L04AB04", "L04AX03"),
+#'                                LegemiddelType = c(46, 999, 59),
+#'                                Legemiddel = c("AdalimumabGenerisk", "ImportertAnnet", "MethotrexateGenerisk"))
+#'
+#' d_vasket_medisin = legg_til_medisinnavn(d_medisin_raa)
+legg_til_medisinnavn = function(d) {
+  # Finne ATC-koder i LegemiddelType 999 som matcher med andre eksisterende
+  # legemiddel med riktig koder.
+  ATC_legemiddel = d |>
+    filter(!is.na(ATC)) |>
+    group_by(ATC) |>
+    distinct(LegemiddelType, Legemiddel) |>
+    arrange(ATC, LegemiddelType) |>
+    select(ATC,
+      Legemiddel_kobling = Legemiddel,
+      LegemiddelType_kobling = LegemiddelType
     ) |>
-    mutate(medisin = dplyr::coalesce(Legemiddel, legemiddel_navn)) |>
-    left_join(norartritt::legemiddelkobling, by = c("medisin" = "legemiddel_kodebok")) |>
+    slice(1)
+
+  d |>
+    left_join(ATC_legemiddel, by = "ATC") |>
     mutate(
-      legemiddel_navn_kode =
-        case_when(
-          !is.na(legemiddel_kodebok_kode) ~ legemiddel_kodebok_kode,
-          TRUE ~ legemiddel_navn_kode
-        )
-    )
-
-  # Legger til ekstra informasjon om hvert legemiddel
-  d_medisin = d_medisin |>
-    select(
-      -Legemiddel, -LegemiddelType, -legemiddel_navn,
-      -medisin, -legemiddel_kodebok_kode
+      LegemiddelType = coalesce(LegemiddelType_kobling, LegemiddelType),
+      Legemiddel = coalesce(str_remove(Legemiddel_kobling, "AnnetImportert"), Legemiddel)
     ) |>
-    left_join(distinct(norartritt::medisinkobling, legemiddel_navn_kode, .keep_all = TRUE),
-      by = "legemiddel_navn_kode"
+    mutate(
+      generisk_kode = if_else(str_detect(Legemiddel, "Generisk"), LegemiddelType, NA_integer_),
+      legemiddel_navn = str_remove_all(Legemiddel, "Generisk")
     ) |>
-    select(-legemiddelnavn_i_kodebok)
-
-  d_medisin
+    group_by(legemiddel_navn) |>
+    arrange(legemiddel_navn, generisk_kode) |>
+    fill(generisk_kode, .direction = "down") |>
+    mutate(legemiddel_navn_kode = coalesce(generisk_kode, LegemiddelType)) |>
+    select(-generisk_kode) |>
+    filter(LegemiddelType != 999)
 }
 
+
+legg_til_medisintype = function() {
+  #FIXME - Legge til gruppering av medisiner i ulike kategorier.
+  # Tester som fanger opp medisiner som ikke er i metaliste.
+}
 #' Legg til sykehusnavn
 #'
 #' Kobler på sykehusnavn for bruk i analyser og rapporter.

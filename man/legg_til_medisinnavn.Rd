@@ -4,9 +4,11 @@
 \alias{legg_til_medisinnavn}
 \title{Legg til medisinnavn}
 \usage{
-legg_til_medisinnavn(d_medisin)
+legg_til_medisinnavn(d)
 }
 \arguments{
+\item{d}{Medisindatasett fra NorArtritt.}
+
 \item{d_medisin}{medisindata fra NorArtritt.
 Må inneholde kolonnen LegemiddelType.}
 }
@@ -31,12 +33,19 @@ hvor legemiddel er gruppert. For eksempel slås alle de ulike medisinene med
 virkestoff infliximab sammen til en gruppe.
 \item \strong{Virkestoffnavn} Navn på virkestoff alene.
 }
+
+Returnerer opprinnelig datasett med ekstra kolonner legemiddel_navn og
+legemiddel_navn_kode som er vasket slik det er nevnt i beskrivelsen over.
 }
 \description{
-Kobler på legemiddelnavn og ekstra informasjon om medisiner registrert
-i NorArtritt til medisindata.
+Funksjon som grupperer legemiddel som har flere LegemiddelTyper og fjerner
+'generisk' fra navn. Kobler også legemiddel som ikke importeres riktig ved
+å bruke ATC kode og matche med eksisterende ATC-koder for kjente legemiddel.
 }
 \details{
+Kobler på legemiddelnavn og ekstra informasjon om medisiner registrert
+i NorArtritt til medisindata.
+
 På grunn av måten data overføres fra GoTreatIt til registeret er det
 enkelte medisiner som mangler navn og kode ved innlesning. Disse blir
 registrert med LegemiddelType 999. Denne funksjonen løser opp disse
@@ -51,4 +60,12 @@ er det her vi må oppdatere for å få det inn i analysene.
 # d_medisin er medisindata fra NorArtritt.
 
 d_medisin_med_navn = legg_til_medisinnavn(d_medisin)
+Legg til medisinnavn
+
+
+d_medisin_raa = tibble::tibble(ATC = c("L04AB04", "L04AB04", "L04AX03"),
+                               LegemiddelType = c(46, 999, 59),
+                               Legemiddel = c("AdalimumabGenerisk", "ImportertAnnet", "MethotrexateGenerisk"))
+
+d_vasket_medisin = legg_til_medisinnavn(d_medisin_raa)
 }
