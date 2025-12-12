@@ -168,6 +168,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 
   d_diag = d_diag |>
     legg_til_diagnosegrupper() |>
+    filter(!is.na(diaggrupper_med)) |>
     left_join(d_dodsdato, by = "PasientGUID") |>
     filter(is.na(DeathDate) | DeathDate >= dato_diag)
 
@@ -177,18 +178,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
   )
 
   d_med = d_med |>
-    filter(!(LegemiddelType == 999 & is.na(Legemiddel))) |>
-    # FIXME - Fjerner her medisinforløp med LegemiddelType 999 som kommer fra St. Olav etter innføring
-    # av helseplattformen. Disse er på et format som gjør at vi må vedlikeholde et separat sett
-    # med interne kodebøker for å ta imot data fra HP, og det er ikke aktuelt.
-    # Tar de derfor bort fra analyse.
-    # Fjern filtrering når data er korrigert og import er fikset i MRS/HP.
-    # FIXME - Har også lagt Ålesund til listen etter de fikk innført helseplattformen der
-    filter(
-      !(LegemiddelType == 999 & Hospital == "St. Olav" & lubridate::date(CreationDate) > "2023-05-29"),
-      !(LegemiddelType == 999 & Hospital == "Ålesund" & lubridate::date(CreationDate) > "2024-06-05")
-    ) |>
     legg_til_medisinnavn() |>
+    legg_til_medisintype() |>
     left_join(d_dodsdato, by = "PasientGUID") |>
     mutate(
       SluttDato = case_when(
@@ -206,6 +197,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
       StartDato <= SluttDato | is.na(SluttDato)
     )
 
+  # FIXME - Ny måte å teste for manglende koblinger av legemiddel siden 999 filtreres bort
+  # i legg_til_medisinnavn-funksjon
   # medisinforløp for hver pasient hvor duplikater er fjernet
   if (d_med |> filter(legemiddel_navn_kode == 999) |> nrow() > 0) {
     stop(error = "Det finnes legemiddel med LegemiddelType 999 som ikke er definert i kodebok")
@@ -238,11 +231,9 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
     ) |>
     left_join(select(d_med_vasket,
       PasientGUID, Enhet, Mengde, LegemiddelType, Intervall,
-      EndringArsak, StartDato, SluttDato, EndringsDato, DeathDate,
+      EndringArsak, StartDato, SluttDato, DeathDate,
       startaar, sluttaar, legemiddel_navn, legemiddel_navn_kode,
-      biokat, csdmard, dmard, tsdmard, bio_og_tsdmard,
-      legemiddel_gruppert, legemiddel_gruppert_navn,
-      Virkestoff
+      biokat, csdmard, dmard, tsdmard, bio_og_tsdmard
     ), by = "PasientGUID") |>
     mutate(
       legemiddel_navn = replace(
@@ -265,18 +256,6 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
       ),
       bio_og_tsdmard = ifelse(is.na(LegemiddelType), yes = 0L,
         no = bio_og_tsdmard
-      ),
-      legemiddel_gruppert = replace(
-        as.integer(legemiddel_gruppert),
-        is.na(legemiddel_gruppert), 99L
-      ),
-      legemiddel_gruppert_navn = replace(
-        as.character(legemiddel_gruppert_navn),
-        is.na(legemiddel_gruppert_navn), "Ingen medisin"
-      ),
-      Virkestoff = replace(
-        as.character(Virkestoff),
-        is.na(Virkestoff), "Ingen medisin"
       ),
       diagnose_aar = lubridate::year(dato_diag)
     )

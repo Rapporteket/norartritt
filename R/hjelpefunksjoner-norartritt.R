@@ -137,15 +137,40 @@ legg_til_medisinnavn = function(d) {
     arrange(legemiddel_navn, generisk_kode) |>
     fill(generisk_kode, .direction = "down") |>
     mutate(legemiddel_navn_kode = coalesce(generisk_kode, LegemiddelType)) |>
-    select(-generisk_kode) |>
+    select(-c(generisk_kode, Legemiddel_kobling, LegemiddelType_kobling)) |>
     filter(LegemiddelType != 999)
 }
 
 
-legg_til_medisintype = function() {
-  #FIXME - Legge til gruppering av medisiner i ulike kategorier.
-  # Tester som fanger opp medisiner som ikke er i metaliste.
+#' Legg til medisintype
+#'
+#' @description
+#' Henter legemiddeltype-gruppering fra intern tabell. Denne tabellen inneholder
+#' informasjon om hvilke av legemiddlene som er biologiske, dmards, csdmards,
+#' tsdmards, og samlekategori biologiske_eller_tsdmard.
+#'
+#' Kjøres som del av datavask-funksjon for NorArtritt.
+#'
+#' @param d Medisindatasett fra norartritt.
+#'
+#' @returns Returnerer opprinnelig datasett med følgende variabler koblet på
+#' * \strong{biokat} 1 hvis legemiddel er biologisk, 0 ellers.
+#' * \strong{dmard} 1 hvis legemiddel er dmard, 0 ellers.
+#' * \strong{csdmard} 1 hvis legemiddel er csdmard, 0 ellers.
+#' * \strong{tsdmard} 1 hvis legemiddel er tsdmard,  0 ellers.
+#' * \strong{bio_og_tsdmard} 1 hvis legemiddel er biologisk/tsdmard, 0 ellers.
+#'
+#' @export
+#'
+#' @keywords internal
+legg_til_medisintype = function(d) {
+
+  d |> left_join(norartritt::medisinkobling |>
+                   select(legemiddel_navn_kode, biokat, dmard, csdmard, tsdmard, bio_og_tsdmard) |>
+                   distinct(, .keep_all = TRUE),
+                 by = "legemiddel_navn_kode")
 }
+
 #' Legg til sykehusnavn
 #'
 #' Kobler på sykehusnavn for bruk i analyser og rapporter.
