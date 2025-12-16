@@ -129,7 +129,7 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel, diagnosek
       ),
       by = "PasientGUID"
     ) |>
-    mutate(ki_krit_nevner = diaggrupper_med %in% diagnosekoder &
+    mutate(ki_krit_nevner = diaggrupper_rem %in% diagnosekoder &
       diag_stilt_aar <= aarstall &
       (year(DeathDate) >= aarstall | is.na(DeathDate)))
 
