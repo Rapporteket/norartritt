@@ -770,7 +770,8 @@ konverter_missing_til_na = function(d) {
     "Utendors", "Vaske", "Boye", "Skru", "KommeInn",
     "Rand12Q01", "Rand12Q02", "Rand12Q03", "Rand12Q04",
     "Rand12Q05", "Rand12Q06", "Rand12Q07", "Rand12Q08",
-    "Rand12Q09", "Rand12Q10", "Rand12Q11", "Rand12Q12"
+    "Rand12Q09", "Rand12Q10", "Rand12Q11", "Rand12Q12",
+    "PasientSmerter"
   )
 
 
