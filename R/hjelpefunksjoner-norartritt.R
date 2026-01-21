@@ -166,7 +166,8 @@ legg_til_medisinnavn = function(d) {
 legg_til_medisintype = function(d) {
 
   d |> left_join(norartritt::medisinkobling |>
-                   select(legemiddel_navn_kode, biokat, dmard, csdmard, tsdmard, bio_og_tsdmard) |>
+                   select(legemiddel_navn_kode, biokat, dmard, csdmard, tsdmard,
+                          bio_og_tsdmard, legemiddel_gruppert, legemiddel_gruppert_navn) |>
                    distinct(, .keep_all = TRUE),
                  by = "legemiddel_navn_kode")
 }
