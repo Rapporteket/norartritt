@@ -200,7 +200,7 @@ medisinkobling = tibble::tribble(
   73L,                       "Guselkumab",                   73L,      1L,     1L,       0L,       0L,              1L,                  73L,                       "Guselkumab",
   74L,                      "Bimekizumab",                   74L,      1L,     1L,       0L,       0L,              1L,                  74L,                      "Bimekizumab",
   75L,               "Certolizumab pegol",                   75L,      1L,     1L,       0L,       0L,              1L,                  75L,               "Certolizumab pegol",
-  76L,                       "Etanercept",                   76L,      1L,     1L,       0L,       0L,              1L,                  76L,                       "Etanercept",
+  76L,                       "Etanercept",                   76L,      1L,     1L,       0L,       0L,              1L,                  76L,                       "etanercept",
   77L,             "Tocilizumab Subkutan",                   77L,      1L,     1L,       0L,       0L,              1L,                  52L,             "Tocilizumab Subkutan",
   78L,            "Cyclofosfamid Peroral",                   78L,      0L,     1L,       0L,       0L,              0L,                  64L,            "Cyclofosfamid Peroral",
   999L,                "Annet (importert)",                  999L,      0L,     0L,       0L,       0L,              0L,                 999L,                "Annet (importert)",
