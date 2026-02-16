@@ -52,8 +52,9 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
       relationship = "one-to-one"
     ) |>
     left_join(select(d_medisin,
-        PasientGUID, StartDato, SluttDato,
-        legemiddel_navn, legemiddel_navn_kode, dmard
+        PasientGUID, StartDato, SluttDato, dmard,
+        legemiddel_navn, legemiddel_navn_kode,
+        legemiddel_gruppert, legemiddel_gruppert_navn
       ),
       by = "PasientGUID",
       relationship = "one-to-many"
@@ -124,8 +125,8 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel, diagnosek
   d_ki = d_diagnose |>
     left_join(select(d_medisin,
         PasientGUID, StartDato,
-        SluttDato, startaar, sluttaar, legemiddel_navn,
-        legemiddel_navn_kode
+        SluttDato, startaar, sluttaar,
+        legemiddel_gruppert, legemiddel_gruppert_navn
       ),
       by = "PasientGUID"
     ) |>
@@ -136,8 +137,8 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel, diagnosek
   d_ki_med_krit = d_ki |>
     filter(ki_krit_nevner) |>
     mutate(ki_krit_teller = ki_krit_nevner &
-      legemiddel_navn_kode %in% legemiddel &
-      !is.na(legemiddel_navn_kode) &
+        legemiddel_gruppert %in% legemiddel &
+      !is.na(legemiddel_gruppert) &
       !is.na(startaar) &
       startaar <= aarstall &
       (sluttaar >= aarstall | is.na(SluttDato))) |>
@@ -747,3 +748,4 @@ ki_asdas = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
 
   d_ki_asdas
 }
+
