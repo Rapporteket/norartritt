@@ -578,8 +578,9 @@ fjern_uaktuelle_diagnoser = function(diag) {
   )
   uakt_koder = c(
     "M130", "M131", "M138", "M139",
-    "M080", "M081", "M083", "M088"
-  ) # Polyartritt
+    "M080", "M081", "M083", "M088",
+    "M673", "M008", "M23", "M233"
+  )
 
   # Fjerner diagnoseskjema for pasienter som mangler andre diagnoser enn de overnevnte
   diag = filter(diag, !Navn %in% !!uakt_diag, !Kode %in% !!uakt_koder)
