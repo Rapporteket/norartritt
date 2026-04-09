@@ -181,12 +181,12 @@ medisinkobling = tibble::tribble(
                                54L,                       "Leflunomid",                   54L,      0L,     1L,       1L,       0L,              0L,                  54L,              "leflunomid",
                                55L,              "Mycofenolat mofetil",                   55L,      0L,     1L,       1L,       0L,              0L,                  55L,     "mycofenolat mofetil",
                                56L,                          "Folsyre",                   56L,      0L,     0L,       0L,       0L,              0L,                  56L,                 "folsyre",
-                               57L,                      "Azathioprin",                   57L,      0L,     1L,       1L,       0L,              0L,                  57L,             "azathioprin",
+                               57L,                      "Azathioprin",                   57L,      0L,     1L,       1L,       0L,              0L,                  18L,             "azathioprin",
                                58L,                          "Lodotra",                   58L,      0L,     0L,       0L,       0L,              0L,                  58L,                 "lodotra",
                                59L,                     "Methotrexate",                   59L,      0L,     1L,       1L,       0L,              0L,                  59L,            "methotrexate",
                                60L,                 "Hydroksyklorokin",                   60L,      0L,     1L,       1L,       0L,              0L,                  60L,        "hydroksyklorokin",
                                61L,                      "Prednisolon",                   61L,      0L,     0L,       0L,       0L,              0L,                  61L,             "prednisolon",
-                               62L,                     "Sulfasalazin",                   62L,      0L,     1L,       1L,       0L,              0L,                  62L,            "sulfasalazin",
+                               62L,                     "Sulfasalazin",                   62L,      0L,     1L,       1L,       0L,              0L,                  24L,            "sulfasalazin",
                                63L,                    "Cyclosporin A",                   63L,      0L,     1L,       1L,       0L,              0L,                  63L,           "cyclosporin A",
                                64L,                    "Cyclofosfamid",                   64L,      0L,     1L,       0L,       0L,              0L,                  64L,           "cyclofosfamid",
                                65L,                      "Ustekinumab",                   65L,      1L,     1L,       0L,       0L,              1L,                  65L,             "ustekinumab",
@@ -203,8 +203,10 @@ medisinkobling = tibble::tribble(
                                76L,                       "Etanercept",                   76L,      1L,     1L,       0L,       0L,              1L,                  76L,              "etanercept",
                                77L,             "Tocilizumab Subkutan",                   77L,      1L,     1L,       0L,       0L,              1L,                  52L,    "tocilizumab subkutan",
                                78L,            "Cyclofosfamid Peroral",                   78L,      0L,     1L,       0L,       0L,              0L,                  64L,   "cyclofosfamid peroral",
-                              999L,                "Annet (importert)",                  999L,      0L,     0L,       0L,       0L,              0L,                 999L,       "annet (importert)"
+                              999L,                "Annet (importert)",                  999L,      0L,     0L,       0L,       0L,              0L,                 999L,       "annet (importert)",
+                                NA,                    "Ingen Medisin",                   99L,      0L,     0L,       0L,       0L,              0L,                  99L,           "Ingen medisin"
                    )
+
 
 
 
