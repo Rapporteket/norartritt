@@ -178,7 +178,7 @@ medisinkobling = tibble::tribble(
                                51L,                        "Abatacept",                   51L,      1L,     1L,       0L,       0L,              1L,                  51L,               "abatacept",
                                52L,                      "Tocilizumab",                   52L,      1L,     1L,       0L,       0L,              1L,                  52L,             "tocilizumab",
                                53L,                        "Golimumab",                   53L,      1L,     1L,       0L,       0L,              1L,                  53L,               "golimumab",
-                               54L,                       "Leflunomid",                   54L,      0L,     1L,       1L,       0L,              0L,                  54L,              "leflunomid",
+                               54L,                       "Leflunomid",                   54L,      0L,     1L,       1L,       0L,              0L,                  15L,              "leflunomid",
                                55L,              "Mycofenolat mofetil",                   55L,      0L,     1L,       1L,       0L,              0L,                  55L,     "mycofenolat mofetil",
                                56L,                          "Folsyre",                   56L,      0L,     0L,       0L,       0L,              0L,                  56L,                 "folsyre",
                                57L,                      "Azathioprin",                   57L,      0L,     1L,       1L,       0L,              0L,                  18L,             "azathioprin",
@@ -206,6 +206,7 @@ medisinkobling = tibble::tribble(
                               999L,                "Annet (importert)",                  999L,      0L,     0L,       0L,       0L,              0L,                 999L,       "annet (importert)",
                                 NA,                    "Ingen Medisin",                   99L,      0L,     0L,       0L,       0L,              0L,                  99L,           "Ingen medisin"
                    )
+
 
 
 
