@@ -11,5 +11,10 @@ Diverse funksjoner for håndtering, analyse og rapportering av data for det medi
 \author{
 \strong{Maintainer}: Endre Kvåle Evjen \email{endre.kvale.evjen@helse-bergen.no}
 
+Authors:
+\itemize{
+  \item Endre Kvåle Evjen \email{endre.kvale.evjen@helse-bergen.no}
+}
+
 }
 \keyword{internal}
