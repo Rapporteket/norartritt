@@ -17,7 +17,7 @@ med datonavn (format: \code{ÅÅÅÅ-MM-DD}). Hvis \code{NULL} (standard), blir
 grunnmappe_norartritt brukt.}
 
 \item{dato}{Datoen for den aktuelle datadumpen (enten tekst på formatet \code{ÅÅÅÅ-MM-DD}
-eller et \link[base:Dates]{base::Date}-objekt). Brukes for å velge riktig undermappe i
+eller et \link[base:Date]{base::Date}-objekt). Brukes for å velge riktig undermappe i
 \code{mappe_dd}. Hvis \code{NULL} (standard), brukes siste dato i \code{mappe_dd}.}
 
 \item{versjon}{Versjon av data som skal lastes ned. Standard er \code{MRS-PROD}.
