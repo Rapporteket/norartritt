@@ -188,8 +188,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
         DeathDate > SluttDato ~ SluttDato,
         TRUE ~ SluttDato
       ),
-      startaar = lubridate::year(StartDato),
-      sluttaar = lubridate::year(SluttDato)
+      startaar = year(StartDato),
+      sluttaar = year(SluttDato)
     ) |>
     filter(
       StartDato < DeathDate | is.na(DeathDate),
@@ -257,7 +257,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
       bio_og_tsdmard = ifelse(is.na(LegemiddelType), yes = 0L,
         no = bio_og_tsdmard
       ),
-      diagnose_aar = lubridate::year(dato_diag)
+      diagnose_aar = year(dato_diag)
     )
 
   d_inkl_oppf = bind_rows(d_inkl, d_oppf)
