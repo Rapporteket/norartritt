@@ -4,6 +4,7 @@ export(appServer)
 export(appUi)
 export(fjern_uaktuelle_diagnoser)
 export(fjern_ugyldige_skjema)
+export(hent_skjema)
 export(ki_asdas)
 export(ki_dapsa)
 export(ki_kontroll)
@@ -38,19 +39,31 @@ importFrom(dplyr,
   distinct,
   filter,
   group_by,
+  last,
   left_join,
   mutate,
   n_distinct,
   pull,
   right_join,
+  row_number,
   select,
   slice,
   summarise,
   ungroup
 )
 importFrom(lubridate,
+  as.difftime,
   as_date,
   days,
   year,
   ymd
 )
+importFrom(rapwhale,
+  les_dd_mrs,
+  les_kb_mrs
+)
+importFrom(stringr,
+  str_c,
+  str_detect
+)
+importFrom(tibble,tibble)
