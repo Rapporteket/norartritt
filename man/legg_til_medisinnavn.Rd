@@ -63,7 +63,7 @@ d_medisin_med_navn = legg_til_medisinnavn(d_medisin)
 Legg til medisinnavn
 
 
-d_medisin_raa = tibble::tibble(ATC = c("L04AB04", "L04AB04", "L04AX03"),
+d_medisin_raa = tibble(ATC = c("L04AB04", "L04AB04", "L04AX03"),
                                LegemiddelType = c(46, 999, 59),
                                Legemiddel = c("AdalimumabGenerisk", "ImportertAnnet", "MethotrexateGenerisk"))
 

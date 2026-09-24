@@ -20,3 +20,24 @@ Lager et base-uttrekk for pasienter som skal inkluderes i indikatorer for
 RA-pasienter.
 Ytterligere skjema må kobles på for den enkelte indikator.
 }
+\examples{
+
+d_diag = tibble(
+PasientGUID = c("1","2","3"),
+dato_diag = as.Date(c("2014-01-01", "2015-02-02", "2016-03-03")),
+diag_stilt_aar = c(2014, 2015, 2016),
+diaggrupper_med = c(2L, 1L, 1L),
+Kode = c("L405", "M059", "M059"),
+Navn = c("Psoriasisartritt", "Seropositiv revmatoid artritt", "Seropositiv revmatoid artritt"),
+dager_diag_til_datadump = c(4383, 4018, 3653)
+)
+
+d_inkl = tibble(
+PasientGUID = c("1", "2", "3"),
+UnitId = c(110629, 4210041, 102977),
+InklusjonDato = as.Date(c("2014-01-10", "2015-02-10", "2016-03-10")),
+DeathDate = as.Datetime(c("2026-01-22 01:00:00", "2026-02-10 01:00:00", "2025-10-06 00:00:00"), format = "\%Y-\%m-\%d \%H:\%M:\%OS")
+)
+
+d_ra_ind = lag_ra_indikator_base(d_diag, d_inkl)
+}

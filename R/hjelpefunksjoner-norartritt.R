@@ -47,12 +47,12 @@
 #   # Sjekk at alle LegemiddelTyper i datasettet finnes i medisinkobling
 #   na_legemiddel_navn = d_medisin |>
 #     filter(!LegemiddelType %in% norartritt::medisinkobling$LegemiddelType) |>
-#     dplyr::pull(LegemiddelType)
+#     pull(LegemiddelType)
 #
 #   if (length(na_legemiddel_navn) > 0) {
 #     stop(
 #       "LegemiddelType ",
-#       stringr::str_c(unique(na_legemiddel_navn), collapse = ", "),
+#       str_c(unique(na_legemiddel_navn), collapse = ", "),
 #       " er ikke definert i medisinkodeboken"
 #     )
 #   }
@@ -104,7 +104,7 @@
 #'
 #' @examples
 #'
-#' d_medisin_raa = tibble::tibble(ATC = c("L04AB04", "L04AB04", "L04AX03"),
+#' d_medisin_raa = tibble(ATC = c("L04AB04", "L04AB04", "L04AX03"),
 #'                                LegemiddelType = c(46, 999, 59),
 #'                                Legemiddel = c("AdalimumabGenerisk", "ImportertAnnet", "MethotrexateGenerisk"))
 #'
@@ -217,7 +217,7 @@ legg_til_sykehusnavn = function(d) {
         filter(is.na(sykehusnavn)) |>
         distinct(UnitId) |>
         pull(UnitId) |>
-        stringr::str_c(collapse = ", ")
+        str_c(collapse = ", ")
     )
   }
   d
@@ -286,7 +286,7 @@ legg_til_diagnosegrupper = function(d) {
   if (length(ukjent_kode) > 0) {
     stop(
       "Kode: ",
-      stringr::str_c(ukjent_kode, collapse = ", "),
+      str_c(ukjent_kode, collapse = ", "),
       " finnes ikke i diagnosekodebok"
     )
   }
@@ -417,7 +417,7 @@ valider_legemiddeltype = function(mappe_dd) {
   legemiddel_feil = setdiff(kb_legemiddel_type, medisin_uttrekk)
 
   if (nrow(legemiddel_feil) > 0) {
-    stop(stringr::str_c("Det er ikke samsvar mellom legemiddelnavn i kodebok og vår medisinfil
+    stop(str_c("Det er ikke samsvar mellom legemiddelnavn i kodebok og vår medisinfil
          for legemiddeltype: ", legemiddel_feil$verdi, collapse = ", "))
   }
 }
