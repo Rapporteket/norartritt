@@ -8,32 +8,8 @@ legg_til_medisinnavn(d)
 }
 \arguments{
 \item{d}{Medisindatasett fra NorArtritt.}
-
-\item{d_medisin}{medisindata fra NorArtritt.
-Må inneholde kolonnen LegemiddelType.}
 }
 \value{
-Returnerer opprinnelig datasett i tillegg til ekstra informasjon om
-de ulike medisinene som registreres. Nye variabler som legges til er:
-\itemize{
-\item \strong{legemiddel_navn}	Navn på formatet \code{legemiddelnavn (virkestoff)}.
-\item \strong{legemiddel_navn_kode}	Heltallskode for gruppering av legemiddel_navn.
-\item \strong{biokat}	Indikator for om legemiddel er biologisk. Tar verdien 0 eller 1.
-\item \strong{dmard}	Indikator for om legemiddel er dmard
-(disease modifying antirheumatic drugs). Tar verdien 0 eller 1.
-\item \strong{csdmard}	Indikator for om legemiddel er csdmard
-(conventional synthetic disease modifying antirheumatic drugs).
-Tar verdien 0 eller 1.
-\item \strong{tsdmard}	Indikator for om legemiddel er tsdmard (targeted synthetic disease modifying antirheumatic drugs). Tar verdien 0 eller 1.
-\item \strong{bio_og_tsdmard}	Indikator for om legemiddel er enten biologisk eller tsdmard.
-Tar verdien 0 eller 1.
-\item \strong{legemiddel_gruppert} Heltallskode for gruppering av enkelte legemidler.
-\item \strong{legemiddel_gruppert_navn}	Navn for legemiddel som brukes i de tilfeller
-hvor legemiddel er gruppert. For eksempel slås alle de ulike medisinene med
-virkestoff infliximab sammen til en gruppe.
-\item \strong{Virkestoffnavn} Navn på virkestoff alene.
-}
-
 Returnerer opprinnelig datasett med ekstra kolonner legemiddel_navn og
 legemiddel_navn_kode som er vasket slik det er nevnt i beskrivelsen over.
 }
@@ -42,26 +18,7 @@ Funksjon som grupperer legemiddel som har flere LegemiddelTyper og fjerner
 'generisk' fra navn. Kobler også legemiddel som ikke importeres riktig ved
 å bruke ATC kode og matche med eksisterende ATC-koder for kjente legemiddel.
 }
-\details{
-Kobler på legemiddelnavn og ekstra informasjon om medisiner registrert
-i NorArtritt til medisindata.
-
-På grunn av måten data overføres fra GoTreatIt til registeret er det
-enkelte medisiner som mangler navn og kode ved innlesning. Disse blir
-registrert med LegemiddelType 999. Denne funksjonen løser opp disse
-medisinene og fordeler dem til egne koder for hver medisin.
-
-Det finnes to csv-filer som leses inn fra NorArtritt sin kvalitetsserver.
-En kodebok for alle legemiddel og en for legemiddel kodet
-som LegemiddelType 999. Ved endringer i hvilke medisiner som registreres
-er det her vi må oppdatere for å få det inn i analysene.
-}
 \examples{
-# d_medisin er medisindata fra NorArtritt.
-
-d_medisin_med_navn = legg_til_medisinnavn(d_medisin)
-Legg til medisinnavn
-
 
 d_medisin_raa = tibble(ATC = c("L04AB04", "L04AB04", "L04AX03"),
                                LegemiddelType = c(46, 999, 59),
