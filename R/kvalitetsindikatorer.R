@@ -266,6 +266,20 @@ ki_sykmod_median = function(d_ra_base, d_med) {
 #' @export
 #'
 #' @examples
+#' d_ra_base = tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' dato_diag = c("2021-01-01", "2022-02-02", "2023-03-03"),
+#' dager_diag_til_datadump = c(1826, 1429, 1035),
+#' DeathDate = c(NA, NA, NA),
+#' )
+#'
+#' d_med = tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' StartDato = c("2021-01-10", "2022-02-10", "2023-03-10"),
+#' LegemiddelType = c(1,2,3),
+#' dmard = c(1, 1, 1))
+#'
+#' d_ki_sykmod = ki_sykmod_snitt(d_ra_base, d_med)
 ki_sykmod_snitt = function(d_ra_base, d_med) {
 
   ovre_grense_medisin = 365
@@ -534,8 +548,6 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
 #' Pasienter som ikke har vært til kontroll innen 365 dager fjernes fra
 #' indikatoren. Pasienter som fikk diagnose for under 365 dager siden men som
 #' enda ikke har vært til kontroll fjernes også.
-#' Det gjelder ca. X % av pasientene.
-#'
 #'
 #' @param d_ra_base Forhåndsbehandlet datasett som inkluderer et uttrekk fra
 #' registeret hvor vi har hentet ut pasienter som er aktuelle for de ulike
@@ -553,6 +565,7 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
 #' @export
 #'
 #' @examples
+#' d_kontroll_snitt = ki_kontroll_snitt(d_ra_base, d_inkl_oppf)
 ki_kontroll_snitt = function(d_ra_base, d_inkl_oppf) {
   # Hvis pasienten ikke har vært til kontroll innen 365 dager etter diagnose
   # antar vi at pasienten ikke er aktuell for indikatoren.
