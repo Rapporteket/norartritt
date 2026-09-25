@@ -694,12 +694,42 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
 #'
 #' @param d_inkl Inklusjonsskjema
 #' @param d_diag Diagnoseskjema
+#' @param datadump_dato Dato datadump er tatt ut.
 #'
 #' @return
+#' Returnerer opprinnelig diagnosedatasett med oppdatert dato_diag variabel
+#' avhengig av diagnose og tilgjengelighet av kriteriedato som nevnt over.
+#' Legger også til variablene `diag_stilt_aar` og `dager_diag_til_datadump`.
 #' @export
 #'
 #' @examples
-legg_til_kriteriedatoer = function(d_inkl, d_diag) {
+#' d_inkl = tibble(
+#' PasientGUID = c("1", "2", "3", "4"),
+#' AcrEularKlassifikasjonsKriterier = c(1,2,3,4),
+#' OppfyltacrEularKriterier = c(1, 2, 2, 2),
+#' OppfyltacrEularKriterierDato = as.Date("1991-01-01", NA, NA, NA),
+#' AsasKriterierAksial = c(2, 1, 2, 2),
+#' AsasKriterierAksialDato = c(NA, "2001-01-01", NA, NA),
+#' AsasKriterierPerifer = c(2, 2, 1, 2),
+#' AsasKriterierPeriferDato = c(NA, NA, "2002-01-01", NA),
+#' CasparKriterier = c(2,2,2,1),
+#' CasparKriterierDato = c(NA, NA, NA, "2020-01-01"),
+#' )
+#'
+#' datadump_dato = c("2026-01-01")
+#'
+#' d_diag = tibble(
+#' PasientGUID = c("1", "2", "3", "4"),
+#' diaggrupper_med = c(1, 5, NA, 2),
+#' Kode = c(NA, NA, "M138", NA),
+#' dato_diag = c("2025-01-01", "2025-02-02", "2025-03-03"),
+#' )
+#'
+#' d_diag_kritdato = legg_til_kriteriedatoer(
+#' d_inkl = d_inkl,
+#' d_diag = d_diag,
+#' dato_datadump = dato_datadump)
+legg_til_kriteriedatoer = function(d_inkl, d_diag, datadump_dato = NULL) {
   kriterievariabler = c(
     "AcrEularKlassifikasjonsKriterier",
     "OppfyltacrEularKriterier",
