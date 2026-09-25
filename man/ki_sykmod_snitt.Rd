@@ -50,5 +50,5 @@ StartDato = c("2021-01-10", "2022-02-10", "2023-03-10"),
 LegemiddelType = c(1,2,3),
 dmard = c(1, 1, 1))
 
-d_ki_sykmod = ki_sykmod_median(d_ra_base, d_med)
+d_ki_sykmod = ki_sykmod_snitt(d_ra_base, d_med)
 }
