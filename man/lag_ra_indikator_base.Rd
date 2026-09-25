@@ -21,7 +21,6 @@ RA-pasienter.
 Ytterligere skjema må kobles på for den enkelte indikator.
 }
 \examples{
-
 d_diag = tibble(
 PasientGUID = c("1","2","3"),
 dato_diag = as.Date(c("2014-01-01", "2015-02-02", "2016-03-03")),
