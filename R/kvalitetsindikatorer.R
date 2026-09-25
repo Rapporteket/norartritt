@@ -182,6 +182,20 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel, diagnosek
 #' @export
 #'
 #' @examples
+#' d_ra_base = tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' dato_diag = c("2021-01-01", "2022-02-02", "2023-03-03"),
+#' dager_diag_til_datadump = c(1826, 1429, 1035),
+#' DeathDate = c(NA, NA, NA),
+#' )
+#'
+#' d_med = tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' StartDato = c("2021-01-10", "2022-02-10", "2023-03-10"),
+#' LegemiddelType = c(1,2,3),
+#' dmard = c(1, 1, 1))
+#'
+#' d_ki_sykmod = ki_sykmod_median(d_ra_base, d_med)
 ki_sykmod_median = function(d_ra_base, d_med) {
 
   ovre_grense_medisin = 365
