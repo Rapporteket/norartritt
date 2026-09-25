@@ -31,5 +31,7 @@ kompleksitet fra indikatorfunksjoner til en egen filtreringsfunksjon.
 Pasienter som ikke har vært til kontroll innen 365 dager fjernes fra
 indikatoren. Pasienter som fikk diagnose for under 365 dager siden men som
 enda ikke har vært til kontroll fjernes også.
-Det gjelder ca. X \% av pasientene.
+}
+\examples{
+d_kontroll_snitt = ki_kontroll_snitt(d_ra_base, d_inkl_oppf)
 }
