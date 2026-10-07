@@ -37,16 +37,17 @@ et medisinskjema (hvorpå de inkluderes) eller det går 365 dager fra diagnose
 og de ekskluderes.
 }
 \examples{
-d_ra_base = tibble(
+d_ra_base = tibble::tibble(
 PasientGUID = c("1", "2", "3"),
-dato_diag = c("2021-01-01", "2022-02-02", "2023-03-03"),
+dato_diag = as.Date(c("2021-01-01", "2022-02-02", "2023-03-03")),
 dager_diag_til_datadump = c(1826, 1429, 1035),
+dager_diag_til_inklusjon = c(0, 1, 2),
 DeathDate = c(NA, NA, NA),
 )
 
-d_med = tibble(
+d_med = tibble::tibble(
 PasientGUID = c("1", "2", "3"),
-StartDato = c("2021-01-10", "2022-02-10", "2023-03-10"),
+StartDato = as.Date(c("2021-01-10", "2022-02-10", "2023-03-10")),
 LegemiddelType = c(1,2,3),
 dmard = c(1, 1, 1))
 
