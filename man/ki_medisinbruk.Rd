@@ -34,6 +34,28 @@ Indikatoren viser andelen pasienter som bruker en gitt medisin i løpet av
 et år.
 }
 \examples{
-# d_diag og d_medisin er diagnosedata og medisindata
-d_ki_medisinbruk = ki_medisinbruk(d_diagnose = d_diag, d_medisin = d_medisin, aarstall = 2020, legemiddel = 20, diagnosekoder = 1)
+
+d_diag = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+diaggrupper_rem = c(1, 1, 1),
+diag_stilt_aar = c(2021, 2022, 2023),
+DeathDate = c(NA, NA, NA),
+)
+
+d_medisin = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+StartDato = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+SluttDato = as.Date(c("2021-02-01", "2022-02-01", "2023-02-01")),
+startaar = c(2021, 2022, 2023),
+sluttaar = c(2021, 2022, 2023),
+legemiddel_gruppert = c(20, 20, 20),
+legemiddel_gruppert_navn = c("methotrexate", "methotrexate", "methotrexate")
+)
+
+d_ki_medisinbruk = ki_medisinbruk(
+d_diagnose = d_diag,
+d_medisin = d_medisin,
+aarstall = 2022,
+legemiddel = 20,
+diagnosekoder = 1)
 }

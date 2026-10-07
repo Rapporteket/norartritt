@@ -33,10 +33,25 @@ og hvis en pasient mangler inklusjonsskjema vil det tidligste oppfølgingsskjema
 konverteres til inklusjonsskjema.
 }
 \examples{
-# Leser inn data for NorArtritt
-norartritt::les_data_norartritt()
+
+d_full_Inklusjonskjema = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+FormTypeId = c(1,1,1),
+FormDate = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+SkjemaGUID = c("d", "e", "f"),
+Skjematype = c("Inklusjonskjema", "Inklusjonskjema", "Inklusjonskjema")
+)
+
+d_full_Oppfølgingsskjema = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+FormTypeId = c(2, 2, 2),
+FormDate = as.Date(c("2021-01-10", "2022-01-10", "2023-01-10")),
+SkjemaGUID = c("a", "b", "c"),
+Skjematype = c("Oppfølgingskjema", "Oppfølgingskjema", "Oppfølgingskjema")
+)
+
 d_inkl_full_rettet = konverter_skjematype(
-  inkl = d_full_Inklusjonsskjema,
+  inkl = d_full_Inklusjonskjema,
   oppf = d_full_Oppfølgingsskjema
 )
 }

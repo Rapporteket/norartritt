@@ -35,15 +35,19 @@ importFrom(dplyr,
   arrange,
   bind_rows,
   case_when,
+  coalesce,
   desc,
   distinct,
   filter,
+  first,
   group_by,
+  if_else,
   last,
   left_join,
   mutate,
   n_distinct,
   pull,
+  relocate,
   right_join,
   row_number,
   select,
@@ -64,6 +68,9 @@ importFrom(rapwhale,
 )
 importFrom(stringr,
   str_c,
-  str_detect
+  str_detect,
+  str_remove,
+  str_remove_all
 )
 importFrom(tibble,tibble)
+importFrom(tidyr,fill)

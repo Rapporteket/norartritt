@@ -38,7 +38,9 @@
 #' Inneholder oversikt over dødsdato, hvor tilgjengelig.
 #'
 #' @export
-vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
+vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med, datadump_dato = NULL) {
+
+
   # Legger sammen inklusjon og oppfølging
   d_inkl_oppf = bind_rows(d_inkl, d_oppf)
 
@@ -121,7 +123,8 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
     d_inkl = d_inkl,
     d_oppf = d_oppf,
     d_diag = d_diag,
-    d_med = d_med
+    d_med = d_med,
+    datadump_dato = datadump_dato
   )
 }
 
@@ -149,7 +152,7 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
 #' Returnerer objektene d_med_vasket, d_diag_pers og d_diag_med til det
 #' globale miljøet.
 #' @export
-lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
+lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf, datadump_dato = NULL) {
   # Lager objekt med dødsdato for alle pasienter som har dødd
   d_dodsdato = d_inkl |>
     select(PasientGUID, DeathDate) |>
@@ -174,7 +177,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 
   d_diag = legg_til_kriteriedatoer(
     d_inkl = d_inkl,
-    d_diag = d_diag
+    d_diag = d_diag,
+    datadump_dato = !!datadump_dato
   )
 
   d_med = d_med |>
@@ -289,7 +293,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 #' @export
 #'
 #' @examples
-#' d_diag = tibble(
+#' d_diag = tibble::tibble(
 #' PasientGUID = c("1","2","3"),
 #' dato_diag = as.Date(c("2014-01-01", "2015-02-02", "2016-03-03")),
 #' diag_stilt_aar = c(2014, 2015, 2016),
@@ -299,11 +303,11 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 #' dager_diag_til_datadump = c(4383, 4018, 3653)
 #' )
 #'
-#' d_inkl = tibble(
+#' d_inkl = tibble::tibble(
 #' PasientGUID = c("1", "2", "3"),
 #' UnitId = c(110629, 4210041, 102977),
 #' InklusjonDato = as.Date(c("2014-01-10", "2015-02-10", "2016-03-10")),
-#' DeathDate = as.Datetime(c("2026-01-22 01:00:00", "2026-02-10 01:00:00", "2025-10-06 00:00:00"), format = "%Y-%m-%d %H:%M:%OS")
+#' DeathDate = as.POSIXct(c("2026-01-22 01:00:00", "2026-02-10 01:00:00", "2025-10-06 00:00:00"), format = "%Y-%m-%d %H:%M:%OS")
 #' )
 #'
 #' d_ra_ind = lag_ra_indikator_base(d_diag, d_inkl)

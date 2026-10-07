@@ -47,7 +47,31 @@ For å inkluderes i teller må de da i tillegg ha begynt på sykdomsmodifiserend
 medisin innen 2 uker av diagnosedato.
 }
 \examples{
-# d_inkl, d_diag og d_medisin er henholdsvis
-# inklusjonsdata, diagnosedata og medisindata for NorArtitt.
+
+d_inkl = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+InklusjonDato = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+sykehusnavn = c("Haukeland", "Haukeland", "Haukeland"),
+sykehus_kortnavn = c("HUS", "HUS", "HUS"),
+)
+
+d_diag = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+dato_diag = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+diaggrupper_med = c(1, 1, 1),
+diag_stilt_aar = c(2021, 2022, 2023),
+DeathDate = as.Date(c(NA, NA, NA))
+)
+d_medisin = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+StartDato = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+SluttDato = as.Date(c("2021-02-01", "2022-02-01", "2023-02-01")),
+dmard = c(1, 1, 1),
+legemiddel_navn = c("methotrexate", "methotrexate", "methotrexate"),
+legemiddel_navn_kode = c(20, 20, 20),
+legemiddel_gruppert = c(20, 20, 20),
+legemiddel_gruppert_navn = c("methotrexate", "methotrexate", "methotrexate")
+)
+
 d_ki_sykmod = ki_sykmod(d_inkl, d_diag, d_medisin)
 }
