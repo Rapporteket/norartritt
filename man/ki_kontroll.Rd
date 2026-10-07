@@ -32,7 +32,21 @@ For pasienter som har inklusjonsskjema 7-90 dager etter diagnose regnes
 inklusjonsskjema som første kontroll.
 }
 \examples{
-# d_inkl_oppf er sammenkoblet inklusjons- og oppfølgingsdatasett og
-# d_diag er diagnosedatasett
+d_inkl_oppf = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+InklusjonDato = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+DeathDate = c(NA, NA, NA),
+dato_ktrl = as.Date(c("2021-01-10", "2022-01-10", "2023-01-10")),
+Skjematype = c("Inklusjonskjema", "Inklusjonskjema", "Oppfølgingskjema")
+)
+
+d_diag = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+dato_diag = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+diaggrupper_med = c(1, 1, 1),
+diaggrupper_hoved = c(1, 1, 1),
+diag_stilt_aar = c(2021, 2022, 2023)
+)
+
 d_ki_kontroll = ki_kontroll(d_inkl_oppf, d_diag)
 }
