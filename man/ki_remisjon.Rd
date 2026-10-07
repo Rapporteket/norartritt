@@ -48,6 +48,24 @@ For å inkluderes i teller må også følgende krav være oppfylt for ACR-EULAR:
 }
 }
 \examples{
-# d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
+
+d_diag = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+diaggrupper_med = c(1,1,1),
+dato_diag = as.Date(c("2021-01-01", "2022-02-02", "2023-03-03")),
+diag_stilt_aar = c(2021, 2022, 2023),
+dager_diag_til_datadump = c(1826, 1429, 1035)
+)
+
+d_inkl_oppf = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+dato_ktrl = as.Date(c("2021-01-10", "2022-02-10", "2023-03-10")),
+OmmeLeddAntall = c(1,2,3),
+HovneLeddAntall = c(1,2,3),
+Crp = c(1,2,3),
+PasientGlobalSykdomsaktivitet = c(1,2,3),
+DeathDate = as.Date(c(NA, NA, NA))
+)
+
 d_ki_remisjon = ki_remisjon(d_diag, d_inkl_oppf)
 }

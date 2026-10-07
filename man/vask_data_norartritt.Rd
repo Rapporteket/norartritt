@@ -4,7 +4,7 @@
 \alias{vask_data_norartritt}
 \title{vask data norartritt}
 \usage{
-vask_data_norartritt(d_inkl, d_oppf, d_diag, d_med)
+vask_data_norartritt(d_inkl, d_oppf, d_diag, d_med, datadump_dato = NULL)
 }
 \arguments{
 \item{d_inkl}{Inklusjonsdatasett, vanligvis d_full_Inklusjonsskjema.}
