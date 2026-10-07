@@ -36,8 +36,32 @@
 #' @export
 #'
 #' @examples
-#' # d_inkl, d_diag og d_medisin er henholdsvis
-#' # inklusjonsdata, diagnosedata og medisindata for NorArtitt.
+#'
+#' d_inkl = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' InklusjonDato = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+#' sykehusnavn = c("Haukeland", "Haukeland", "Haukeland"),
+#' sykehus_kortnavn = c("HUS", "HUS", "HUS"),
+#' )
+#'
+#' d_diag = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' dato_diag = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+#' diaggrupper_med = c(1, 1, 1),
+#' diag_stilt_aar = c(2021, 2022, 2023),
+#' DeathDate = as.Date(c(NA, NA, NA))
+#' )
+#' d_medisin = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' StartDato = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+#' SluttDato = as.Date(c("2021-02-01", "2022-02-01", "2023-02-01")),
+#' dmard = c(1, 1, 1),
+#' legemiddel_navn = c("methotrexate", "methotrexate", "methotrexate"),
+#' legemiddel_navn_kode = c(20, 20, 20),
+#' legemiddel_gruppert = c(20, 20, 20),
+#' legemiddel_gruppert_navn = c("methotrexate", "methotrexate", "methotrexate")
+#' )
+#'
 #' d_ki_sykmod = ki_sykmod(d_inkl, d_diag, d_medisin)
 ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
 
@@ -118,8 +142,30 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
 #' @export
 #'
 #' @examples
-#' # d_diag og d_medisin er diagnosedata og medisindata
-#' d_ki_medisinbruk = ki_medisinbruk(d_diagnose = d_diag, d_medisin = d_medisin, aarstall = 2020, legemiddel = 20, diagnosekoder = 1)
+#'
+#' d_diag = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' diaggrupper_rem = c(1, 1, 1),
+#' diag_stilt_aar = c(2021, 2022, 2023),
+#' DeathDate = c(NA, NA, NA),
+#' )
+#'
+#' d_medisin = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' StartDato = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+#' SluttDato = as.Date(c("2021-02-01", "2022-02-01", "2023-02-01")),
+#' startaar = c(2021, 2022, 2023),
+#' sluttaar = c(2021, 2022, 2023),
+#' legemiddel_gruppert = c(20, 20, 20),
+#' legemiddel_gruppert_navn = c("methotrexate", "methotrexate", "methotrexate")
+#' )
+#'
+#' d_ki_medisinbruk = ki_medisinbruk(
+#' d_diagnose = d_diag,
+#' d_medisin = d_medisin,
+#' aarstall = 2022,
+#' legemiddel = 20,
+#' diagnosekoder = 1)
 ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel, diagnosekoder) {
 
   d_ki = d_diagnose |>
@@ -182,16 +228,17 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel, diagnosek
 #' @export
 #'
 #' @examples
-#' d_ra_base = tibble(
+#' d_ra_base = tibble::tibble(
 #' PasientGUID = c("1", "2", "3"),
-#' dato_diag = c("2021-01-01", "2022-02-02", "2023-03-03"),
+#' dato_diag = as.Date(c("2021-01-01", "2022-02-02", "2023-03-03")),
 #' dager_diag_til_datadump = c(1826, 1429, 1035),
+#' dager_diag_til_inklusjon = c(0, 1, 10),
 #' DeathDate = c(NA, NA, NA),
 #' )
 #'
-#' d_med = tibble(
+#' d_med = tibble::tibble(
 #' PasientGUID = c("1", "2", "3"),
-#' StartDato = c("2021-01-10", "2022-02-10", "2023-03-10"),
+#' StartDato = as.Date(c("2021-01-10", "2022-02-10", "2023-03-10")),
 #' LegemiddelType = c(1,2,3),
 #' dmard = c(1, 1, 1))
 #'
@@ -266,16 +313,17 @@ ki_sykmod_median = function(d_ra_base, d_med) {
 #' @export
 #'
 #' @examples
-#' d_ra_base = tibble(
+#' d_ra_base = tibble::tibble(
 #' PasientGUID = c("1", "2", "3"),
-#' dato_diag = c("2021-01-01", "2022-02-02", "2023-03-03"),
+#' dato_diag = as.Date(c("2021-01-01", "2022-02-02", "2023-03-03")),
 #' dager_diag_til_datadump = c(1826, 1429, 1035),
+#' dager_diag_til_inklusjon = c(0, 1, 2),
 #' DeathDate = c(NA, NA, NA),
 #' )
 #'
-#' d_med = tibble(
+#' d_med = tibble::tibble(
 #' PasientGUID = c("1", "2", "3"),
-#' StartDato = c("2021-01-10", "2022-02-10", "2023-03-10"),
+#' StartDato = as.Date(c("2021-01-10", "2022-02-10", "2023-03-10")),
 #' LegemiddelType = c(1,2,3),
 #' dmard = c(1, 1, 1))
 #'
@@ -350,7 +398,25 @@ ki_sykmod_snitt = function(d_ra_base, d_med) {
 #' @export
 #'
 #' @examples
-#' # d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
+#'
+#' d_diag = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' diaggrupper_med = c(1,1,1),
+#' dato_diag = as.Date(c("2021-01-01", "2022-02-02", "2023-03-03")),
+#' diag_stilt_aar = c(2021, 2022, 2023),
+#' dager_diag_til_datadump = c(1826, 1429, 1035)
+#' )
+#'
+#' d_inkl_oppf = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' dato_ktrl = as.Date(c("2021-01-10", "2022-02-10", "2023-03-10")),
+#' OmmeLeddAntall = c(1,2,3),
+#' HovneLeddAntall = c(1,2,3),
+#' Crp = c(1,2,3),
+#' PasientGlobalSykdomsaktivitet = c(1,2,3),
+#' DeathDate = as.Date(c(NA, NA, NA))
+#' )
+#'
 #' d_ki_remisjon = ki_remisjon(d_diag, d_inkl_oppf)
 ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
 
@@ -487,8 +553,22 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
 #' @export
 #'
 #' @examples
-#' # d_inkl_oppf er sammenkoblet inklusjons- og oppfølgingsdatasett og
-#' # d_diag er diagnosedatasett
+#' d_inkl_oppf = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' InklusjonDato = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+#' DeathDate = c(NA, NA, NA),
+#' dato_ktrl = as.Date(c("2021-01-10", "2022-01-10", "2023-01-10")),
+#' Skjematype = c("Inklusjonskjema", "Inklusjonskjema", "Oppfølgingskjema")
+#' )
+#'
+#' d_diag = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' dato_diag = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+#' diaggrupper_med = c(1, 1, 1),
+#' diaggrupper_hoved = c(1, 1, 1),
+#' diag_stilt_aar = c(2021, 2022, 2023)
+#' )
+#'
 #' d_ki_kontroll = ki_kontroll(d_inkl_oppf, d_diag)
 ki_kontroll = function(d_inkl_oppf, d_diag) {
 
@@ -565,6 +645,18 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
 #' @export
 #'
 #' @examples
+#' d_ra_base = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' dato_diag = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+#' DeathDate = c(NA, NA, NA)
+#' )
+#'
+#' d_inkl_oppf = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' Skjematype = c("Inklusjonskjema", "Inklusjonskjema", "Inklusjonskjema"),
+#' dato_ktrl = as.Date(c("2021-01-10", "2022-01-10", "2023-01-10"))
+#' )
+#'
 #' d_kontroll_snitt = ki_kontroll_snitt(d_ra_base, d_inkl_oppf)
 ki_kontroll_snitt = function(d_ra_base, d_inkl_oppf) {
   # Hvis pasienten ikke har vært til kontroll innen 365 dager etter diagnose
@@ -653,7 +745,20 @@ ki_kontroll_snitt = function(d_ra_base, d_inkl_oppf) {
 #' @export
 #'
 #' @examples
-#' # d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
+#' d_diag = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' diaggrupper_rem = c(2, 2, 2),
+#' dato_diag = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+#' diag_stilt_aar = c(2021, 2022, 2023),
+#' dager_diag_til_datadump = c(1826, 1461, 1096)
+#' )
+#'
+#' d_inkl_oppf = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' dato_ktrl = as.Date(c("2021-01-10", "2022-01-10", "2023-01-10")),
+#' DAPSA = c(0.1, 0.2, 0.3),
+#' DeathDate = c(NA, NA, NA),
+#' )
 #' d_ki_dapsa = ki_dapsa(d_diag, d_inkl_oppf)
 ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
 
@@ -734,7 +839,18 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
 #' @export
 #'
 #' @examples
-#' # d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
+#' d_diag = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' diaggrupper_med = c(1, 1, 1),
+#' dato_diag = as.Date(c("2021-01-01", "2021-02-01", "2021-03-01")),
+#' diag_stilt_aar = c(2021, 2021, 2021),
+#' dager_diag_til_datadump = c(1826, 1795, 1767))
+#'
+#' d_inkl_oppf = tibble::tibble(PasientGUID = c("1","2","3"),
+#' dato_ktrl = as.Date(c("2021-01-10", "2021-02-10", "2021-03-10")),
+#' Asdas = c(0.41, 0.42, 0.43),
+#' DeathDate = c(as.Date(NA, NA, NA)))
+#'
 #' d_ki_asdas = ki_asdas(d_diag, d_inkl_oppf)
 ki_asdas = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 485) {
 

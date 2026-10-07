@@ -21,8 +21,10 @@ Disse er ikke av interesse for analyser, og hvis pasientene kun har en av
 disse diagnosene oppfyller de ikke inklusjonskriteriene for registeret.
 }
 \examples{
-# Leser inn data fra NorArtritt
-library(norartritt)
-les_data_norartritt()
+d_full_Diagnoseskjema = tibble::tibble(
+Navn = c("Artrose", "Kondrokalsinose", "Revmatoid Artritt"),
+Kode = c("M130", "M139", "M058")
+)
+
 diagnosedata_filtrert = fjern_uaktuelle_diagnoser(d_full_Diagnoseskjema)
 }

@@ -33,26 +33,26 @@ Kriterie-variabler er som følger:
 Tidligste dato av overnevnte og Dato fra Diagnoseskjema brukes som diagnosedato.
 }
 \examples{
-d_inkl = tibble(
+d_inkl = tibble::tibble(
 PasientGUID = c("1", "2", "3", "4"),
 AcrEularKlassifikasjonsKriterier = c(1,2,3,4),
 OppfyltacrEularKriterier = c(1, 2, 2, 2),
-OppfyltacrEularKriterierDato = as.Date("1991-01-01", NA, NA, NA),
+OppfyltacrEularKriterierDato = as.Date(c("1991-01-01", NA, NA, NA)),
 AsasKriterierAksial = c(2, 1, 2, 2),
-AsasKriterierAksialDato = c(NA, "2001-01-01", NA, NA),
+AsasKriterierAksialDato = as.Date(c(NA, "2001-01-01", NA, NA)),
 AsasKriterierPerifer = c(2, 2, 1, 2),
 AsasKriterierPeriferDato = c(NA, NA, "2002-01-01", NA),
 CasparKriterier = c(2,2,2,1),
-CasparKriterierDato = c(NA, NA, NA, "2020-01-01"),
+CasparKriterierDato = as.Date(c(NA, NA, NA, "2020-01-01"))
 )
 
-datadump_dato = c("2026-01-01")
+datadump_dato = as.Date("2026-01-01")
 
-d_diag = tibble(
+d_diag = tibble::tibble(
 PasientGUID = c("1", "2", "3", "4"),
 diaggrupper_med = c(1, 5, NA, 2),
 Kode = c(NA, NA, "M138", NA),
-dato_diag = c("2025-01-01", "2025-02-02", "2025-03-03"),
+dato_diag = as.Date(c("2025-01-01", "2025-02-02", "2025-03-03", "2025-04-04"))
 )
 
 d_diag_kritdato = legg_til_kriteriedatoer(

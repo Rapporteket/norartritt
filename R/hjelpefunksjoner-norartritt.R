@@ -13,10 +13,10 @@
 #' @export
 #'
 #' @examples
-#'
-#' d_medisin_raa = tibble(ATC = c("L04AB04", "L04AB04", "L04AX03"),
-#'                                LegemiddelType = c(46, 999, 59),
-#'                                Legemiddel = c("AdalimumabGenerisk", "ImportertAnnet", "MethotrexateGenerisk"))
+#' d_medisin_raa = tibble::tibble(
+#' ATC = c("L04AB04", "L04AB04", "L04AX03"),
+#' LegemiddelType = c(46, 999, 59),
+#' Legemiddel = c("AdalimumabGenerisk", "ImportertAnnet", "MethotrexateGenerisk"))
 #'
 #' d_vasket_medisin = legg_til_medisinnavn(d_medisin_raa)
 legg_til_medisinnavn = function(d) {
@@ -177,7 +177,12 @@ legg_til_sykehusnavn = function(d) {
 #'
 #' @export
 #' @examples
-#' # d_diagnose er diagnosedata fra NorArtritt
+#'
+#' d_diagnose = tibble::tibble(
+#' Kode = c("M179", "M058", "M059"),
+#' Navn = c("Diagnose", "RA", "Diagnose 2")
+#' )
+#'
 #' d_med_diagnosedata = legg_til_diagnosegrupper(d_diagnose)
 legg_til_diagnosegrupper = function(d) {
 
@@ -360,10 +365,25 @@ valider_legemiddeltype = function(mappe_dd) {
 #' @export
 #'
 #' @examples
-#' # Leser inn data for NorArtritt
-#' norartritt::les_data_norartritt()
+#'
+#' d_full_Inklusjonskjema = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' FormTypeId = c(1,1,1),
+#' FormDate = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+#' SkjemaGUID = c("d", "e", "f"),
+#' Skjematype = c("Inklusjonskjema", "Inklusjonskjema", "Inklusjonskjema")
+#' )
+#'
+#' d_full_Oppfølgingsskjema = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' FormTypeId = c(2, 2, 2),
+#' FormDate = as.Date(c("2021-01-10", "2022-01-10", "2023-01-10")),
+#' SkjemaGUID = c("a", "b", "c"),
+#' Skjematype = c("Oppfølgingskjema", "Oppfølgingskjema", "Oppfølgingskjema")
+#' )
+#'
 #' d_inkl_full_rettet = konverter_skjematype(
-#'   inkl = d_full_Inklusjonsskjema,
+#'   inkl = d_full_Inklusjonskjema,
 #'   oppf = d_full_Oppfølgingsskjema
 #' )
 konverter_skjematype = function(inkl, oppf) {
@@ -437,10 +457,26 @@ konverter_skjematype = function(inkl, oppf) {
 #' @export
 #'
 #' @examples
-#' # leser inn data for NorArtritt
-#' library(norartritt)
-#' les_data_norartritt()
-#' fjern_ugyldige_skjema(
+#'
+#' d_full_Inklusjonskjema = tibble::tibble(
+#' PasientGUID = c("1", "2", "3")
+#' )
+#'
+#' d_full_Oppfølgingskjema = tibble::tibble(
+#' PasientGUID = c("1", "2", "3")
+#' )
+#'
+#' d_full_Medisineringskjema = tibble::tibble(
+#' PasientGUID = c("1", "2", "3")
+#' )
+#'
+#' d_full_Diagnoseskjema = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' Navn = c("Artrose", "Kondrokalsinose", "Revmatoid Artritt"),
+#' Kode = c("M130", "M139", "M058")
+#' )
+#'
+#' l_skjema = fjern_ugyldige_skjema(
 #'   inkl = d_full_Inklusjonskjema,
 #'   oppf = d_full_Oppfølgingskjema,
 #'   med = d_full_Medisineringskjema,
@@ -475,9 +511,11 @@ fjern_ugyldige_skjema = function(inkl, oppf, med, diag) {
 #' @export
 #'
 #' @examples
-#' # Leser inn data fra NorArtritt
-#' library(norartritt)
-#' les_data_norartritt()
+#' d_full_Diagnoseskjema = tibble::tibble(
+#' Navn = c("Artrose", "Kondrokalsinose", "Revmatoid Artritt"),
+#' Kode = c("M130", "M139", "M058")
+#' )
+#'
 #' diagnosedata_filtrert = fjern_uaktuelle_diagnoser(d_full_Diagnoseskjema)
 fjern_uaktuelle_diagnoser = function(diag) {
   # uaktuelle diagnoser----------
@@ -546,13 +584,29 @@ fjerne_skjema_hjelpefunksjon = function(d_hoved, d_motpart) {
 #'
 #' @examples
 #' # leser inn data for norartritt:
-#' library(norartritt)
-#' les_data_norartritt()
-#' legg_til_datovariabler(
-#'   d_inkl = d_full_Inklusjonsskjema,
-#'   d_oppf = d_full_Oppfølgingsskjema,
-#'   d_med = d_full_Medisinskjema,
-#'   d_diag = d_full_Diagnoseskjema
+#'
+#' d_inkl = tibble::tibble(
+#' InklusjonDato = as.Date(c("2021-01-01", "2021-01-01"))
+#' )
+#'
+#' d_oppf = tibble::tibble(
+#' FormDate = as.Date(c("2021-01-01", "2021-01-01"))
+#' )
+#'
+#' d_med = tibble::tibble(
+#' StartDato = as.Date(c("2021-01-01", "2021-01-01")),
+#' SluttDato = as.Date(c("2021-01-01", "2021-01-01"))
+#' )
+#'
+#' d_diag = tibble::tibble(
+#' FormDate = as.Date(c("2021-01-01", "2021-01-01"))
+#' )
+#'
+#' l_skjema_med_ekstra_datovariabler = legg_til_datovariabler(
+#'   d_inkl = d_inkl,
+#'   d_oppf = d_oppf,
+#'   d_med = d_med,
+#'   d_diag = d_diag
 #' )
 legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
   d_inkl = d_inkl |>
@@ -613,26 +667,26 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
 #' @export
 #'
 #' @examples
-#' d_inkl = tibble(
+#' d_inkl = tibble::tibble(
 #' PasientGUID = c("1", "2", "3", "4"),
 #' AcrEularKlassifikasjonsKriterier = c(1,2,3,4),
 #' OppfyltacrEularKriterier = c(1, 2, 2, 2),
-#' OppfyltacrEularKriterierDato = as.Date("1991-01-01", NA, NA, NA),
+#' OppfyltacrEularKriterierDato = as.Date(c("1991-01-01", NA, NA, NA)),
 #' AsasKriterierAksial = c(2, 1, 2, 2),
-#' AsasKriterierAksialDato = c(NA, "2001-01-01", NA, NA),
+#' AsasKriterierAksialDato = as.Date(c(NA, "2001-01-01", NA, NA)),
 #' AsasKriterierPerifer = c(2, 2, 1, 2),
 #' AsasKriterierPeriferDato = c(NA, NA, "2002-01-01", NA),
 #' CasparKriterier = c(2,2,2,1),
-#' CasparKriterierDato = c(NA, NA, NA, "2020-01-01"),
+#' CasparKriterierDato = as.Date(c(NA, NA, NA, "2020-01-01"))
 #' )
 #'
-#' datadump_dato = c("2026-01-01")
+#' datadump_dato = as.Date("2026-01-01")
 #'
-#' d_diag = tibble(
+#' d_diag = tibble::tibble(
 #' PasientGUID = c("1", "2", "3", "4"),
 #' diaggrupper_med = c(1, 5, NA, 2),
 #' Kode = c(NA, NA, "M138", NA),
-#' dato_diag = c("2025-01-01", "2025-02-02", "2025-03-03"),
+#' dato_diag = as.Date(c("2025-01-01", "2025-02-02", "2025-03-03", "2025-04-04"))
 #' )
 #'
 #' d_diag_kritdato = legg_til_kriteriedatoer(
@@ -700,6 +754,13 @@ legg_til_kriteriedatoer = function(d_inkl, d_diag, datadump_dato = NULL) {
 #' @export
 #'
 #' @examples
+#'
+#' d_inkl = tibble::tibble(
+#'   BASDAI = c(0, 1.2, 3.2),
+#'   Das28 = c(-1, 1.2, 2.2),
+#'   Utendors = c(-1, 4, 6)
+#' )
+#'
 #' d_inkl = konverter_missing_til_na(d_inkl)
 konverter_missing_til_na = function(d) {
   vars_fra_0_real = "BASDAI"
@@ -721,15 +782,15 @@ konverter_missing_til_na = function(d) {
   d = d |>
     mutate(
       across(
-        all_of(vars_fra_0_real),
+        any_of(vars_fra_0_real),
         \(x) replace(x, x == 0, NA_real_)
       ),
       across(
-        all_of(vars_fra_1_real),
+        any_of(vars_fra_1_real),
         \(x) replace(x, x == -1, NA_real_)
       ),
       across(
-        all_of(vars_fra_1_int),
+        any_of(vars_fra_1_int),
         \(x) replace(x, x == -1, NA_integer_)
       )
     )

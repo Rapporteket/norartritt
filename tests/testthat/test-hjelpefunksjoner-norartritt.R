@@ -4,7 +4,8 @@
 test_that("Advarsel hvis data inneholder LegemiddelType som ikke har navn i kodebok", {
   d = tibble(
     LegemiddelType = c(1, 2, 3, 765),
-    Legemiddel = c(NA, NA, NA, NA)
+    Legemiddel = c(rep(NA_character_, 4)),
+    ATC = c("L04AB05", "L04AB01", "L04AB04", NA_character_)
   )
 
   expect_error(

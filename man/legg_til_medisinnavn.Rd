@@ -19,10 +19,10 @@ Funksjon som grupperer legemiddel som har flere LegemiddelTyper og fjerner
 å bruke ATC kode og matche med eksisterende ATC-koder for kjente legemiddel.
 }
 \examples{
-
-d_medisin_raa = tibble(ATC = c("L04AB04", "L04AB04", "L04AX03"),
-                               LegemiddelType = c(46, 999, 59),
-                               Legemiddel = c("AdalimumabGenerisk", "ImportertAnnet", "MethotrexateGenerisk"))
+d_medisin_raa = tibble::tibble(
+ATC = c("L04AB04", "L04AB04", "L04AX03"),
+LegemiddelType = c(46, 999, 59),
+Legemiddel = c("AdalimumabGenerisk", "ImportertAnnet", "MethotrexateGenerisk"))
 
 d_vasket_medisin = legg_til_medisinnavn(d_medisin_raa)
 }

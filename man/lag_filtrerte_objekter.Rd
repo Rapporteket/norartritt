@@ -4,7 +4,7 @@
 \alias{lag_filtrerte_objekter}
 \title{Lag filtrerte objekter}
 \usage{
-lag_filtrerte_objekter(d_inkl, d_diag, d_med, d_oppf)
+lag_filtrerte_objekter(d_inkl, d_diag, d_med, d_oppf, datadump_dato = NULL)
 }
 \arguments{
 \item{d_inkl}{Inklusjonsdatasett fra NorArtritt}
