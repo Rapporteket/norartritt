@@ -490,8 +490,22 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
 #' @export
 #'
 #' @examples
-#' # d_diag og d_inkl_oppf er diagnose og sammenslått
-#' # inklusjon og oppfølgingsdatasett
+#' d_diag = tibble::tibble(
+#' PasientGUID = c(1, 2, 3),
+#' diaggrupper_med = c(1, 1, 1),
+#' dato_diag = as.Date(c("2022-01-01", "2023-01-01", "2024-01-01")),
+#' diag_stilt_aar = c(2022, 2023, 2024),
+#' dager_diag_til_datadump = c(1461, 1096, 731),
+#' )
+#'
+#' d_inkl_oppf = tibble::tibble(
+#' PasientGUID = c(1, 2, 3),
+#' OmmeLeddAntall = c(10, 20, 25),
+#' HovneLeddAntall = c(5, 8, 14),
+#' Crp = c(10, 20, 30),
+#' PasientGlobalSykdomsaktivitet = c(8, 12, 14),
+#' )
+#'
 #' d_remisjon_totalt = remisjon_totalt(d_diag, d_inkl_oppf)
 remisjon_totalt = function(d_diag, d_inkl_oppf) {
 

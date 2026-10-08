@@ -20,7 +20,8 @@ Imports:
     rapwhale,
     readr,
     stringr, 
-    tibble
+    tibble, 
+    tidyr
 Remotes:
     Rapporteket/rapwhale
 Suggests: 

@@ -19,7 +19,9 @@ fra de som per nå er kodet som LegemiddelType = 999 vil denne funksjonen
 stanse innlesningen av medisinskjema og gi returnere en feilmelding.
 }
 \examples{
+\dontrun{
 # mappe_dd er plassering for kodebok som skal sjekkes.
 
 valider_legemiddeltype(mappe_dd)
+}
 }

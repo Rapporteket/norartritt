@@ -113,7 +113,8 @@ legg_til_medisintype = function(d) {
 #'
 #' @export
 #' @examples
-#' # d er datasett fra NorArtritt som inneholder variabelen UnitId
+#' d = tibble::tibble(
+#' UnitId = c(110629, 104579))
 #'
 #' d_med_sykehusnavn = legg_til_sykehusnavn(d)
 legg_til_sykehusnavn = function(d) {
@@ -278,7 +279,12 @@ legg_til_diagnosegrupper = function(d) {
 #' @export
 #'
 #' @examples
-#' # d_inkl_oppf er sammenslått datasett med inklusjons- og oppfølgingsskjema
+#'
+#' d_inkl_oppf = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' InklusjonDato = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01"))
+#' )
+#'
 #' d_inkl_oppf_dato = velg_tidligste_inklusjondato(d_inkl_oppf)
 velg_tidligste_inklusjondato = function(d_inkl_oppf, pas_id = PasientGUID) {
   min_na = function(x) {
@@ -313,9 +319,11 @@ velg_tidligste_inklusjondato = function(d_inkl_oppf, pas_id = PasientGUID) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # mappe_dd er plassering for kodebok som skal sjekkes.
 #'
 #' valider_legemiddeltype(mappe_dd)
+#' }
 valider_legemiddeltype = function(mappe_dd) {
   kb = les_kb_mrs(mappe_dd)
 
@@ -693,7 +701,7 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
 #' d_diag_kritdato = legg_til_kriteriedatoer(
 #' d_inkl = d_inkl,
 #' d_diag = d_diag,
-#' dato_datadump = dato_datadump)
+#' datadump_dato = datadump_dato)
 legg_til_kriteriedatoer = function(d_inkl, d_diag, datadump_dato = NULL) {
   kriterievariabler = c(
     "AcrEularKlassifikasjonsKriterier",
