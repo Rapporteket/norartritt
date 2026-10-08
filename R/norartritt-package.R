@@ -38,6 +38,7 @@
 #' @importFrom stringr str_detect
 #' @importFrom stringr str_remove
 #' @importFrom stringr str_remove_all
+#' @importFrom tibble as_tibble
 #' @importFrom tibble tibble
 #' @importFrom tidyr fill
 ## usethis namespace: end
