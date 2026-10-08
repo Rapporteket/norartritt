@@ -31,6 +31,7 @@ export(valider_legemiddeltype)
 export(vask_data_norartritt)
 export(velg_tidligste_inklusjondato)
 importFrom(dplyr,
+  across,
   add_count,
   arrange,
   bind_rows,
@@ -49,6 +50,7 @@ importFrom(dplyr,
   n_distinct,
   pull,
   relocate,
+  rename,
   right_join,
   row_number,
   select,
@@ -61,12 +63,44 @@ importFrom(lubridate,
   as_date,
   days,
   year,
+  years,
   ymd
 )
-importFrom(rapbase,loadRegData)
+importFrom(rapbase,
+  autoReportFormatInput,
+  autoReportInput,
+  autoReportOrgInput,
+  autoReportUI,
+  exportGuideUI,
+  exportUCInput,
+  loadRegData,
+  navbarWidgetInput,
+  rapTheme,
+  regTitle,
+  renderRmd,
+  statsGuideUI,
+  statsInput,
+  statsUI
+)
 importFrom(rapwhale,
   les_dd_mrs,
   les_kb_mrs
+)
+importFrom(shiny,
+  dateRangeInput,
+  downloadButton,
+  htmlOutput,
+  mainPanel,
+  navbarMenu,
+  navbarPage,
+  radioButtons,
+  reactive,
+  renderUI,
+  sidebarLayout,
+  sidebarPanel,
+  tabPanel,
+  tagList,
+  uiOutput
 )
 importFrom(stringr,
   str_c,
@@ -74,5 +108,12 @@ importFrom(stringr,
   str_remove,
   str_remove_all
 )
-importFrom(tibble,tibble)
-importFrom(tidyr,fill)
+importFrom(tibble,
+  as_tibble,
+  tibble
+)
+importFrom(tidyr,
+  all_of,
+  any_of,
+  fill
+)
