@@ -14,6 +14,8 @@ vask_data_norartritt(d_inkl, d_oppf, d_diag, d_med, datadump_dato = NULL)
 \item{d_diag}{Diagnosedatasett, vanligvis d_full_Diagnoseskjema.}
 
 \item{d_med}{Medisindatasett, vanligvis d_full_Medisineringskjema.}
+
+\item{datadump_dato}{Dato for uttrekk av datadump.}
 }
 \value{
 Returnerer filtrerte og \emph{vaskede} datasett for ulike skjema i NorArtritt.

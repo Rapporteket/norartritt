@@ -649,7 +649,8 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
 #' Diagnoseskjema.
 #' Funksjonen `lag_ra_indikator_base()` kan brukes for å generere datasettet.
 #'
-#' @param d_oppf Datasett med aktuelle oppfølgingsskjema.
+#' @param d_inkl_oppf Datasett med aktuelle inklusjons- og oppfølgingsskjema.
+
 #'
 #' @return
 #' Returnerer et datasett med nødvendige koblingsnøkler.
