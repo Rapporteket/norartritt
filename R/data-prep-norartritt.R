@@ -178,7 +178,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf, datadump_dato =
   d_diag = legg_til_kriteriedatoer(
     d_inkl = d_inkl,
     d_diag = d_diag,
-    datadump_dato = !!datadump_dato
+    datadump_dato = datadump_dato
   )
 
   d_med = d_med |>
