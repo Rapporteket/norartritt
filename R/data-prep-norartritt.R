@@ -12,6 +12,7 @@
 #' @param d_oppf Oppfølgingsdatasett, vanligvis d_full_Oppfølgingsskjema.
 #' @param d_diag Diagnosedatasett, vanligvis d_full_Diagnoseskjema.
 #' @param d_med Medisindatasett, vanligvis d_full_Medisineringskjema.
+#' @param datadump_dato Dato for uttrekk av datadump.
 #'
 #' @return
 #' Returnerer filtrerte og *vaskede* datasett for ulike skjema i NorArtritt.
@@ -147,6 +148,8 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med, datadump_dato = N
 #' @param d_inkl Inklusjonsdatasett fra NorArtritt
 #' @param d_diag Diagnosedatasett fra NorArtritt
 #' @param d_med Medisindatasett fra NorArtritt
+#' @param d_oppf Oppfølgingsskjema fra NorArtritt
+#' @param datadump_dato Dato for datauttrekk
 #'
 #' @return
 #' Returnerer objektene d_med_vasket, d_diag_pers og d_diag_med til det
@@ -307,7 +310,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf, datadump_dato =
 #' PasientGUID = c("1", "2", "3"),
 #' UnitId = c(110629, 4210041, 102977),
 #' InklusjonDato = as.Date(c("2014-01-10", "2015-02-10", "2016-03-10")),
-#' DeathDate = as.POSIXct(c("2026-01-22 01:00:00", "2026-02-10 01:00:00", "2025-10-06 00:00:00"), format = "%Y-%m-%d %H:%M:%OS")
+#' DeathDate = as.POSIXct(c("2026-01-22 01:00:00", "2026-02-10 01:00:00",
+#' "2025-10-06 00:00:00"), format = "%Y-%m-%d %H:%M:%OS")
 #' )
 #'
 #' d_ra_ind = lag_ra_indikator_base(d_diag, d_inkl)

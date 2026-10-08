@@ -35,7 +35,8 @@ d_inkl = tibble::tibble(
 PasientGUID = c("1", "2", "3"),
 UnitId = c(110629, 4210041, 102977),
 InklusjonDato = as.Date(c("2014-01-10", "2015-02-10", "2016-03-10")),
-DeathDate = as.POSIXct(c("2026-01-22 01:00:00", "2026-02-10 01:00:00", "2025-10-06 00:00:00"), format = "\%Y-\%m-\%d \%H:\%M:\%OS")
+DeathDate = as.POSIXct(c("2026-01-22 01:00:00", "2026-02-10 01:00:00",
+"2025-10-06 00:00:00"), format = "\%Y-\%m-\%d \%H:\%M:\%OS")
 )
 
 d_ra_ind = lag_ra_indikator_base(d_diag, d_inkl)

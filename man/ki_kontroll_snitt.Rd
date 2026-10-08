@@ -13,7 +13,7 @@ indikatorene for Revmatoid Artritt. Består av data fra inklusjonsskjema og
 Diagnoseskjema.
 Funksjonen \code{lag_ra_indikator_base()} kan brukes for å generere datasettet.}
 
-\item{d_oppf}{Datasett med aktuelle oppfølgingsskjema.}
+\item{d_inkl_oppf}{Datasett med aktuelle inklusjons- og oppfølgingsskjema.}
 }
 \value{
 Returnerer et datasett med nødvendige koblingsnøkler.
