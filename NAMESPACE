@@ -36,6 +36,7 @@ importFrom(dplyr,
   desc,
   distinct,
   filter,
+  filter_out,
   first,
   group_by,
   if_else,
@@ -59,6 +60,7 @@ importFrom(lubridate,
   year,
   ymd
 )
+importFrom(rapbase,loadRegData)
 importFrom(rapwhale,
   les_dd_mrs,
   les_kb_mrs
