@@ -37,7 +37,8 @@ eller RESH-id'er er det denne tabellen som må oppdateres for å få riktige
 navn i rapporter og analyser.
 }
 \examples{
-# d er datasett fra NorArtritt som inneholder variabelen UnitId
+d = tibble::tibble(
+UnitId = c(110629, 104579))
 
 d_med_sykehusnavn = legg_til_sykehusnavn(d)
 }
