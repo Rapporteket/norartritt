@@ -48,7 +48,8 @@ legg_til_medisinnavn = function(d) {
     fill(generisk_kode, .direction = "down") |>
     mutate(legemiddel_navn_kode = coalesce(generisk_kode, LegemiddelType)) |>
     select(-c(generisk_kode, Legemiddel_kobling, LegemiddelType_kobling)) |>
-    filter(LegemiddelType != 999)
+    filter(LegemiddelType != 999) |>
+    ungroup()
 }
 
 
