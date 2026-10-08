@@ -58,5 +58,5 @@ dato_diag = as.Date(c("2025-01-01", "2025-02-02", "2025-03-03", "2025-04-04"))
 d_diag_kritdato = legg_til_kriteriedatoer(
 d_inkl = d_inkl,
 d_diag = d_diag,
-dato_datadump = dato_datadump)
+datadump_dato = datadump_dato)
 }
