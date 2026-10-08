@@ -19,6 +19,7 @@ Imports:
     lubridate,
     rapbase,
     rapwhale,
+    shiny,
     stringr, 
     tibble, 
     tidyr
