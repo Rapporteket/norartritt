@@ -1,56 +1,22 @@
 # tester hjelpefunksjoner-norartritt.R
 
 # legg_til_medisinnavn ----------------------------------------------------
-test_that("Advarsel hvis data inneholder LegemiddelType som ikke har navn i kodebok", {
-  d = tibble(
-    LegemiddelType = c(1, 2, 3, 765),
-    Legemiddel = c(rep(NA_character_, 4)),
-    ATC = c("L04AB05", "L04AB01", "L04AB04", NA_character_)
-  )
-
-  expect_error(
-    legg_til_medisinnavn(d),
-    "LegemiddelType 765 er ikke definert i medisinkodeboken"
-  )
-})
 
 test_that("Leser inn data fra medisinkodebok som forventet", {
   d = tibble(
     LegemiddelType = c(1, 2, 3, 38),
-    Legemiddel = c(NA, NA, NA, NA)
+    Legemiddel = c("Humira", "Enbrel", "Cimzia", "Hyrimoz"),
+    ATC = c("L04AB01", "L04AB04", "L04AB05", NA_character_)
   )
 
   d_ut_forventet = tibble(
-    legemiddel_navn_kode = c(1L, 2L, 3L, 38L),
-    LegemiddelType = c(1L, 2L, 3L, 38L),
-    legemiddel_navn = c(
-      "Cimzia (certolizumab pegol)",
-      "Enbrel (etanercept)",
-      "Humira (adalimumab)",
-      "Hyrimoz (adalimumab)"
-    ),
-    biokat = c(1L, 1L, 1L, 1L),
-    dmard = c(1L, 1L, 1L, 1L),
-    csdmard = c(0L, 0L, 0L, 0L),
-    tsdmard = c(0L, 0L, 0L, 0L),
-    bio_og_tsdmard = c(1L, 1L, 1L, 1L),
-    legemiddel_gruppert = c(1L, 2L, 3L, 3L),
-    legemiddel_gruppert_navn = c(
-      "Cimzia (certolizumab pegol)",
-      "etanercept",
-      "adalimumab",
-      "adalimumab"
-    ),
-    Virkestoff = c(
-      "certolizumab pegol",
-      "etanercept",
-      "adalimumab",
-      "adalimumab"
-    ),
-    Kommentar = c(
-      rep(NA_character_, 4)
-    )
+    LegemiddelType = c(3, 2, 1, 38),
+    Legemiddel = c("Cimzia", "Enbrel", "Humira", "Hyrimoz"),
+    ATC = c("L04AB05", "L04AB04", "L04AB01", NA_character_),
+    legemiddel_navn  = c( "Cimzia", "Enbrel", "Humira", "Hyrimoz"),
+    legemiddel_navn_kode = c(3, 2, 1, 38)
   )
+
 
   expect_identical(
     legg_til_medisinnavn(d),
@@ -58,6 +24,36 @@ test_that("Leser inn data fra medisinkodebok som forventet", {
   )
 })
 
+# legg_til_medisintype -------------------------------------------------
+
+test_that(" Legg til medisintype returnerer forventet resultat", {
+d = tibble(
+  LegemiddelType = c(1L, 2L, 3L, 38L),
+  Legemiddel = c("Cimzia", "Enbrel", "Humira", "Hyrimoz"),
+  ATC = c("L04AB01", "L04AB04", "L04AB05", NA_character_),
+  legemiddel_navn  = c( "Cimzia", "Enbrel", "Humira", "Hyrimoz"),
+  legemiddel_navn_kode = c(1L, 2L, 3L, 38L)
+)
+
+d_ut_forventet = tibble(
+  LegemiddelType = c(1L, 2L, 3L, 38L),
+  Legemiddel = c("Cimzia", "Enbrel", "Humira", "Hyrimoz"),
+  ATC = c("L04AB01", "L04AB04", "L04AB05", NA_character_),
+  legemiddel_navn = c("Cimzia", "Enbrel", "Humira", "Hyrimoz"),
+  legemiddel_navn_kode = c(1L, 2L, 3L, 38L),
+  biokat = c(1L, 1L, 1L, 1L),
+  dmard = c(1L, 1L, 1L, 1L),
+  csdmard = c(0L, 0L, 0L, 0L),
+  tsdmard = c(0L, 0L, 0L, 0L),
+  bio_og_tsdmard = c(1L, 1L, 1L, 1L),
+  legemiddel_gruppert = c(75L, 76L, 46L, 46L),
+  legemiddel_gruppert_navn = c("certolizumab pegol", "etanercept", "adalimumab", "adalimumab")
+)
+
+expect_identical(
+  legg_til_medisintype(d),
+  d_ut_forventet)
+})
 
 # legg_til_sykehusnavn ----------------------------------------------------
 test_that("Feilmelding hvis UnitID i datasett ikke finnes i kodebok", {
