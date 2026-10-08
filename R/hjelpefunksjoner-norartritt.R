@@ -540,9 +540,7 @@ fjern_uaktuelle_diagnoser = function(diag) {
   )
 
   # Fjerner diagnoseskjema for pasienter som mangler andre diagnoser enn de overnevnte
-  diag = filter(diag, !Navn %in% !!uakt_diag, !Kode %in% !!uakt_koder)
-
-  diag
+  filter_out(diag, Navn %in% !!uakt_diag, Kode %in% !!uakt_koder)
 }
 
 #' Hjelpefunksjon for fjerning av skjema
