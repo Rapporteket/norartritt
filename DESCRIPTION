@@ -17,12 +17,14 @@ Roxygen: list(markdown = TRUE)
 Imports:
     dplyr,
     lubridate,
+    rapbase,
     rapwhale,
     stringr, 
     tibble, 
     tidyr
 Remotes:
-    Rapporteket/rapwhale
+    Rapporteket/rapwhale,
+    Rapporteket/rapbase
 Suggests: 
     testthat (>= 3.0.0),
 Depends:
