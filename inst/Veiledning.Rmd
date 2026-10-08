@@ -1,0 +1,32 @@
+---
+title: 'Veiledning'
+author: ''
+date: '`r format(Sys.time(), "%d. %B %Y")`'
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+# Rapporteket - NorArtritt
+Her vil du finne informasjon og rapporter knyttet til lokale og nasjonale data for NorArtritt. 
+Videre følger en forklaring på hva som finnes på rapporteket og hvordan det kan brukes.
+
+# Rapporter og data
+Her finnes rapportene det er mulig å hente ut fra rapporteket. 
+Etter hvert som nye rapporter lages vil de legges til i 
+nedtrekksmenyen _Rapporter_ øverst på siden. Dersom det er ønskelig å få 
+tilsendt en rapport fast (f.eks. månedlig) kan dette bestilles under 
+fanen _Abonnement_. 
+Datadumper kan hentes ned under fanen _Datadump_. Hvis man er innlogget via 
+lokalt sykehus, vil rapportene generes med lokale data for dette sykehuset. 
+Er man innlogget på det nasjonale registeret brukes nasjonale data.
+
+## Registerets nåværende rapporter
+
+**Rapport 1:** Her kan vi legge til rapporter. 
+
+
+# Nye rapporter
+Dersom det er informasjon som er av interesse å hente ut gjentatte ganger 
+kan det lønne seg å få laget en rapport. 
+
