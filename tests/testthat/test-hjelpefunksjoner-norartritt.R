@@ -309,13 +309,14 @@ test_that("Duplikate inklusjonsskjema konverteres til oppfølging", {
 # fjern_uaktuelle_diagnoser -----------------------------------------------
 test_that("Uaktuelle diagnoser blir filtrert bort som forventet", {
   diagnose_med_uakt = tibble(
-    pas_id = c(1, 2, 3, 4, 5),
+    pas_id = c(1, 2, 3, 4, 5, 6, 7, 8),
     Navn = c(
       "Revmatoid artritt", "Psoriasisartritt",
-      "Artrose", "Polyartritt", "Septisk Artritt"
+      "Artrose", "Polyartritt", "Septisk Artritt", NA_character_, "Revmatoid artritt", "Kondrokalsinose"
     ),
-    Kode = c("M058", "M073", NA_character_, "M130", NA_character_)
+    Kode = c("M058", "M073", NA_character_, "M130", NA_character_, NA_character_, "M130", "M058")
   )
+
   diagnose_med_uakt_ut = tibble(
     pas_id = c(1, 2),
     Navn = c("Revmatoid artritt", "Psoriasisartritt"),
@@ -326,6 +327,7 @@ test_that("Uaktuelle diagnoser blir filtrert bort som forventet", {
     fjern_uaktuelle_diagnoser(diagnose_med_uakt),
     diagnose_med_uakt_ut
   )
+
 })
 
 # fjerne_skjema_hjelpefunksjon --------------------------------------------

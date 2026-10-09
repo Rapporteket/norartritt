@@ -77,8 +77,8 @@ legg_til_medisinnavn = function(d) {
 legg_til_medisintype = function(d) {
 
   d |> left_join(norartritt::medisinkobling |>
-                   select(legemiddel_navn_kode, biokat, dmard, csdmard, tsdmard,
-                          bio_og_tsdmard, legemiddel_gruppert, legemiddel_gruppert_navn) |>
+                   select("legemiddel_navn_kode", "biokat", "dmard", "csdmard", "tsdmard",
+                          "bio_og_tsdmard", "legemiddel_gruppert", "legemiddel_gruppert_navn") |>
                    distinct(, .keep_all = TRUE),
                  by = "legemiddel_navn_kode")
 }
@@ -539,8 +539,8 @@ fjern_uaktuelle_diagnoser = function(diag) {
     "M673", "M008", "M23", "M233"
   )
 
-  # Fjerner diagnoseskjema for pasienter som mangler andre diagnoser enn de overnevnte
-  filter_out(diag, Navn %in% !!uakt_diag, Kode %in% !!uakt_koder)
+# Fjerner diagnoseskjema med uaktuelle diagnosekoder og/eller diagnosenavn
+  filter_out(diag, Navn %in% !!uakt_diag | Kode %in% !!uakt_koder | is.na(Navn) & is.na(Kode))
 }
 
 #' Hjelpefunksjon for fjerning av skjema
