@@ -24,5 +24,12 @@ verdier og manglende besvarelser er kodet som henholdsvis 0 for \code{BASDAI} og
 \code{lag_filtrerte_objekter()} kjøres.
 }
 \examples{
+
+d_inkl = tibble::tibble(
+  BASDAI = c(0, 1.2, 3.2),
+  Das28 = c(-1, 1.2, 2.2),
+  Utendors = c(-1, 4, 6)
+)
+
 d_inkl = konverter_missing_til_na(d_inkl)
 }

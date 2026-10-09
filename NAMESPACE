@@ -4,6 +4,7 @@ export(appServer)
 export(appUi)
 export(fjern_uaktuelle_diagnoser)
 export(fjern_ugyldige_skjema)
+export(hent_skjema)
 export(ki_asdas)
 export(ki_dapsa)
 export(ki_kontroll)
@@ -30,27 +31,89 @@ export(valider_legemiddeltype)
 export(vask_data_norartritt)
 export(velg_tidligste_inklusjondato)
 importFrom(dplyr,
+  across,
   add_count,
   arrange,
   bind_rows,
   case_when,
+  coalesce,
   desc,
   distinct,
   filter,
+  filter_out,
+  first,
   group_by,
+  if_else,
+  last,
   left_join,
   mutate,
   n_distinct,
   pull,
+  relocate,
+  rename,
   right_join,
+  row_number,
   select,
   slice,
   summarise,
   ungroup
 )
 importFrom(lubridate,
+  as.difftime,
   as_date,
   days,
   year,
+  years,
   ymd
+)
+importFrom(rapbase,
+  autoReportFormatInput,
+  autoReportInput,
+  autoReportOrgInput,
+  autoReportUI,
+  exportGuideUI,
+  exportUCInput,
+  loadRegData,
+  navbarWidgetInput,
+  rapTheme,
+  regTitle,
+  renderRmd,
+  statsGuideUI,
+  statsInput,
+  statsUI
+)
+importFrom(rapwhale,
+  les_dd_mrs,
+  les_kb_mrs
+)
+importFrom(shiny,
+  dateRangeInput,
+  downloadButton,
+  htmlOutput,
+  mainPanel,
+  navbarMenu,
+  navbarPage,
+  radioButtons,
+  reactive,
+  renderUI,
+  sidebarLayout,
+  sidebarPanel,
+  tabPanel,
+  tagList,
+  uiOutput
+)
+importFrom(stringr,
+  str_c,
+  str_detect,
+  str_remove,
+  str_remove_all
+)
+importFrom(tibble,
+  as_tibble,
+  tibble
+)
+importFrom(tidyr,
+  all_of,
+  any_of,
+  fill
 )

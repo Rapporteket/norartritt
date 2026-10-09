@@ -43,9 +43,9 @@ les_data_norartritt = function(mappe_dd, dato = NULL, versjon = NULL, omgjevnad 
   if (is.null(dato)) {
     dato = dir(mappe_dd, pattern = "^[0-9]{4}-[0-1][0-9]-[0-9]{2}$", full.names = FALSE) |>
       sort() |>
-      dplyr::last()
+      last()
   }
-  dato = lubridate::as_date(dato)
+  dato = as_date(dato)
 
   if (is.null(versjon)) {
     versjon = "MRS-PROD"
@@ -58,7 +58,7 @@ les_data_norartritt = function(mappe_dd, dato = NULL, versjon = NULL, omgjevnad 
   } else {
     assign("datadump_dato", dato, envir = omgjevnad)
     # les inn kodebok
-    kb = rapwhale::les_kb_mrs(mappe_dd, dato = dato)
+    kb = les_kb_mrs(mappe_dd, dato = dato)
 
     # les inn data
     les_inn_data = function(skjema_id,
@@ -66,11 +66,11 @@ les_data_norartritt = function(mappe_dd, dato = NULL, versjon = NULL, omgjevnad 
                             dato = parent.frame()$dato,
                             versjon = parent.frame()$versjon) {
       # skjekk at skjema finnes i datadump-mappe, hvis ikke hopper vi over den
-      if (any(stringr::str_detect(
+      if (any(str_detect(
         string = list.files(paste0(mappe_dd, "\\", dato, "\\")),
         pattern = skjema_id
       ))) {
-        d = rapwhale::les_dd_mrs(mappe_dd,
+        d = les_dd_mrs(mappe_dd,
           dato = parent.frame()$dato,
           versjon = parent.frame()$versjon,
           skjema_id = skjema_id,

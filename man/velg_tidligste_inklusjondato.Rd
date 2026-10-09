@@ -32,6 +32,11 @@ Hvis en pasient aldri har fått registrert inklusjonsdato returneres NA for
 denne pasienten.
 }
 \examples{
-# d_inkl_oppf er sammenslått datasett med inklusjons- og oppfølgingsskjema
+
+d_inkl_oppf = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+InklusjonDato = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01"))
+)
+
 d_inkl_oppf_dato = velg_tidligste_inklusjondato(d_inkl_oppf)
 }

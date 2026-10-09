@@ -45,6 +45,17 @@ blir bare den kontrollen (som ikke har missing ASDAS-CRP-verdi)
 som er nærmest 365 dager etter diagnose inkludert.
 }
 \examples{
-# d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
+d_diag = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+diaggrupper_med = c(1, 1, 1),
+dato_diag = as.Date(c("2021-01-01", "2021-02-01", "2021-03-01")),
+diag_stilt_aar = c(2021, 2021, 2021),
+dager_diag_til_datadump = c(1826, 1795, 1767))
+
+d_inkl_oppf = tibble::tibble(PasientGUID = c("1","2","3"),
+dato_ktrl = as.Date(c("2021-01-10", "2021-02-10", "2021-03-10")),
+Asdas = c(0.41, 0.42, 0.43),
+DeathDate = c(as.Date(NA, NA, NA)))
+
 d_ki_asdas = ki_asdas(d_diag, d_inkl_oppf)
 }

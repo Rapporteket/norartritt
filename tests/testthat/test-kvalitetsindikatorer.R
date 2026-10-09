@@ -3,17 +3,17 @@
 # ki_dapsa()
 
 test_that("ki_dapsa() gjev ut forventa resultat", {
-  d_diag = tibble::tibble(
+  d_diag = tibble(
     PasientGUID = as.character(1:5),
     diaggrupper_rem = c(2, 2, 2, 2, 1),
     dato_diag = as.Date(
       c("2022-04-05", "2020-01-15", "2018-10-30", "2012-02-24", "2021-05-17")
     ),
-    diag_stilt_aar = lubridate::year(dato_diag),
+    diag_stilt_aar = year(dato_diag),
     dager_diag_til_datadump = as.Date("2022-12-31") - dato_diag
   )
 
-  d_inkl_oppf = tibble::tibble(
+  d_inkl_oppf = tibble(
     PasientGUID = c("1", "2", "2", "3", "4", "5"),
     dato_ktrl = as.Date(
       c(
@@ -25,7 +25,7 @@ test_that("ki_dapsa() gjev ut forventa resultat", {
     DeathDate = c(rep(NA, 6))
   )
 
-  d_forventa = tibble::tibble(
+  d_forventa = tibble(
     PasientGUID = as.character(1:5),
     dato_ktrl = as.Date(
       c(
@@ -39,7 +39,7 @@ test_that("ki_dapsa() gjev ut forventa resultat", {
       c("2022-04-05", "2020-01-15", "2018-10-30", "2012-02-24", "2021-05-17")
     ),
     dager_diag_til_datadump = as.Date("2022-12-31") - dato_diag,
-    diag_stilt_aar = lubridate::year(dato_diag),
+    diag_stilt_aar = year(dato_diag),
     dager_siden_diagnose = dato_ktrl - dato_diag,
     ki_aktuell = c(FALSE, TRUE, FALSE, FALSE, FALSE),
     ki_x = DAPSA
@@ -51,17 +51,17 @@ test_that("ki_dapsa() gjev ut forventa resultat", {
 # ki_asdas()
 
 test_that("ki_asdas() gjev ut forventa resultat", {
-  d_diag = tibble::tibble(
+  d_diag = tibble(
     PasientGUID = as.character(1:5),
     diaggrupper_med = c(5, 5, 5, 5, 1),
     dato_diag = as.Date(
       c("2022-04-05", "2020-01-15", "2018-10-30", "2012-02-24", "2021-05-17")
     ),
-    diag_stilt_aar = lubridate::year(dato_diag),
+    diag_stilt_aar = year(dato_diag),
     dager_diag_til_datadump = as.Date("2022-12-31") - dato_diag
   )
 
-  d_inkl_oppf = tibble::tibble(
+  d_inkl_oppf = tibble(
     PasientGUID = c("1", "2", "2", "3", "4", "5"),
     dato_ktrl = as.Date(
       c(
@@ -73,7 +73,7 @@ test_that("ki_asdas() gjev ut forventa resultat", {
     DeathDate = c(rep(NA, 6))
   )
 
-  d_forventa = tibble::tibble(
+  d_forventa = tibble(
     PasientGUID = as.character(1:5),
     dato_ktrl = as.Date(
       c(
@@ -87,7 +87,7 @@ test_that("ki_asdas() gjev ut forventa resultat", {
       c("2022-04-05", "2020-01-15", "2018-10-30", "2012-02-24", "2021-05-17")
     ),
     dager_diag_til_datadump = as.Date("2022-12-31") - dato_diag,
-    diag_stilt_aar = lubridate::year(dato_diag),
+    diag_stilt_aar = year(dato_diag),
     dager_siden_diagnose = dato_ktrl - dato_diag,
     ki_aktuell = c(FALSE, TRUE, FALSE, FALSE, FALSE),
     ki_x = Asdas
@@ -145,39 +145,39 @@ test_that("Funksjonen gir forventet resultat", {
   # Pasient inkludert før diagnose
   # oppfølging innen 90
   # oppfølging etter 90
-  d_inkl_oppf_test = tibble::tibble(
+  d_inkl_oppf_test = tibble(
     PasientGUID = c("1", "1", "1"),
     Skjematype = c("Inklusjonskjema", "Oppfølgingskjema", "Oppfølgingskjema"),
-    InklusjonDato = c(lubridate::ymd("2024-01-01", "2024-01-01", "2024-01-01")),
-    DeathDate = c(lubridate::ymd(NA, NA, NA)),
-    dato_ktrl = c(lubridate::ymd("2024-01-01", "2024-02-01", "2024-06-01"))
+    InklusjonDato = c(ymd("2024-01-01", "2024-01-01", "2024-01-01")),
+    DeathDate = c(ymd(NA, NA, NA)),
+    dato_ktrl = c(ymd("2024-01-01", "2024-02-01", "2024-06-01"))
   )
 
-  d_diag_test = tibble::tibble(
+  d_diag_test = tibble(
     PasientGUID = "1",
     diaggrupper_med = 1,
     diaggrupper_hoved = 1,
-    dato_diag = lubridate::ymd("2024-01-05"),
+    dato_diag = ymd("2024-01-05"),
     diag_stilt_aar = 2024
   )
 
-  d_ki_kontroll_forventet = tibble::tibble(
+  d_ki_kontroll_forventet = tibble(
     PasientGUID = "1",
     Skjematype = "Inklusjonskjema",
-    InklusjonDato = lubridate::ymd("2024-01-01"),
-    DeathDate = lubridate::ymd(NA),
-    dato_ktrl = lubridate::ymd("2024-01-01"),
+    InklusjonDato = ymd("2024-01-01"),
+    DeathDate = ymd(NA),
+    dato_ktrl = ymd("2024-01-01"),
     diaggrupper_med = 1,
     diaggrupper_hoved = 1,
-    dato_diag = lubridate::ymd("2024-01-05"),
+    dato_diag = ymd("2024-01-05"),
     diag_stilt_aar = 2024,
-    tid_til_inkl = lubridate::as.difftime(-4, units = "days"),
+    tid_til_inkl = as.difftime(-4, units = "days"),
     ki_krit_nevner = FALSE,
-    dager_til_ktrl = lubridate::as.difftime(-4, units = "days"),
+    dager_til_ktrl = as.difftime(-4, units = "days"),
     ki_krit_teller = FALSE
   )
 
-  testthat::expect_identical(ki_kontroll(d_inkl_oppf_test, d_diag_test),
+  expect_identical(ki_kontroll(d_inkl_oppf_test, d_diag_test),
     expected = d_ki_kontroll_forventet
   )
 })

@@ -35,12 +35,28 @@ For medisinskjema legges det til:
 }
 \examples{
 # leser inn data for norartritt:
-library(norartritt)
-les_data_norartritt()
-legg_til_datovariabler(
-  d_inkl = d_full_Inklusjonsskjema,
-  d_oppf = d_full_Oppfølgingsskjema,
-  d_med = d_full_Medisinskjema,
-  d_diag = d_full_Diagnoseskjema
+
+d_inkl = tibble::tibble(
+InklusjonDato = as.Date(c("2021-01-01", "2021-01-01"))
+)
+
+d_oppf = tibble::tibble(
+FormDate = as.Date(c("2021-01-01", "2021-01-01"))
+)
+
+d_med = tibble::tibble(
+StartDato = as.Date(c("2021-01-01", "2021-01-01")),
+SluttDato = as.Date(c("2021-01-01", "2021-01-01"))
+)
+
+d_diag = tibble::tibble(
+FormDate = as.Date(c("2021-01-01", "2021-01-01"))
+)
+
+l_skjema_med_ekstra_datovariabler = legg_til_datovariabler(
+  d_inkl = d_inkl,
+  d_oppf = d_oppf,
+  d_med = d_med,
+  d_diag = d_diag
 )
 }

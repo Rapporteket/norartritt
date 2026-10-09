@@ -4,12 +4,19 @@
 \alias{legg_til_kriteriedatoer}
 \title{Velg tidligste registrerte dato for diagnose}
 \usage{
-legg_til_kriteriedatoer(d_inkl, d_diag)
+legg_til_kriteriedatoer(d_inkl, d_diag, datadump_dato = NULL)
 }
 \arguments{
 \item{d_inkl}{Inklusjonsskjema}
 
 \item{d_diag}{Diagnoseskjema}
+
+\item{datadump_dato}{Dato datadump er tatt ut.}
+}
+\value{
+Returnerer opprinnelig diagnosedatasett med oppdatert dato_diag variabel
+avhengig av diagnose og tilgjengelighet av kriteriedato som nevnt over.
+Legger også til variablene \code{diag_stilt_aar} og \code{dager_diag_til_datadump}.
 }
 \description{
 Det finnes flere ulike kilder for det som kan anses å være en diagnosedato.
@@ -24,4 +31,32 @@ Kriterie-variabler er som følger:
 \code{Psoriasisartritt}: \code{CasparKriterierDato}
 
 Tidligste dato av overnevnte og Dato fra Diagnoseskjema brukes som diagnosedato.
+}
+\examples{
+d_inkl = tibble::tibble(
+PasientGUID = c("1", "2", "3", "4"),
+AcrEularKlassifikasjonsKriterier = c(1,2,3,4),
+OppfyltacrEularKriterier = c(1, 2, 2, 2),
+OppfyltacrEularKriterierDato = as.Date(c("1991-01-01", NA, NA, NA)),
+AsasKriterierAksial = c(2, 1, 2, 2),
+AsasKriterierAksialDato = as.Date(c(NA, "2001-01-01", NA, NA)),
+AsasKriterierPerifer = c(2, 2, 1, 2),
+AsasKriterierPeriferDato = c(NA, NA, "2002-01-01", NA),
+CasparKriterier = c(2,2,2,1),
+CasparKriterierDato = as.Date(c(NA, NA, NA, "2020-01-01"))
+)
+
+datadump_dato = as.Date("2026-01-01")
+
+d_diag = tibble::tibble(
+PasientGUID = c("1", "2", "3", "4"),
+diaggrupper_med = c(1, 5, NA, 2),
+Kode = c(NA, NA, "M138", NA),
+dato_diag = as.Date(c("2025-01-01", "2025-02-02", "2025-03-03", "2025-04-04"))
+)
+
+d_diag_kritdato = legg_til_kriteriedatoer(
+d_inkl = d_inkl,
+d_diag = d_diag,
+datadump_dato = datadump_dato)
 }

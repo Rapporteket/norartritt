@@ -45,6 +45,19 @@ blir bare den kontrollen (som ikke har missing DAPSA-verdi) som er nærmest
 365 dager etter diagnose inkludert.
 }
 \examples{
-# d_diag og d_inkl_oppf er diagnose og inklusjon/oppfølgingsdata fra NorArtritt.
+d_diag = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+diaggrupper_rem = c(2, 2, 2),
+dato_diag = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+diag_stilt_aar = c(2021, 2022, 2023),
+dager_diag_til_datadump = c(1826, 1461, 1096)
+)
+
+d_inkl_oppf = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+dato_ktrl = as.Date(c("2021-01-10", "2022-01-10", "2023-01-10")),
+DAPSA = c(0.1, 0.2, 0.3),
+DeathDate = c(NA, NA, NA),
+)
 d_ki_dapsa = ki_dapsa(d_diag, d_inkl_oppf)
 }

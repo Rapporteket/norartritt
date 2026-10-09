@@ -1,95 +1,5 @@
 #' Legg til medisinnavn
 #'
-#' Kobler på legemiddelnavn og ekstra informasjon om medisiner registrert
-#' i NorArtritt til medisindata.
-#'
-#' @param d_medisin medisindata fra NorArtritt.
-#' Må inneholde kolonnen LegemiddelType.
-#'
-#' @details
-#' På grunn av måten data overføres fra GoTreatIt til registeret er det
-#' enkelte medisiner som mangler navn og kode ved innlesning. Disse blir
-#' registrert med LegemiddelType 999. Denne funksjonen løser opp disse
-#' medisinene og fordeler dem til egne koder for hver medisin.
-#'
-#' Det finnes to csv-filer som leses inn fra NorArtritt sin kvalitetsserver.
-#' En kodebok for alle legemiddel og en for legemiddel kodet
-#' som LegemiddelType 999. Ved endringer i hvilke medisiner som registreres
-#' er det her vi må oppdatere for å få det inn i analysene.
-#'
-#' @return
-#' Returnerer opprinnelig datasett i tillegg til ekstra informasjon om
-#' de ulike medisinene som registreres. Nye variabler som legges til er:
-#' * \strong{legemiddel_navn}	Navn på formatet `legemiddelnavn (virkestoff)`.
-#' * \strong{legemiddel_navn_kode}	Heltallskode for gruppering av legemiddel_navn.
-#' * \strong{biokat}	Indikator for om legemiddel er biologisk. Tar verdien 0 eller 1.
-#' * \strong{dmard}	Indikator for om legemiddel er dmard
-#' (disease modifying antirheumatic drugs). Tar verdien 0 eller 1.
-#' * \strong{csdmard}	Indikator for om legemiddel er csdmard
-#' (conventional synthetic disease modifying antirheumatic drugs).
-#' Tar verdien 0 eller 1.
-#' * \strong{tsdmard}	Indikator for om legemiddel er tsdmard (targeted synthetic disease modifying antirheumatic drugs). Tar verdien 0 eller 1.
-#' * \strong{bio_og_tsdmard}	Indikator for om legemiddel er enten biologisk eller tsdmard.
-#' Tar verdien 0 eller 1.
-#' * \strong{legemiddel_gruppert} Heltallskode for gruppering av enkelte legemidler.
-#' * \strong{legemiddel_gruppert_navn}	Navn for legemiddel som brukes i de tilfeller
-#' hvor legemiddel er gruppert. For eksempel slås alle de ulike medisinene med
-#' virkestoff infliximab sammen til en gruppe.
-#' * \strong{Virkestoffnavn} Navn på virkestoff alene.
-#'
-#' @export
-#' @examples
-#' # d_medisin er medisindata fra NorArtritt.
-#'
-#' d_medisin_med_navn = legg_til_medisinnavn(d_medisin)
-# legg_til_medisinnavn = function(d_medisin) {
-#
-#   # Sjekk at alle LegemiddelTyper i datasettet finnes i medisinkobling
-#   na_legemiddel_navn = d_medisin |>
-#     filter(!LegemiddelType %in% norartritt::medisinkobling$LegemiddelType) |>
-#     dplyr::pull(LegemiddelType)
-#
-#   if (length(na_legemiddel_navn) > 0) {
-#     stop(
-#       "LegemiddelType ",
-#       stringr::str_c(unique(na_legemiddel_navn), collapse = ", "),
-#       " er ikke definert i medisinkodeboken"
-#     )
-#   }
-#
-#   # Henter ut navn og riktig kode for medisiner med LegemiddelType 999
-#   d_medisin = d_medisin |>
-#     left_join(select(norartritt::medisinkobling,
-#         LegemiddelType, legemiddel_navn, legemiddel_navn_kode
-#       ),
-#       by = "LegemiddelType"
-#     ) |>
-#     mutate(medisin = dplyr::coalesce(Legemiddel, legemiddel_navn)) |>
-#     left_join(norartritt::legemiddelkobling, by = c("medisin" = "legemiddel_kodebok")) |>
-#     mutate(
-#       legemiddel_navn_kode =
-#         case_when(
-#           !is.na(legemiddel_kodebok_kode) ~ legemiddel_kodebok_kode,
-#           TRUE ~ legemiddel_navn_kode
-#         )
-#     )
-#
-#   # Legger til ekstra informasjon om hvert legemiddel
-#   d_medisin = d_medisin |>
-#     select(
-#       -Legemiddel, -LegemiddelType, -legemiddel_navn,
-#       -medisin, -legemiddel_kodebok_kode
-#     ) |>
-#     left_join(distinct(norartritt::medisinkobling, legemiddel_navn_kode, .keep_all = TRUE),
-#       by = "legemiddel_navn_kode"
-#     ) |>
-#     select(-legemiddelnavn_i_kodebok)
-#
-#   d_medisin
-# }
-
-#' Legg til medisinnavn
-#'
 #' @description
 #' Funksjon som grupperer legemiddel som har flere LegemiddelTyper og fjerner
 #' 'generisk' fra navn. Kobler også legemiddel som ikke importeres riktig ved
@@ -103,10 +13,10 @@
 #' @export
 #'
 #' @examples
-#'
-#' d_medisin_raa = tibble::tibble(ATC = c("L04AB04", "L04AB04", "L04AX03"),
-#'                                LegemiddelType = c(46, 999, 59),
-#'                                Legemiddel = c("AdalimumabGenerisk", "ImportertAnnet", "MethotrexateGenerisk"))
+#' d_medisin_raa = tibble::tibble(
+#' ATC = c("L04AB04", "L04AB04", "L04AX03"),
+#' LegemiddelType = c(46, 999, 59),
+#' Legemiddel = c("AdalimumabGenerisk", "ImportertAnnet", "MethotrexateGenerisk"))
 #'
 #' d_vasket_medisin = legg_til_medisinnavn(d_medisin_raa)
 legg_til_medisinnavn = function(d) {
@@ -138,7 +48,8 @@ legg_til_medisinnavn = function(d) {
     fill(generisk_kode, .direction = "down") |>
     mutate(legemiddel_navn_kode = coalesce(generisk_kode, LegemiddelType)) |>
     select(-c(generisk_kode, Legemiddel_kobling, LegemiddelType_kobling)) |>
-    filter(LegemiddelType != 999)
+    filter(LegemiddelType != 999) |>
+    ungroup()
 }
 
 
@@ -166,8 +77,8 @@ legg_til_medisinnavn = function(d) {
 legg_til_medisintype = function(d) {
 
   d |> left_join(norartritt::medisinkobling |>
-                   select(legemiddel_navn_kode, biokat, dmard, csdmard, tsdmard,
-                          bio_og_tsdmard, legemiddel_gruppert, legemiddel_gruppert_navn) |>
+                   select("legemiddel_navn_kode", "biokat", "dmard", "csdmard", "tsdmard",
+                          "bio_og_tsdmard", "legemiddel_gruppert", "legemiddel_gruppert_navn") |>
                    distinct(, .keep_all = TRUE),
                  by = "legemiddel_navn_kode")
 }
@@ -202,7 +113,8 @@ legg_til_medisintype = function(d) {
 #'
 #' @export
 #' @examples
-#' # d er datasett fra NorArtritt som inneholder variabelen UnitId
+#' d = tibble::tibble(
+#' UnitId = c(110629, 104579))
 #'
 #' d_med_sykehusnavn = legg_til_sykehusnavn(d)
 legg_til_sykehusnavn = function(d) {
@@ -217,7 +129,7 @@ legg_til_sykehusnavn = function(d) {
         filter(is.na(sykehusnavn)) |>
         distinct(UnitId) |>
         pull(UnitId) |>
-        stringr::str_c(collapse = ", ")
+        str_c(collapse = ", ")
     )
   }
   d
@@ -267,7 +179,12 @@ legg_til_sykehusnavn = function(d) {
 #'
 #' @export
 #' @examples
-#' # d_diagnose er diagnosedata fra NorArtritt
+#'
+#' d_diagnose = tibble::tibble(
+#' Kode = c("M179", "M058", "M059"),
+#' Navn = c("Diagnose", "RA", "Diagnose 2")
+#' )
+#'
 #' d_med_diagnosedata = legg_til_diagnosegrupper(d_diagnose)
 legg_til_diagnosegrupper = function(d) {
 
@@ -286,7 +203,7 @@ legg_til_diagnosegrupper = function(d) {
   if (length(ukjent_kode) > 0) {
     stop(
       "Kode: ",
-      stringr::str_c(ukjent_kode, collapse = ", "),
+      str_c(ukjent_kode, collapse = ", "),
       " finnes ikke i diagnosekodebok"
     )
   }
@@ -362,7 +279,12 @@ legg_til_diagnosegrupper = function(d) {
 #' @export
 #'
 #' @examples
-#' # d_inkl_oppf er sammenslått datasett med inklusjons- og oppfølgingsskjema
+#'
+#' d_inkl_oppf = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' InklusjonDato = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01"))
+#' )
+#'
 #' d_inkl_oppf_dato = velg_tidligste_inklusjondato(d_inkl_oppf)
 velg_tidligste_inklusjondato = function(d_inkl_oppf, pas_id = PasientGUID) {
   min_na = function(x) {
@@ -397,9 +319,11 @@ velg_tidligste_inklusjondato = function(d_inkl_oppf, pas_id = PasientGUID) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # mappe_dd er plassering for kodebok som skal sjekkes.
 #'
 #' valider_legemiddeltype(mappe_dd)
+#' }
 valider_legemiddeltype = function(mappe_dd) {
   kb = les_kb_mrs(mappe_dd)
 
@@ -417,7 +341,7 @@ valider_legemiddeltype = function(mappe_dd) {
   legemiddel_feil = setdiff(kb_legemiddel_type, medisin_uttrekk)
 
   if (nrow(legemiddel_feil) > 0) {
-    stop(stringr::str_c("Det er ikke samsvar mellom legemiddelnavn i kodebok og vår medisinfil
+    stop(str_c("Det er ikke samsvar mellom legemiddelnavn i kodebok og vår medisinfil
          for legemiddeltype: ", legemiddel_feil$verdi, collapse = ", "))
   }
 }
@@ -450,10 +374,25 @@ valider_legemiddeltype = function(mappe_dd) {
 #' @export
 #'
 #' @examples
-#' # Leser inn data for NorArtritt
-#' norartritt::les_data_norartritt()
+#'
+#' d_full_Inklusjonskjema = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' FormTypeId = c(1,1,1),
+#' FormDate = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+#' SkjemaGUID = c("d", "e", "f"),
+#' Skjematype = c("Inklusjonskjema", "Inklusjonskjema", "Inklusjonskjema")
+#' )
+#'
+#' d_full_Oppfølgingsskjema = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' FormTypeId = c(2, 2, 2),
+#' FormDate = as.Date(c("2021-01-10", "2022-01-10", "2023-01-10")),
+#' SkjemaGUID = c("a", "b", "c"),
+#' Skjematype = c("Oppfølgingskjema", "Oppfølgingskjema", "Oppfølgingskjema")
+#' )
+#'
 #' d_inkl_full_rettet = konverter_skjematype(
-#'   inkl = d_full_Inklusjonsskjema,
+#'   inkl = d_full_Inklusjonskjema,
 #'   oppf = d_full_Oppfølgingsskjema
 #' )
 konverter_skjematype = function(inkl, oppf) {
@@ -527,10 +466,26 @@ konverter_skjematype = function(inkl, oppf) {
 #' @export
 #'
 #' @examples
-#' # leser inn data for NorArtritt
-#' library(norartritt)
-#' les_data_norartritt()
-#' fjern_ugyldige_skjema(
+#'
+#' d_full_Inklusjonskjema = tibble::tibble(
+#' PasientGUID = c("1", "2", "3")
+#' )
+#'
+#' d_full_Oppfølgingskjema = tibble::tibble(
+#' PasientGUID = c("1", "2", "3")
+#' )
+#'
+#' d_full_Medisineringskjema = tibble::tibble(
+#' PasientGUID = c("1", "2", "3")
+#' )
+#'
+#' d_full_Diagnoseskjema = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' Navn = c("Artrose", "Kondrokalsinose", "Revmatoid Artritt"),
+#' Kode = c("M130", "M139", "M058")
+#' )
+#'
+#' l_skjema = fjern_ugyldige_skjema(
 #'   inkl = d_full_Inklusjonskjema,
 #'   oppf = d_full_Oppfølgingskjema,
 #'   med = d_full_Medisineringskjema,
@@ -565,9 +520,11 @@ fjern_ugyldige_skjema = function(inkl, oppf, med, diag) {
 #' @export
 #'
 #' @examples
-#' # Leser inn data fra NorArtritt
-#' library(norartritt)
-#' les_data_norartritt()
+#' d_full_Diagnoseskjema = tibble::tibble(
+#' Navn = c("Artrose", "Kondrokalsinose", "Revmatoid Artritt"),
+#' Kode = c("M130", "M139", "M058")
+#' )
+#'
 #' diagnosedata_filtrert = fjern_uaktuelle_diagnoser(d_full_Diagnoseskjema)
 fjern_uaktuelle_diagnoser = function(diag) {
   # uaktuelle diagnoser----------
@@ -582,10 +539,8 @@ fjern_uaktuelle_diagnoser = function(diag) {
     "M673", "M008", "M23", "M233"
   )
 
-  # Fjerner diagnoseskjema for pasienter som mangler andre diagnoser enn de overnevnte
-  diag = filter(diag, !Navn %in% !!uakt_diag, !Kode %in% !!uakt_koder)
-
-  diag
+# Fjerner diagnoseskjema med uaktuelle diagnosekoder og/eller diagnosenavn
+  filter_out(diag, Navn %in% !!uakt_diag | Kode %in% !!uakt_koder | is.na(Navn) & is.na(Kode))
 }
 
 #' Hjelpefunksjon for fjerning av skjema
@@ -636,13 +591,29 @@ fjerne_skjema_hjelpefunksjon = function(d_hoved, d_motpart) {
 #'
 #' @examples
 #' # leser inn data for norartritt:
-#' library(norartritt)
-#' les_data_norartritt()
-#' legg_til_datovariabler(
-#'   d_inkl = d_full_Inklusjonsskjema,
-#'   d_oppf = d_full_Oppfølgingsskjema,
-#'   d_med = d_full_Medisinskjema,
-#'   d_diag = d_full_Diagnoseskjema
+#'
+#' d_inkl = tibble::tibble(
+#' InklusjonDato = as.Date(c("2021-01-01", "2021-01-01"))
+#' )
+#'
+#' d_oppf = tibble::tibble(
+#' FormDate = as.Date(c("2021-01-01", "2021-01-01"))
+#' )
+#'
+#' d_med = tibble::tibble(
+#' StartDato = as.Date(c("2021-01-01", "2021-01-01")),
+#' SluttDato = as.Date(c("2021-01-01", "2021-01-01"))
+#' )
+#'
+#' d_diag = tibble::tibble(
+#' FormDate = as.Date(c("2021-01-01", "2021-01-01"))
+#' )
+#'
+#' l_skjema_med_ekstra_datovariabler = legg_til_datovariabler(
+#'   d_inkl = d_inkl,
+#'   d_oppf = d_oppf,
+#'   d_med = d_med,
+#'   d_diag = d_diag
 #' )
 legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
   d_inkl = d_inkl |>
@@ -694,12 +665,42 @@ legg_til_datovariabler = function(d_inkl, d_oppf, d_med, d_diag) {
 #'
 #' @param d_inkl Inklusjonsskjema
 #' @param d_diag Diagnoseskjema
+#' @param datadump_dato Dato datadump er tatt ut.
 #'
 #' @return
+#' Returnerer opprinnelig diagnosedatasett med oppdatert dato_diag variabel
+#' avhengig av diagnose og tilgjengelighet av kriteriedato som nevnt over.
+#' Legger også til variablene `diag_stilt_aar` og `dager_diag_til_datadump`.
 #' @export
 #'
 #' @examples
-legg_til_kriteriedatoer = function(d_inkl, d_diag) {
+#' d_inkl = tibble::tibble(
+#' PasientGUID = c("1", "2", "3", "4"),
+#' AcrEularKlassifikasjonsKriterier = c(1,2,3,4),
+#' OppfyltacrEularKriterier = c(1, 2, 2, 2),
+#' OppfyltacrEularKriterierDato = as.Date(c("1991-01-01", NA, NA, NA)),
+#' AsasKriterierAksial = c(2, 1, 2, 2),
+#' AsasKriterierAksialDato = as.Date(c(NA, "2001-01-01", NA, NA)),
+#' AsasKriterierPerifer = c(2, 2, 1, 2),
+#' AsasKriterierPeriferDato = c(NA, NA, "2002-01-01", NA),
+#' CasparKriterier = c(2,2,2,1),
+#' CasparKriterierDato = as.Date(c(NA, NA, NA, "2020-01-01"))
+#' )
+#'
+#' datadump_dato = as.Date("2026-01-01")
+#'
+#' d_diag = tibble::tibble(
+#' PasientGUID = c("1", "2", "3", "4"),
+#' diaggrupper_med = c(1, 5, NA, 2),
+#' Kode = c(NA, NA, "M138", NA),
+#' dato_diag = as.Date(c("2025-01-01", "2025-02-02", "2025-03-03", "2025-04-04"))
+#' )
+#'
+#' d_diag_kritdato = legg_til_kriteriedatoer(
+#' d_inkl = d_inkl,
+#' d_diag = d_diag,
+#' datadump_dato = datadump_dato)
+legg_til_kriteriedatoer = function(d_inkl, d_diag, datadump_dato = NULL) {
   kriterievariabler = c(
     "AcrEularKlassifikasjonsKriterier",
     "OppfyltacrEularKriterier",
@@ -760,6 +761,13 @@ legg_til_kriteriedatoer = function(d_inkl, d_diag) {
 #' @export
 #'
 #' @examples
+#'
+#' d_inkl = tibble::tibble(
+#'   BASDAI = c(0, 1.2, 3.2),
+#'   Das28 = c(-1, 1.2, 2.2),
+#'   Utendors = c(-1, 4, 6)
+#' )
+#'
 #' d_inkl = konverter_missing_til_na(d_inkl)
 konverter_missing_til_na = function(d) {
   vars_fra_0_real = "BASDAI"
@@ -781,15 +789,15 @@ konverter_missing_til_na = function(d) {
   d = d |>
     mutate(
       across(
-        all_of(vars_fra_0_real),
+        any_of(vars_fra_0_real),
         \(x) replace(x, x == 0, NA_real_)
       ),
       across(
-        all_of(vars_fra_1_real),
+        any_of(vars_fra_1_real),
         \(x) replace(x, x == -1, NA_real_)
       ),
       across(
-        all_of(vars_fra_1_int),
+        any_of(vars_fra_1_int),
         \(x) replace(x, x == -1, NA_integer_)
       )
     )
