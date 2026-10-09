@@ -175,16 +175,17 @@ appServer <- function(input, output, session) {
 
   # logShinyInputChanges(input)
 
-  reportParams <- reactive(
-    list(
-      hospitalName = hospitalName(),
-      reshId = user$org(),
-      registryName = registryName(),
-      userRole = user$role(),
-      userFullName = userFullName,
-      shinySession = session
-    )
-  )
+
+  # reportParams <- reactive(
+  #   list(
+  #     hospitalName = hospitalName(),
+  #     reshId = user$org(),
+  #     registryName = registryName(),
+  #     userRole = user$role(),
+  #     userFullName = userFullName,
+  #     shinySession = session
+  #   )
+  # )
 
 # tabs --------------------------------------------------------------------
 
