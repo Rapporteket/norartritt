@@ -329,10 +329,10 @@ valider_legemiddeltype = function(mappe_dd) {
 
   kb_legemiddeltype = kb |>
     filter(
-      skjema_id == "Medisineringskjema",
-      variabel_id == "LegemiddelType"
+      .data$skjema_id == "Medisineringskjema",
+      .data$variabel_id == "LegemiddelType"
     ) |>
-    select(verdi, verditekst)
+    select("verdi", "verditekst")
 
   medisin_uttrekk = norartritt::medisinkobling |>
     select("verdi" = LegemiddelType, "verditekst" = legemiddelnavn_i_kodebok) |>
