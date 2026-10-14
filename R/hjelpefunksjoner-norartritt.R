@@ -297,8 +297,8 @@ velg_tidligste_inklusjondato = function(d_inkl_oppf, pas_id = PasientGUID) {
 
   d = d_inkl_oppf |>
     group_by({{ pas_id }}) |>
-    mutate(InklusjonDato = as.Date(min_na(InklusjonDato))) |>
-    filter(!is.na(InklusjonDato)) |>
+    mutate(InklusjonDato = as.Date(min_na(.data$InklusjonDato))) |>
+    filter(!is.na(.data$InklusjonDato)) |>
     ungroup()
 
   d

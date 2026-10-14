@@ -86,6 +86,7 @@ importFrom(rapwhale,
   les_dd_mrs,
   les_kb_mrs
 )
+importFrom(rlang,.data)
 importFrom(shiny,
   dateRangeInput,
   downloadButton,
