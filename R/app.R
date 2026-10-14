@@ -195,7 +195,7 @@ appServer <- function(input, output, session) {
   # Veiledning
   output$veiledning <- renderUI({
     renderRmd(
-      system.file("veiledning.Rmd", package = "norartritt"),
+      system.file("Veiledning.Rmd", package = "norartritt"),
       outputType = "html_fragment"
     )
   })
