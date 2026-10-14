@@ -50,6 +50,7 @@
 #' @importFrom rapbase statsUI
 #' @importFrom rapwhale les_dd_mrs
 #' @importFrom rapwhale les_kb_mrs
+#' @importFrom rlang .data
 #' @importFrom shiny dateRangeInput
 #' @importFrom shiny downloadButton
 #' @importFrom shiny htmlOutput

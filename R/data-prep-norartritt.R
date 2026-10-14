@@ -158,7 +158,7 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med, datadump_dato = N
 lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf, datadump_dato = NULL) {
   # Lager objekt med dødsdato for alle pasienter som har dødd
   d_dodsdato = d_inkl |>
-    select(PasientGUID, DeathDate) |>
+    select("PasientGUID", "DeathDate") |>
     filter(!is.na(DeathDate)) |>
     distinct(PasientGUID, .keep_all = TRUE) |>
     mutate(DeathDate = as_date(DeathDate))
@@ -230,18 +230,19 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf, datadump_dato =
   # for de som ikke har medisinsk behandling
   d_diag_med = d_diag_pers |>
     select(
-      PasientGUID, UnitId, FormDate, PatientAge, PatientGender, Kode, Navn, Dato, DiagnoseDato,
-      dato_diag, diag_stilt_aar, dager_diag_til_datadump, diaggrupper_med, diaggrupper_med_tekst,
-      diaggrupper_rem, diaggrupper_rem_tekst, rem_maal, diaggrupper_hoved,
-      diaggrupper_hoved_tekst, perifer_aksial_diaggruppe,
-      perifer_aksial_diaggruppe_tekst
+      "PasientGUID", "UnitId", "FormDate", "PatientAge", "PatientGender",
+      "Kode", "Navn", "Dato", "DiagnoseDato", "dato_diag", "diag_stilt_aar",
+      "dager_diag_til_datadump", "diaggrupper_med", "diaggrupper_med_tekst",
+      "diaggrupper_rem", "diaggrupper_rem_tekst", "rem_maal",
+      "diaggrupper_hoved", "diaggrupper_hoved_tekst",
+      "perifer_aksial_diaggruppe", "perifer_aksial_diaggruppe_tekst"
     ) |>
     left_join(select(d_med_vasket,
-      PasientGUID, Enhet, Mengde, LegemiddelType, Intervall,
-      EndringArsak, StartDato, SluttDato, DeathDate,
-      startaar, sluttaar, legemiddel_navn, legemiddel_navn_kode,
-      biokat, csdmard, dmard, tsdmard, bio_og_tsdmard
-    ), by = "PasientGUID") |>
+      "PasientGUID", "Enhet", "Mengde", "LegemiddelType", "Intervall",
+      "EndringArsak", "StartDato", "SluttDato", "DeathDate",
+      "startaar", "sluttaar", "legemiddel_navn", "legemiddel_navn_kode",
+      "biokat", "csdmard", "dmard", "tsdmard", "bio_og_tsdmard"),
+      by = "PasientGUID") |>
     mutate(
       legemiddel_navn = replace(
         as.character(legemiddel_navn),
@@ -325,8 +326,10 @@ lag_ra_indikator_base = function(d_diag, d_inkl) {
       diaggrupper_med == 1,
       diag_stilt_aar >= 2014,
     ) |>
-    select(PasientGUID, Kode, Navn, dato_diag, diag_stilt_aar, dager_diag_til_datadump) |>
-    left_join(select(d_inkl, PasientGUID, UnitId, InklusjonDato, DeathDate),
+    select("PasientGUID", "Kode", "Navn", "dato_diag", "diag_stilt_aar",
+           "dager_diag_til_datadump") |>
+    left_join(select(d_inkl, "PasientGUID", "UnitId",
+                     "InklusjonDato", "DeathDate"),
       by = "PasientGUID",
       relationship = "one-to-one"
     ) |>
