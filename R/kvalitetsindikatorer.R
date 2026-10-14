@@ -70,15 +70,15 @@ ki_sykmod = function(d_inklusjon, d_diagnose, d_medisin) {
     arrange(dato_diag) |>
     distinct(PasientGUID, .keep_all = TRUE) |>
     left_join(select(d_inklusjon,
-        PasientGUID, InklusjonDato, sykehusnavn, sykehus_kortnavn
+        "PasientGUID", "InklusjonDato", "sykehusnavn", "sykehus_kortnavn"
       ),
       by = "PasientGUID",
       relationship = "one-to-one"
     ) |>
     left_join(select(d_medisin,
-        PasientGUID, StartDato, SluttDato, dmard,
-        legemiddel_navn, legemiddel_navn_kode,
-        legemiddel_gruppert, legemiddel_gruppert_navn
+        "PasientGUID", "StartDato", "SluttDato", "dmard",
+        "legemiddel_navn", "legemiddel_navn_kode",
+        "legemiddel_gruppert", "legemiddel_gruppert_navn"
       ),
       by = "PasientGUID",
       relationship = "one-to-many"
@@ -170,9 +170,9 @@ ki_medisinbruk = function(d_diagnose, d_medisin, aarstall, legemiddel, diagnosek
 
   d_ki = d_diagnose |>
     left_join(select(d_medisin,
-        PasientGUID, StartDato,
-        SluttDato, startaar, sluttaar,
-        legemiddel_gruppert, legemiddel_gruppert_navn
+        "PasientGUID", "StartDato",
+        "SluttDato", "startaar", "sluttaar",
+        "legemiddel_gruppert", "legemiddel_gruppert_navn"
       ),
       by = "PasientGUID"
     ) |>
@@ -251,7 +251,7 @@ ki_sykmod_median = function(d_ra_base, d_med) {
     left_join(
       d_med |>
         filter(dmard == 1) |>
-        select(PasientGUID, StartDato, LegemiddelType, dmard),
+        select("PasientGUID", "StartDato", "LegemiddelType", "dmard"),
       by = "PasientGUID",
       relationship = "one-to-many"
     ) |>
@@ -265,8 +265,8 @@ ki_sykmod_median = function(d_ra_base, d_med) {
       ),
     ) |>
     select(
-      -dmard, -sensurert, -dager_til_medisin,
-      -dager_diag_til_datadump, -dager_diag_til_inklusjon
+      -"dmard", -"sensurert", -"dager_til_medisin",
+      -"dager_diag_til_datadump", -"dager_diag_til_inklusjon"
     ) |>
     mutate(
       ki_aktuell = dager_til_medisin_sens >= 0 &
@@ -274,7 +274,7 @@ ki_sykmod_median = function(d_ra_base, d_med) {
         (DeathDate >= dato_diag + days(14) | is.na(DeathDate)),
       ki_x = dager_til_medisin_sens
     ) |>
-    select(-dager_til_medisin_sens)
+    select(-"dager_til_medisin_sens")
 
   d_ki_medisin_median
 }
@@ -336,7 +336,7 @@ ki_sykmod_snitt = function(d_ra_base, d_med) {
     left_join(
       d_med |>
         filter(dmard == 1) |>
-        select(PasientGUID, StartDato, LegemiddelType, dmard),
+        select("PasientGUID", "StartDato", "LegemiddelType", "dmard"),
       by = "PasientGUID",
       relationship = "one-to-many"
     ) |>
@@ -348,14 +348,14 @@ ki_sykmod_snitt = function(d_ra_base, d_med) {
       )
     )) |>
     filter(!is.na(dager_til_medisin)) |>
-    select(-dmard, -dager_diag_til_datadump, -dager_diag_til_inklusjon) |>
+    select(-"dmard", -"dager_diag_til_datadump", -"dager_diag_til_inklusjon") |>
     mutate(
       ki_aktuell = dager_til_medisin >= 0 &
         dager_til_medisin <= ovre_grense_medisin &
         (DeathDate >= dato_diag + days(14) | is.na(DeathDate)),
       ki_x = dager_til_medisin
     ) |>
-    select(-dager_til_medisin)
+    select(-"dager_til_medisin")
 
   d_ki_medisin_snitt
 }
@@ -422,7 +422,7 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
   id_diagnose = d_diag |>
-    select(PasientGUID, diaggrupper_med, dato_diag, diag_stilt_aar, dager_diag_til_datadump) |>
+    select("PasientGUID", "diaggrupper_med", "dato_diag", "diag_stilt_aar", "dager_diag_til_datadump") |>
     arrange(dato_diag) |>
     distinct(PasientGUID, .keep_all = TRUE) |>
     filter(
@@ -435,8 +435,8 @@ ki_remisjon = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt =
   # Kobler diagnosedata med skjema for de ulike kontrollene for hver pasient i utvalget.
   d = d_inkl_oppf |>
     left_join(select(d_diag,
-        PasientGUID, diaggrupper_med, dato_diag,
-        dager_diag_til_datadump, diag_stilt_aar
+        "PasientGUID", "diaggrupper_med", "dato_diag",
+        "dager_diag_til_datadump", "diag_stilt_aar"
       ),
       by = "PasientGUID",
       relationship = "many-to-one"
@@ -511,7 +511,7 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose
   id_diagnose = d_diag |>
-    select(PasientGUID, diaggrupper_med, dato_diag, dager_diag_til_datadump) |>
+    select("PasientGUID", "diaggrupper_med", "dato_diag", "dager_diag_til_datadump") |>
     arrange(dato_diag) |>
     distinct(PasientGUID, .keep_all = TRUE) |>
     filter(diaggrupper_med == 1) |>
@@ -519,8 +519,8 @@ remisjon_totalt = function(d_diag, d_inkl_oppf) {
 
   d = d_inkl_oppf |>
     left_join(select(d_diag,
-        PasientGUID, diaggrupper_med, dato_diag,
-        dager_diag_til_datadump, diag_stilt_aar
+        "PasientGUID", "diaggrupper_med", "dato_diag",
+        "dager_diag_til_datadump", "diag_stilt_aar"
       ),
       by = "PasientGUID"
     ) |>
@@ -600,7 +600,7 @@ ki_kontroll = function(d_inkl_oppf, d_diag) {
   # Finner de som oppfyller krav for nevner
   d_base = d_inkl_oppf |>
     left_join(
-      select(d_diag, PasientGUID, diaggrupper_med, diaggrupper_hoved, dato_diag, diag_stilt_aar),
+      select(d_diag, "PasientGUID", "diaggrupper_med", "diaggrupper_hoved", "dato_diag", "diag_stilt_aar"),
       by = "PasientGUID"
     ) |>
     mutate(tid_til_inkl = InklusjonDato - dato_diag) |>
@@ -683,7 +683,7 @@ ki_kontroll_snitt = function(d_ra_base, d_inkl_oppf) {
   inklusjonskjema_ovre_grense = 90
 
   d_ki_kontroll_snitt = d_ra_base |>
-    left_join(select(d_inkl_oppf, PasientGUID, Skjematype, dato_ktrl),
+    left_join(select(d_inkl_oppf, "PasientGUID", "Skjematype", "dato_ktrl"),
       by = "PasientGUID",
       relationship = "one-to-many"
     ) |>
@@ -715,7 +715,7 @@ ki_kontroll_snitt = function(d_ra_base, d_inkl_oppf) {
     ) |>
     arrange(desc(ki_aktuell)) |>
     distinct(PasientGUID, .keep_all = TRUE) |>
-    select(-er_oppf, -er_oppf_fiks) |>
+    select(-"er_oppf", -"er_oppf_fiks") |>
     ungroup()
 
   d_ki_kontroll_snitt
@@ -779,7 +779,7 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
   id_diagnose = d_diag |>
-    select(PasientGUID, diaggrupper_rem, dato_diag, diag_stilt_aar, dager_diag_til_datadump) |>
+    select("PasientGUID", "diaggrupper_rem", "dato_diag", "diag_stilt_aar", "dager_diag_til_datadump") |>
     arrange(dato_diag) |>
     distinct(PasientGUID, .keep_all = TRUE) |>
     filter(
@@ -792,8 +792,8 @@ ki_dapsa = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
   # Kobler diagnosedata med skjema for de ulike kontrollene for hver pasient i utvalget.
   d = d_inkl_oppf |>
     left_join(select(d_diag,
-        PasientGUID, diaggrupper_rem, dato_diag,
-        dager_diag_til_datadump, diag_stilt_aar
+        "PasientGUID", "diaggrupper_rem", "dato_diag",
+        "dager_diag_til_datadump", "diag_stilt_aar"
       ),
       by = "PasientGUID"
     ) |>
@@ -871,7 +871,7 @@ ki_asdas = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
 
   # Henter ut id til pasientene som oppfyller kriterier for diagnose og diagnosetidspunkt
   id_diagnose = d_diag |>
-    select(PasientGUID, diaggrupper_med, dato_diag, diag_stilt_aar, dager_diag_til_datadump) |>
+    select("PasientGUID", "diaggrupper_med", "dato_diag", "diag_stilt_aar", "dager_diag_til_datadump") |>
     arrange(desc(dato_diag)) |>
     distinct(PasientGUID, .keep_all = TRUE) |>
     filter(
@@ -884,8 +884,8 @@ ki_asdas = function(d_diag, d_inkl_oppf, tidsrom_start = 180, tidsrom_slutt = 48
   # Kobler diagnosedata med skjema for de ulike kontrollene for hver pasient i utvalget.
   d = d_inkl_oppf |>
     left_join(select(d_diag,
-        PasientGUID, diaggrupper_med, dato_diag,
-        dager_diag_til_datadump, diag_stilt_aar
+        "PasientGUID", "diaggrupper_med", "dato_diag",
+        "dager_diag_til_datadump", "diag_stilt_aar"
       ),
       by = "PasientGUID"
     ) |>
