@@ -50,6 +50,11 @@ Ved endringer i hvilke diagnoser som inkluderes i
 analyser er det i denne filen vi må oppdatere koblingene.
 }
 \examples{
-# d_diagnose er diagnosedata fra NorArtritt
+
+d_diagnose = tibble::tibble(
+Kode = c("M179", "M058", "M059"),
+Navn = c("Diagnose", "RA", "Diagnose 2")
+)
+
 d_med_diagnosedata = legg_til_diagnosegrupper(d_diagnose)
 }

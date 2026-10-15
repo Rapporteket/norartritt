@@ -30,10 +30,26 @@ Oppfølgingsskjema for pasienter som mangler diagnoseskjema.
 Medisineringsskjema for pasienter som mangler diagnoseskjema.
 }
 \examples{
-# leser inn data for NorArtritt
-library(norartritt)
-les_data_norartritt()
-fjern_ugyldige_skjema(
+
+d_full_Inklusjonskjema = tibble::tibble(
+PasientGUID = c("1", "2", "3")
+)
+
+d_full_Oppfølgingskjema = tibble::tibble(
+PasientGUID = c("1", "2", "3")
+)
+
+d_full_Medisineringskjema = tibble::tibble(
+PasientGUID = c("1", "2", "3")
+)
+
+d_full_Diagnoseskjema = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+Navn = c("Artrose", "Kondrokalsinose", "Revmatoid Artritt"),
+Kode = c("M130", "M139", "M058")
+)
+
+l_skjema = fjern_ugyldige_skjema(
   inkl = d_full_Inklusjonskjema,
   oppf = d_full_Oppfølgingskjema,
   med = d_full_Medisineringskjema,

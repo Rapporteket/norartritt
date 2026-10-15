@@ -13,7 +13,7 @@ indikatorene for Revmatoid Artritt. Består av data fra inklusjonsskjema og
 Diagnoseskjema.
 Funksjonen \code{lag_ra_indikator_base()} kan brukes for å generere datasettet.}
 
-\item{d_oppf}{Datasett med aktuelle oppfølgingsskjema.}
+\item{d_inkl_oppf}{Datasett med aktuelle inklusjons- og oppfølgingsskjema.}
 }
 \value{
 Returnerer et datasett med nødvendige koblingsnøkler.
@@ -31,5 +31,19 @@ kompleksitet fra indikatorfunksjoner til en egen filtreringsfunksjon.
 Pasienter som ikke har vært til kontroll innen 365 dager fjernes fra
 indikatoren. Pasienter som fikk diagnose for under 365 dager siden men som
 enda ikke har vært til kontroll fjernes også.
-Det gjelder ca. X \% av pasientene.
+}
+\examples{
+d_ra_base = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+dato_diag = as.Date(c("2021-01-01", "2022-01-01", "2023-01-01")),
+DeathDate = c(NA, NA, NA)
+)
+
+d_inkl_oppf = tibble::tibble(
+PasientGUID = c("1", "2", "3"),
+Skjematype = c("Inklusjonskjema", "Inklusjonskjema", "Inklusjonskjema"),
+dato_ktrl = as.Date(c("2021-01-10", "2022-01-10", "2023-01-10"))
+)
+
+d_kontroll_snitt = ki_kontroll_snitt(d_ra_base, d_inkl_oppf)
 }

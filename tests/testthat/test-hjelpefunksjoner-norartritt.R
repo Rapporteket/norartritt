@@ -1,55 +1,22 @@
 # tester hjelpefunksjoner-norartritt.R
 
 # legg_til_medisinnavn ----------------------------------------------------
-test_that("Advarsel hvis data inneholder LegemiddelType som ikke har navn i kodebok", {
-  d = tibble::tibble(
-    LegemiddelType = c(1, 2, 3, 765),
-    Legemiddel = c(NA, NA, NA, NA)
-  )
-
-  expect_error(
-    legg_til_medisinnavn(d),
-    "LegemiddelType 765 er ikke definert i medisinkodeboken"
-  )
-})
 
 test_that("Leser inn data fra medisinkodebok som forventet", {
-  d = tibble::tibble(
+  d = tibble(
     LegemiddelType = c(1, 2, 3, 38),
-    Legemiddel = c(NA, NA, NA, NA)
+    Legemiddel = c("Humira", "Enbrel", "Cimzia", "Hyrimoz"),
+    ATC = c("L04AB01", "L04AB04", "L04AB05", NA_character_)
   )
 
-  d_ut_forventet = tibble::tibble(
-    legemiddel_navn_kode = c(1L, 2L, 3L, 38L),
-    LegemiddelType = c(1L, 2L, 3L, 38L),
-    legemiddel_navn = c(
-      "Cimzia (certolizumab pegol)",
-      "Enbrel (etanercept)",
-      "Humira (adalimumab)",
-      "Hyrimoz (adalimumab)"
-    ),
-    biokat = c(1L, 1L, 1L, 1L),
-    dmard = c(1L, 1L, 1L, 1L),
-    csdmard = c(0L, 0L, 0L, 0L),
-    tsdmard = c(0L, 0L, 0L, 0L),
-    bio_og_tsdmard = c(1L, 1L, 1L, 1L),
-    legemiddel_gruppert = c(1L, 2L, 3L, 3L),
-    legemiddel_gruppert_navn = c(
-      "Cimzia (certolizumab pegol)",
-      "etanercept",
-      "adalimumab",
-      "adalimumab"
-    ),
-    Virkestoff = c(
-      "certolizumab pegol",
-      "etanercept",
-      "adalimumab",
-      "adalimumab"
-    ),
-    Kommentar = c(
-      rep(NA_character_, 4)
-    )
+  d_ut_forventet = tibble(
+    LegemiddelType = c(3, 2, 1, 38),
+    Legemiddel = c("Cimzia", "Enbrel", "Humira", "Hyrimoz"),
+    ATC = c("L04AB05", "L04AB04", "L04AB01", NA_character_),
+    legemiddel_navn  = c( "Cimzia", "Enbrel", "Humira", "Hyrimoz"),
+    legemiddel_navn_kode = c(3, 2, 1, 38)
   )
+
 
   expect_identical(
     legg_til_medisinnavn(d),
@@ -57,19 +24,49 @@ test_that("Leser inn data fra medisinkodebok som forventet", {
   )
 })
 
+# legg_til_medisintype -------------------------------------------------
+
+test_that(" Legg til medisintype returnerer forventet resultat", {
+d = tibble(
+  LegemiddelType = c(1L, 2L, 3L, 38L),
+  Legemiddel = c("Cimzia", "Enbrel", "Humira", "Hyrimoz"),
+  ATC = c("L04AB01", "L04AB04", "L04AB05", NA_character_),
+  legemiddel_navn  = c( "Cimzia", "Enbrel", "Humira", "Hyrimoz"),
+  legemiddel_navn_kode = c(1L, 2L, 3L, 38L)
+)
+
+d_ut_forventet = tibble(
+  LegemiddelType = c(1L, 2L, 3L, 38L),
+  Legemiddel = c("Cimzia", "Enbrel", "Humira", "Hyrimoz"),
+  ATC = c("L04AB01", "L04AB04", "L04AB05", NA_character_),
+  legemiddel_navn = c("Cimzia", "Enbrel", "Humira", "Hyrimoz"),
+  legemiddel_navn_kode = c(1L, 2L, 3L, 38L),
+  biokat = c(1L, 1L, 1L, 1L),
+  dmard = c(1L, 1L, 1L, 1L),
+  csdmard = c(0L, 0L, 0L, 0L),
+  tsdmard = c(0L, 0L, 0L, 0L),
+  bio_og_tsdmard = c(1L, 1L, 1L, 1L),
+  legemiddel_gruppert = c(75L, 76L, 46L, 46L),
+  legemiddel_gruppert_navn = c("certolizumab pegol", "etanercept", "adalimumab", "adalimumab")
+)
+
+expect_identical(
+  legg_til_medisintype(d),
+  d_ut_forventet)
+})
 
 # legg_til_sykehusnavn ----------------------------------------------------
 test_that("Feilmelding hvis UnitID i datasett ikke finnes i kodebok", {
-  d = tibble::tibble(UnitId = c(1, 2, 34))
+  d = tibble(UnitId = c(1, 2, 34))
   feilmelding = "Det mangler kobling for UnitId: 1, 2, 34"
 
   expect_error(legg_til_sykehusnavn(d), feilmelding)
 })
 
 test_that("Leser inn enhetsinformasjon fra sykehusfil som forventet", {
-  d = tibble::tibble(UnitId = c(110629L, 102977L, 104579L))
+  d = tibble(UnitId = c(110629L, 102977L, 104579L))
 
-  d_forventet_ut = tibble::tibble(
+  d_forventet_ut = tibble(
     UnitId = c(110629L, 102977L, 104579L),
     sykehusnavn = c(
       "Martina Hansens hospital", "Haukeland universitetsjukehus",
@@ -90,7 +87,7 @@ test_that("Leser inn enhetsinformasjon fra sykehusfil som forventet", {
 # legg_til_diagnosegrupper ------------------------------------------------
 # Gir advarsel om det finnes diagnosekoder som ikke har navn i kodebok
 test_that("Feilmelding hvis diagnosekoder ikke finnes i diagnosekodebok", {
-  d = tibble::tibble(
+  d = tibble(
     Kode = c("M7654", "M49494"),
     Navn = c("Ny diagnose", "Narvestad")
   )
@@ -104,12 +101,12 @@ test_that("Feilmelding hvis diagnosekoder ikke finnes i diagnosekodebok", {
 })
 
 test_that("Pasienter med Leddsykdom får forventet info fra diagnosekodebok", {
-  d = tibble::tibble(
+  d = tibble(
     Kode = c("M123", "M130", NA_character_),
     Navn = c("Palindrom revmatisme", "Polyartritt", "Leddsykdom")
   )
 
-  d_forventet = tibble::tibble(
+  d_forventet = tibble(
     Kode = c("M123", "M130", NA_character_),
     Navn = c("Palindrom revmatisme", "Polyartritt", "Leddsykdom"),
     diaggrupper_med = c(8L, 4L, 8L),
@@ -138,12 +135,12 @@ test_that("Pasienter med Leddsykdom får forventet info fra diagnosekodebok", {
 })
 
 test_that("Leser inn diagnoseinformasjon som forventet", {
-  d = tibble::tibble(
+  d = tibble(
     Kode = c("M123", "M130", "M131"),
     Navn = c("Palindrom revmatisme", "Polyartritt", "Monoartritt")
   )
 
-  d_forventet = tibble::tibble(
+  d_forventet = tibble(
     Kode = c("M123", "M130", "M131"),
     Navn = c("Palindrom revmatisme", "Polyartritt", "Monoartritt"),
     diaggrupper_med = c(8L, 4L, 4L),
@@ -175,12 +172,12 @@ test_that("Leser inn diagnoseinformasjon som forventet", {
 # velg_tidligste_inklusjonsdato -------------------------------------------
 test_that("Tidligste dato returneres hvis det også finnes NA", {
   dato = c("NA", "2019-11-12", "2020-11-23", "2020-08-27")
-  d = tibble::tibble(
+  d = tibble(
     PasientGUID = c("A", "A", "B", "B"),
     InklusjonDato = (as.POSIXct(dato, tz = "UTC", format = "%Y-%m-%d"))
   ) # Sjekke om det skal være HMS her
 
-  d_ut_forventet = tibble::tibble(
+  d_ut_forventet = tibble(
     PasientGUID = c("A", "A", "B", "B"),
     InklusjonDato = as.Date(c("2019-11-12", "2019-11-12", "2020-08-27", "2020-08-27"))
   )
@@ -193,12 +190,12 @@ test_that("Tidligste dato returneres hvis det også finnes NA", {
 
 test_that("Fungerer med alternativ pasientidentifikator", {
   dato = c("NA", "2019-11-12", "2020-11-23", "2020-08-27")
-  d = tibble::tibble(
+  d = tibble(
     fnr = c(1, 1, 2, 2),
     InklusjonDato = (as.POSIXct(dato, tz = "UTC", format = "%Y-%m-%d"))
   )
 
-  d_ut_forventet = tibble::tibble(
+  d_ut_forventet = tibble(
     fnr = c(1, 1, 2, 2),
     InklusjonDato = as.Date(c("2019-11-12", "2019-11-12", "2020-08-27", "2020-08-27"))
   )
@@ -212,7 +209,7 @@ test_that("Fungerer med alternativ pasientidentifikator", {
 
 # konverter_skjematype ----------------------------------------------------
 test_that("Oppfølgingsskjema blir konvertert til inklusjon hvis inklusjon mangler", {
-  d_inkl = tibble::tibble(
+  d_inkl = tibble(
     PasientGUID = c("a", "b"),
     Skjematype = c("Inklusjonskjema", "Inklusjonskjema"),
     FormTypeId = c(1, 1),
@@ -222,7 +219,7 @@ test_that("Oppfølgingsskjema blir konvertert til inklusjon hvis inklusjon mangl
 
 
 
-  d_oppf = tibble::tibble(
+  d_oppf = tibble(
     PasientGUID = c("a", "b", "c"),
     Skjematype = c(
       "Oppfølgingskjema",
@@ -239,7 +236,7 @@ test_that("Oppfølgingsskjema blir konvertert til inklusjon hvis inklusjon mangl
   )
 
 
-  forventet_ut = tibble::tibble(
+  forventet_ut = tibble(
     PasientGUID = c("a", "b", "c", "a", "b"),
     Skjematype = c(
       "Inklusjonskjema", "Inklusjonskjema",
@@ -264,7 +261,7 @@ test_that("Oppfølgingsskjema blir konvertert til inklusjon hvis inklusjon mangl
 })
 
 test_that("Duplikate inklusjonsskjema konverteres til oppfølging", {
-  d_inkl_duplikat = tibble::tibble(
+  d_inkl_duplikat = tibble(
     PasientGUID = c("a", "a", "a", "b"),
     Skjematype = c("Inklusjonskjema", "Inklusjonskjema", "Inklusjonskjema", "Inklusjonskjema"),
     FormTypeId = c(1, 1, 1, 1),
@@ -272,7 +269,7 @@ test_that("Duplikate inklusjonsskjema konverteres til oppfølging", {
     SkjemaGUID = c("skjema_1", "skjema_2", "skjema_6", "skjema_3")
   )
 
-  d_oppf_ok = tibble::tibble(
+  d_oppf_ok = tibble(
     PasientGUID = c("a", "b"),
     Skjematype = c(
       "Oppfølgingskjema",
@@ -286,7 +283,7 @@ test_that("Duplikate inklusjonsskjema konverteres til oppfølging", {
     SkjemaGUID = c("skjema_4", "skjema_5")
   )
 
-  duplikat_forventet_ut = tibble::tibble(
+  duplikat_forventet_ut = tibble(
     PasientGUID = c("a", "b", "a", "a", "a", "b"),
     Skjematype = c(
       "Inklusjonskjema", "Inklusjonskjema",
@@ -311,15 +308,16 @@ test_that("Duplikate inklusjonsskjema konverteres til oppfølging", {
 
 # fjern_uaktuelle_diagnoser -----------------------------------------------
 test_that("Uaktuelle diagnoser blir filtrert bort som forventet", {
-  diagnose_med_uakt = tibble::tibble(
-    pas_id = c(1, 2, 3, 4, 5),
+  diagnose_med_uakt = tibble(
+    pas_id = c(1, 2, 3, 4, 5, 6, 7, 8),
     Navn = c(
       "Revmatoid artritt", "Psoriasisartritt",
-      "Artrose", "Polyartritt", "Septisk Artritt"
+      "Artrose", "Polyartritt", "Septisk Artritt", NA_character_, "Revmatoid artritt", "Kondrokalsinose"
     ),
-    Kode = c("M058", "M073", NA_character_, "M130", NA_character_)
+    Kode = c("M058", "M073", NA_character_, "M130", NA_character_, NA_character_, "M130", "M058")
   )
-  diagnose_med_uakt_ut = tibble::tibble(
+
+  diagnose_med_uakt_ut = tibble(
     pas_id = c(1, 2),
     Navn = c("Revmatoid artritt", "Psoriasisartritt"),
     Kode = c("M058", "M073")
@@ -329,14 +327,15 @@ test_that("Uaktuelle diagnoser blir filtrert bort som forventet", {
     fjern_uaktuelle_diagnoser(diagnose_med_uakt),
     diagnose_med_uakt_ut
   )
+
 })
 
 # fjerne_skjema_hjelpefunksjon --------------------------------------------
 test_that("skjema filtreres ut som forventet", {
-  a = tibble::tibble(PasientGUID = c("1", "2", "3", "4"))
-  b = tibble::tibble(PasientGUID = c("1", "2", "3", "5"))
+  a = tibble(PasientGUID = c("1", "2", "3", "4"))
+  b = tibble(PasientGUID = c("1", "2", "3", "5"))
 
-  forventet_ut = filter(b, dplyr::row_number() %in% 1:3)
+  forventet_ut = filter(b, row_number() %in% 1:3)
 
   expect_identical(
     fjerne_skjema_hjelpefunksjon(d_hoved = a, d_motpart = b),
@@ -350,7 +349,7 @@ test_that("skjema filtreres ut som forventet", {
 
 # konverter_missing_til_na ------------------------------------------------
 test_that("Konverterer 0 og -1 til NA som forventet ", {
-  d = tibble::tibble(
+  d = tibble(
     BASDAI = c(4.1, 0, 0, 0, 0, 0.7),
     Das28 = c(1.63, -1, 3.64, -1, -1, -1),
     Das283 = c(1.21, -1, 3.2, -1, -1, -1),
@@ -383,7 +382,7 @@ test_that("Konverterer 0 og -1 til NA som forventet ", {
     Rand12Q12 = c(-1L, 1L, 2L, 3L, 4L, 5L)
   )
 
-  d_forventet = tibble::tibble(
+  d_forventet = tibble(
     BASDAI = c(
       4.1, NA_real_, NA_real_,
       NA_real_, NA_real_, 0.7

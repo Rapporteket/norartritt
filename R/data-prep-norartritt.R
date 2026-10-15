@@ -12,6 +12,7 @@
 #' @param d_oppf Oppfølgingsdatasett, vanligvis d_full_Oppfølgingsskjema.
 #' @param d_diag Diagnosedatasett, vanligvis d_full_Diagnoseskjema.
 #' @param d_med Medisindatasett, vanligvis d_full_Medisineringskjema.
+#' @param datadump_dato Dato for uttrekk av datadump.
 #'
 #' @return
 #' Returnerer filtrerte og *vaskede* datasett for ulike skjema i NorArtritt.
@@ -38,7 +39,9 @@
 #' Inneholder oversikt over dødsdato, hvor tilgjengelig.
 #'
 #' @export
-vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
+vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med, datadump_dato = NULL) {
+
+
   # Legger sammen inklusjon og oppfølging
   d_inkl_oppf = bind_rows(d_inkl, d_oppf)
 
@@ -121,7 +124,8 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
     d_inkl = d_inkl,
     d_oppf = d_oppf,
     d_diag = d_diag,
-    d_med = d_med
+    d_med = d_med,
+    datadump_dato = datadump_dato
   )
 }
 
@@ -144,15 +148,17 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med) {
 #' @param d_inkl Inklusjonsdatasett fra NorArtritt
 #' @param d_diag Diagnosedatasett fra NorArtritt
 #' @param d_med Medisindatasett fra NorArtritt
+#' @param d_oppf Oppfølgingsskjema fra NorArtritt
+#' @param datadump_dato Dato for datauttrekk
 #'
 #' @return
 #' Returnerer objektene d_med_vasket, d_diag_pers og d_diag_med til det
 #' globale miljøet.
 #' @export
-lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
+lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf, datadump_dato = NULL) {
   # Lager objekt med dødsdato for alle pasienter som har dødd
   d_dodsdato = d_inkl |>
-    select(PasientGUID, DeathDate) |>
+    select("PasientGUID", "DeathDate") |>
     filter(!is.na(DeathDate)) |>
     distinct(PasientGUID, .keep_all = TRUE) |>
     mutate(DeathDate = as_date(DeathDate))
@@ -174,7 +180,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 
   d_diag = legg_til_kriteriedatoer(
     d_inkl = d_inkl,
-    d_diag = d_diag
+    d_diag = d_diag,
+    datadump_dato = datadump_dato
   )
 
   d_med = d_med |>
@@ -188,8 +195,8 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
         DeathDate > SluttDato ~ SluttDato,
         TRUE ~ SluttDato
       ),
-      startaar = lubridate::year(StartDato),
-      sluttaar = lubridate::year(SluttDato)
+      startaar = year(StartDato),
+      sluttaar = year(SluttDato)
     ) |>
     filter(
       StartDato < DeathDate | is.na(DeathDate),
@@ -223,18 +230,19 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
   # for de som ikke har medisinsk behandling
   d_diag_med = d_diag_pers |>
     select(
-      PasientGUID, UnitId, FormDate, PatientAge, PatientGender, Kode, Navn, Dato, DiagnoseDato,
-      dato_diag, diag_stilt_aar, dager_diag_til_datadump, diaggrupper_med, diaggrupper_med_tekst,
-      diaggrupper_rem, diaggrupper_rem_tekst, rem_maal, diaggrupper_hoved,
-      diaggrupper_hoved_tekst, perifer_aksial_diaggruppe,
-      perifer_aksial_diaggruppe_tekst
+      "PasientGUID", "UnitId", "FormDate", "PatientAge", "PatientGender",
+      "Kode", "Navn", "Dato", "DiagnoseDato", "dato_diag", "diag_stilt_aar",
+      "dager_diag_til_datadump", "diaggrupper_med", "diaggrupper_med_tekst",
+      "diaggrupper_rem", "diaggrupper_rem_tekst", "rem_maal",
+      "diaggrupper_hoved", "diaggrupper_hoved_tekst",
+      "perifer_aksial_diaggruppe", "perifer_aksial_diaggruppe_tekst"
     ) |>
     left_join(select(d_med_vasket,
-      PasientGUID, Enhet, Mengde, LegemiddelType, Intervall,
-      EndringArsak, StartDato, SluttDato, DeathDate,
-      startaar, sluttaar, legemiddel_navn, legemiddel_navn_kode,
-      biokat, csdmard, dmard, tsdmard, bio_og_tsdmard
-    ), by = "PasientGUID") |>
+      "PasientGUID", "Enhet", "Mengde", "LegemiddelType", "Intervall",
+      "EndringArsak", "StartDato", "SluttDato", "DeathDate",
+      "startaar", "sluttaar", "legemiddel_navn", "legemiddel_navn_kode",
+      "biokat", "csdmard", "dmard", "tsdmard", "bio_og_tsdmard"),
+      by = "PasientGUID") |>
     mutate(
       legemiddel_navn = replace(
         as.character(legemiddel_navn),
@@ -257,7 +265,7 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
       bio_og_tsdmard = ifelse(is.na(LegemiddelType), yes = 0L,
         no = bio_og_tsdmard
       ),
-      diagnose_aar = lubridate::year(dato_diag)
+      diagnose_aar = year(dato_diag)
     )
 
   d_inkl_oppf = bind_rows(d_inkl, d_oppf)
@@ -289,6 +297,25 @@ lag_filtrerte_objekter = function(d_inkl, d_diag, d_med, d_oppf) {
 #' @export
 #'
 #' @examples
+#' d_diag = tibble::tibble(
+#' PasientGUID = c("1","2","3"),
+#' dato_diag = as.Date(c("2014-01-01", "2015-02-02", "2016-03-03")),
+#' diag_stilt_aar = c(2014, 2015, 2016),
+#' diaggrupper_med = c(2L, 1L, 1L),
+#' Kode = c("L405", "M059", "M059"),
+#' Navn = c("Psoriasisartritt", "Seropositiv revmatoid artritt", "Seropositiv revmatoid artritt"),
+#' dager_diag_til_datadump = c(4383, 4018, 3653)
+#' )
+#'
+#' d_inkl = tibble::tibble(
+#' PasientGUID = c("1", "2", "3"),
+#' UnitId = c(110629, 4210041, 102977),
+#' InklusjonDato = as.Date(c("2014-01-10", "2015-02-10", "2016-03-10")),
+#' DeathDate = as.POSIXct(c("2026-01-22 01:00:00", "2026-02-10 01:00:00",
+#' "2025-10-06 00:00:00"), format = "%Y-%m-%d %H:%M:%OS")
+#' )
+#'
+#' d_ra_ind = lag_ra_indikator_base(d_diag, d_inkl)
 lag_ra_indikator_base = function(d_diag, d_inkl) {
   d_ra_base = d_diag |>
     arrange(dato_diag) |>
@@ -299,8 +326,10 @@ lag_ra_indikator_base = function(d_diag, d_inkl) {
       diaggrupper_med == 1,
       diag_stilt_aar >= 2014,
     ) |>
-    select(PasientGUID, Kode, Navn, dato_diag, diag_stilt_aar, dager_diag_til_datadump) |>
-    left_join(select(d_inkl, PasientGUID, UnitId, InklusjonDato, DeathDate),
+    select("PasientGUID", "Kode", "Navn", "dato_diag", "diag_stilt_aar",
+           "dager_diag_til_datadump") |>
+    left_join(select(d_inkl, "PasientGUID", "UnitId",
+                     "InklusjonDato", "DeathDate"),
       by = "PasientGUID",
       relationship = "one-to-one"
     ) |>

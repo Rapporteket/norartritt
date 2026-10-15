@@ -4,7 +4,7 @@
 \alias{lag_filtrerte_objekter}
 \title{Lag filtrerte objekter}
 \usage{
-lag_filtrerte_objekter(d_inkl, d_diag, d_med, d_oppf)
+lag_filtrerte_objekter(d_inkl, d_diag, d_med, d_oppf, datadump_dato = NULL)
 }
 \arguments{
 \item{d_inkl}{Inklusjonsdatasett fra NorArtritt}
@@ -12,6 +12,10 @@ lag_filtrerte_objekter(d_inkl, d_diag, d_med, d_oppf)
 \item{d_diag}{Diagnosedatasett fra NorArtritt}
 
 \item{d_med}{Medisindatasett fra NorArtritt}
+
+\item{d_oppf}{Oppfølgingsskjema fra NorArtritt}
+
+\item{datadump_dato}{Dato for datauttrekk}
 }
 \value{
 Returnerer objektene d_med_vasket, d_diag_pers og d_diag_med til det
