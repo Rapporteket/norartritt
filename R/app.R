@@ -17,8 +17,8 @@ appUi = function() {
       tabPanel(
         title = "Veiledning",
         value = "tab_veiledning",
-        navbarWidgetInput("navbar-widget", selectOrganization = TRUE),
         mainPanel(width = 12,
+                  navbarWidgetInput("navbar-widget", selectOrganization = TRUE),
                   htmlOutput("veiledning", inline = TRUE)
         )
       ),
@@ -175,6 +175,12 @@ appServer <- function(input, output, session) {
 
   # logShinyInputChanges(input)
 
+  map_orgname = get_org_access() |>
+    rename("orgname" = Title)
+
+  rapbase::navbarWidgetServer2("navbar-widget",
+                      orgName = "NorArtritt",
+                      map_orgname = map_orgname)
 
   # reportParams <- reactive(
   #   list(
