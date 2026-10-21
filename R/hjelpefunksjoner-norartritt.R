@@ -194,13 +194,14 @@ legg_til_diagnosegrupper = function(d) {
       "T845","M192","M230","M163","M246","M050","M232","M224","M064","M063",
       "M109","M241","M000","M204","T840","S834","G98;","M180","M165","M150",
       "D868","M191","S821","M100","M660","M713","M259","M125","M128","M779",
-      "M750","M463","M173")
+      "M750","M463","M173", "S835", "M205", "M122", "M189", "M712", "M234",
+      "M008", "M233")
 
   ukjent_kode = setdiff(d$Kode, norartritt::diagnosekobling$Kode)
   ukjent_kode = ukjent_kode[!ukjent_kode %in% uaktuelle_diagnoser_fra_HP]
   ukjent_kode = ukjent_kode[!is.na(ukjent_kode)]
 
-  if (length(ukjent_kode) > 0) {
+  if (length(ukjent_kode[ukjent_kode != ""]) > 0) {
     stop(
       "Kode: ",
       str_c(ukjent_kode, collapse = ", "),
@@ -208,7 +209,10 @@ legg_til_diagnosegrupper = function(d) {
     )
   }
 
-  d = left_join(d, norartritt::diagnosekobling, by = "Kode")
+  d = left_join(d |>
+                filter_out(Kode %in% uaktuelle_diagnoser_fra_HP),
+                norartritt::diagnosekobling,
+                by = "Kode")
 
   # Leddsykdom har ikke kode i registeret, så den må håndteres manuelt.
   d = d |>
@@ -246,7 +250,8 @@ legg_til_diagnosegrupper = function(d) {
           Navn == "Leddsykdom",
           "Udifferensiert"
         )
-    )
+    ) |>
+    filter_out(Navn != "Leddsykdom" & is.na(Kode)) # Tar vekk skjema uten Kode (Kommer fra HP)
 
   d
 }
