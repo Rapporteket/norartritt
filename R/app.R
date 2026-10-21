@@ -18,7 +18,9 @@ appUi = function() {
         title = "Veiledning",
         value = "tab_veiledning",
         mainPanel(width = 12,
-                  navbarWidgetInput("navbar-widget", selectOrganization = TRUE),
+                  navbarWidgetInput("navbar-widget",
+                                    addUserInfo = TRUE,
+                                    selectOrganization = TRUE),
                   htmlOutput("veiledning", inline = TRUE)
         )
       ),
@@ -173,25 +175,29 @@ appUi = function() {
 #' @export
 appServer <- function(input, output, session) {
 
-  # logShinyInputChanges(input)
 
-  map_orgname = get_org_access() |>
+# Reaktive elementer -------------------------------------------
+  map_orgname = norartritt:::get_org_access() |>
     rename("orgname" = Title)
 
-  rapbase::navbarWidgetServer2("navbar-widget",
-                      orgName = "NorArtritt",
-                      map_orgname = map_orgname)
+  user = rapbase::navbarWidgetServer2("navbar-widget",
+                                      orgName = "NorArtritt",
+                                      caller = "norartritt",
+                      map_orgname = req(map_orgname))
 
-  # reportParams <- reactive(
-  #   list(
-  #     hospitalName = hospitalName(),
-  #     reshId = user$org(),
-  #     registryName = registryName(),
-  #     userRole = user$role(),
-  #     userFullName = userFullName,
-  #     shinySession = session
-  #   )
-  # )
+  if(rapbase::isRapContext()){
+  reportParams <- reactive(
+    list(
+      hospitalName = hospitalName(),
+      reshId = user$org(),
+      registryName = registryName(),
+      userRole = user$role(),
+      userFullName <- Sys.getenv("FALK_USER_FULLNAME"),
+      shinySession = session
+    )
+  )
+  }
+
 
 # tabs --------------------------------------------------------------------
 
