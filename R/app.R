@@ -85,6 +85,19 @@ appUi = function() {
         ),
       ),
       tabPanel(
+        title = "Utforsker",
+        value = "tab_utforsker",
+        sidebarLayout(
+          sidebarPanel(
+            width = 4,
+            uiOutput("utforskerControl")
+          ),
+          mainPanel(
+            htmlOutput("dumpDataInfo")
+          )
+        )
+      ),
+      tabPanel(
         title = "Datadump",
         value = "tab_datadump",
         sidebarLayout(
