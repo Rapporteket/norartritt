@@ -21,7 +21,13 @@ appUi = function() {
                   navbarWidgetInput("navbar-widget",
                                     addUserInfo = TRUE,
                                     selectOrganization = TRUE),
-                  htmlOutput("veiledning", inline = TRUE)
+                  htmlOutput("veiledning", inline = TRUE),
+                  waiter::useWaiter(),
+                  waiter::waiterPreloader(html = waiter::spin_folding_cube(),
+                                          color = "#2C3E50",
+                                          image = "",
+                                          fadeout = TRUE,
+                                          logo = ""),
         )
       ),
       navbarMenu(
