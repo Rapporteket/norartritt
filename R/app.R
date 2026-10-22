@@ -40,10 +40,10 @@ appUi = function() {
           value = "tab_rapport_1",
           sidebarLayout(
             sidebarPanel(
-              shiny::renderText("SidebarPanel Placeholder")
+              defaultReportInput("rap1")
             ),
             mainPanel(
-              shiny::renderText("mainPanel placeholder")
+              defaultReportUI("rap1")
             )
           )
         ),
@@ -52,10 +52,10 @@ appUi = function() {
           value = "tab_rapport_2",
           sidebarLayout(
             sidebarPanel(
-              shiny::renderText("SidebarPanel Placeholder")
+              defaultReportInput("rap2")
             ),
             mainPanel(
-              shiny::renderText("mainPanel placeholder")
+              defaultReportUI("rap2")
             )
           )
         ),
@@ -64,10 +64,10 @@ appUi = function() {
           value = "tab_rapport_3",
           sidebarLayout(
             sidebarPanel(
-              shiny::renderText("SidebarPanel Placeholder")
+              defaultReportInput("rap3")
             ),
             mainPanel(
-              shiny::renderText("mainPanel placeholder")
+              defaultReportUI("rap3")
             )
           )
         ),
@@ -76,10 +76,10 @@ appUi = function() {
           value = "tab_rapport_4",
           sidebarLayout(
             sidebarPanel(
-              shiny::renderText("SidebarPanel Placeholder")
+              defaultReportInput("rap4")
             ),
             mainPanel(
-              shiny::renderText("mainPanel placeholder")
+              defaultReportUI("rap4")
             )
           )
         ),

@@ -2,6 +2,9 @@
 
 export(appServer)
 export(appUi)
+export(defaultReportInput)
+export(defaultReportServer)
+export(defaultReportUI)
 export(fjern_uaktuelle_diagnoser)
 export(fjern_ugyldige_skjema)
 export(hent_og_vask_data_norartritt_rapportek)
