@@ -13,6 +13,7 @@
 #' @param d_diag Diagnosedatasett, vanligvis d_full_Diagnoseskjema.
 #' @param d_med Medisindatasett, vanligvis d_full_Medisineringskjema.
 #' @param datadump_dato Dato for uttrekk av datadump.
+#' @param report Funksjon for å sende meldinger om fremgang.
 #'
 #' @return
 #' Returnerer filtrerte og *vaskede* datasett for ulike skjema i NorArtritt.
@@ -39,29 +40,37 @@
 #' Inneholder oversikt over dødsdato, hvor tilgjengelig.
 #'
 #' @export
-vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med, datadump_dato = NULL) {
+vask_data_norartritt = function(d_inkl, d_oppf,
+                                d_diag, d_med,
+                                datadump_dato = NULL,
+                                report = function(message) invisible(NULL)) {
 
-
-  # Legger sammen inklusjon og oppfølging
+  report("Slår sammen inklusjon og oppfølging …")
   d_inkl_oppf = bind_rows(d_inkl, d_oppf)
 
-  # Rett inklusjonsdato
-  d_inkl_oppf = velg_tidligste_inklusjondato(d_inkl_oppf = d_inkl_oppf)
+  report("Retter inklusjonsdato …")
+  d_inkl_oppf = velg_tidligste_inklusjondato(
+    d_inkl_oppf = d_inkl_oppf
+  )
 
-  # Pakk ut inklusjons og oppfølgingsskjema.
+  report("Skiller inklusjons- og oppfølgingsskjema …")
   d_inkl = filter(d_inkl_oppf, FormTypeId == 1)
   d_oppf = filter(d_inkl_oppf, FormTypeId == 2)
 
-  # Rett skjematype
-  d_inkl_oppf = konverter_skjematype(inkl = d_inkl, oppf = d_oppf)
+  report("Konverterer skjematype …")
+  d_inkl_oppf = konverter_skjematype(
+    inkl = d_inkl,
+    oppf = d_oppf
+  )
 
-  # Pakk ut inklusjons og oppfølgingsskjema.
   d_inkl = filter(d_inkl_oppf, FormTypeId == 1)
   d_oppf = filter(d_inkl_oppf, FormTypeId == 2)
 
   # Konsolidere skjemaGUIDs (For pasienter som har inklusjon/kontroll ved flere
   # sykehus vil det være ulike HovedskjemaGUIDs). Dette sikrer at alle oppfølginger
   # for den enkelte pasient følger med.
+
+  report("Kobler skjema sammen på pasient …")
   skjemaguid_kobling = d_inkl |>
     group_by(PasientGUID) |>
     arrange(FormDate) |>
@@ -93,38 +102,28 @@ vask_data_norartritt = function(d_inkl, d_oppf, d_diag, d_med, datadump_dato = N
       relationship = "many-to-one"
     )
 
-  # Filtrer bort ugyldige skjema
+  report("Filtrerer bort ugyldige skjema …")
   filtrerte_skjema = fjern_ugyldige_skjema(
     inkl = d_inkl,
     oppf = d_oppf,
     diag = d_diag,
     med = d_med
   )
-  inkl_filtrert = filtrerte_skjema[[1]]
-  oppf_filtrert = filtrerte_skjema[[2]]
-  diag_filtrert = filtrerte_skjema[[3]]
-  med_filtrert = filtrerte_skjema[[4]]
 
-  # Legg til datovariabler
+  report("Legger til datovariabler …")
   skjema = legg_til_datovariabler(
-    d_inkl = inkl_filtrert, d_oppf = oppf_filtrert,
-    d_diag = diag_filtrert, d_med = med_filtrert
+    d_inkl = filtrerte_skjema[[1]],
+    d_oppf = filtrerte_skjema[[2]],
+    d_diag = filtrerte_skjema[[3]],
+    d_med = filtrerte_skjema[[4]]
   )
 
-  # Trekker ut de ulike skjematypene fra skjema objekt
-  d_inkl = skjema[[1]]
-  d_oppf = skjema[[2]]
-  d_diag = skjema[[3]]
-  d_med = skjema[[4]]
-
-  # strukturer variabler som mangler kodebok
-
-  # Lag utvalgte ferdigfiltrerte objekter
+  report("Lager filtrerte objekter …")
   lag_filtrerte_objekter(
-    d_inkl = d_inkl,
-    d_oppf = d_oppf,
-    d_diag = d_diag,
-    d_med = d_med,
+    d_inkl = skjema[[1]],
+    d_oppf = skjema[[2]],
+    d_diag = skjema[[3]],
+    d_med = skjema[[4]],
     datadump_dato = datadump_dato
   )
 }

@@ -4,7 +4,14 @@
 \alias{vask_data_norartritt}
 \title{vask data norartritt}
 \usage{
-vask_data_norartritt(d_inkl, d_oppf, d_diag, d_med, datadump_dato = NULL)
+vask_data_norartritt(
+  d_inkl,
+  d_oppf,
+  d_diag,
+  d_med,
+  datadump_dato = NULL,
+  report = function(message) invisible(NULL)
+)
 }
 \arguments{
 \item{d_inkl}{Inklusjonsdatasett, vanligvis d_full_Inklusjonsskjema.}
@@ -16,6 +23,8 @@ vask_data_norartritt(d_inkl, d_oppf, d_diag, d_med, datadump_dato = NULL)
 \item{d_med}{Medisindatasett, vanligvis d_full_Medisineringskjema.}
 
 \item{datadump_dato}{Dato for uttrekk av datadump.}
+
+\item{report}{Funksjon for å sende meldinger om fremgang.}
 }
 \value{
 Returnerer filtrerte og \emph{vaskede} datasett for ulike skjema i NorArtritt.

@@ -23,11 +23,14 @@ appUi = function() {
                                     selectOrganization = TRUE),
                   htmlOutput("veiledning", inline = TRUE),
                   waiter::useWaiter(),
-                  waiter::waiterPreloader(html = waiter::spin_folding_cube(),
-                                          color = "#2C3E50",
-                                          image = "",
-                                          fadeout = TRUE,
-                                          logo = ""),
+                  waiter::waiterPreloader(
+                    html = tagList(
+                      waiter::spin_folding_cube(),
+                      shiny::p("Laster og klargjør data …")
+                    ),
+                    color = "#2C3E50",
+                    fadeout = TRUE
+                  ),
         )
       ),
       navbarMenu(
@@ -204,6 +207,30 @@ appServer <- function(input, output, session) {
   )
   }
 
+# Laste data --------------------------------------------------------------
+  waiter::waiter_show(
+    html = tagList(
+      waiter::spin_folding_cube(),
+      shiny::p("Starter databehandling …")
+    ),
+    color = "#2C3E50"
+  )
+
+  tryCatch(
+    {
+      hent_og_vask_data_norartritt_rapportek(
+        report = function(message) {
+          waiter::waiter_update(
+            html = tagList(
+              waiter::spin_folding_cube(),
+              shiny::p(message)
+            )
+          )
+        }
+      )
+    },
+    finally = waiter::waiter_hide()
+  )
 
 # tabs --------------------------------------------------------------------
 
