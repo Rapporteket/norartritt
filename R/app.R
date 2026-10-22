@@ -197,7 +197,6 @@ appUi = function() {
 #' @export
 appServer <- function(input, output, session) {
 
-
 # Reaktive elementer -------------------------------------------
   map_orgname = norartritt:::get_org_access() |>
     rename("orgname" = Title)
@@ -251,10 +250,21 @@ appServer <- function(input, output, session) {
 # Output ------------------------------------------------------------------
 
   # Veiledning
-  output$veiledning <- renderUI({
+  output$veiledning = renderUI({
     renderRmd(
       system.file("Veiledning.Rmd", package = "norartritt"),
       outputType = "html_fragment"
     )
+  })
+  dumps = c("Inklusjon", "Oppfølging", "Medisinering", "Diagnose")
+
+  # Utforsker
+  output$dumpTabControl = renderUI({
+    selectInput("skjema", "Velg skjema:", dumps)
+  })
+
+  # Datadump
+  output$dumpTabControl = renderUI({
+    selectInput("dumpDataSet", "Velg datasett:", dumps)
   })
 }
