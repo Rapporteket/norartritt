@@ -5,14 +5,12 @@
 \alias{defaultReportInput}
 \alias{defaultReportUI}
 \alias{defaultReportServer}
-\alias{defaultReportServer2}
-\alias{defaultReportApp}
 \title{Shiny modules for Norartritt at Rapportket}
 \usage{
 defaultReportInput(
   id,
   startDate = today() - years(1),
-  endDate = today() - weeks(1),
+  endDate = today() - days(1),
   min = "1980-01-01",
   max = "2100-01-01"
 )
@@ -20,10 +18,6 @@ defaultReportInput(
 defaultReportUI(id)
 
 defaultReportServer(id, reportFileName, reportParams)
-
-defaultReportServer2(id, reportFileName, reportParams)
-
-defaultReportApp()
 }
 \arguments{
 \item{id}{Character string with module id (namespace).}
